@@ -11,6 +11,7 @@ export const useStockUnits = (
     color?: string;
     in_stock?: boolean;
     status?: string;
+    specified?: string;
   },
 ) =>
   useQuery({

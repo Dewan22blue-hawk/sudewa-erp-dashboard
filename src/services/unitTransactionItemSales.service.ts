@@ -15,7 +15,8 @@ export const unitTransactionItemSalesService = {
       {
         params: {
           company_id: companyId,
-          // in_stock: 'true',
+          in_stock: 'true',
+          stock_state: 'receipt'
         },
       }
     );
@@ -29,6 +30,8 @@ export const unitTransactionItemSalesService = {
       chassis_number: String(detail.chassis_number ?? '-'),
       in_stock: detail.in_stock === true || detail.in_stock === 1 || detail.in_stock === '1',
       status: String(detail.status ?? ''),
+      warehouse_sub_block: detail.warehouse_sub_block,
+      stock_state: detail.stock_state ?? null,
     }));
   },
 

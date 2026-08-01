@@ -49,19 +49,19 @@ export interface ApiResponse<T> {
 }
 
 export const getTaxes = async (page: number = 1, perPage: number = 25, search: string = '') => {
-  const response = await apiClient.get<ApiResponse<PaginatedResponse<Tax>>>(`/wapi/settings/tax`, {
+  const response = await apiClient.get<ApiResponse<PaginatedResponse<Tax>>>(`/wapi/master-data/tax`, {
     params: { page, limit: perPage, search },
   });
   return response.data;
 };
 
 export const getTaxDetail = async (id: number) => {
-  const response = await apiClient.get<ApiResponse<Tax>>(`/wapi/settings/tax/${id}`);
+  const response = await apiClient.get<ApiResponse<Tax>>(`/wapi/master-data/tax/${id}`);
   return response.data;
 };
 
 export const getDefaultTaxByCode = async (taxCode: string) => {
-  const response = await apiClient.get<ApiResponse<TaxVersion>>(`/wapi/settings/tax/${taxCode}/default`);
+  const response = await apiClient.get<ApiResponse<TaxVersion>>(`/wapi/master-data/tax/${taxCode}/default`);
   return response.data;
 };
 
@@ -69,7 +69,7 @@ export const createTax = async (data: { code: string; name: string }) => {
   const formData = new FormData();
   formData.append('code', data.code);
   formData.append('name', data.name);
-  const response = await apiClient.post<ApiResponse<Tax>>(`/wapi/settings/tax`, formData);
+  const response = await apiClient.post<ApiResponse<Tax>>(`/wapi/master-data/tax`, formData);
   return response.data;
 };
 
@@ -78,11 +78,11 @@ export const updateTax = async (id: number, data: { code: string; name: string }
   formData.append('code', data.code);
   formData.append('name', data.name);
   formData.append('_method', 'PUT');
-  const response = await apiClient.post<ApiResponse<Tax>>(`/wapi/settings/tax/${id}`, formData);
+  const response = await apiClient.post<ApiResponse<Tax>>(`/wapi/master-data/tax/${id}`, formData);
   return response.data;
 };
 
 export const deleteTax = async (id: number) => {
-  const response = await apiClient.delete<ApiResponse<any>>(`/wapi/settings/tax/${id}`);
+  const response = await apiClient.delete<ApiResponse<any>>(`/wapi/master-data/tax/${id}`);
   return response.data;
 };

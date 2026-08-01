@@ -73,7 +73,20 @@ type UnitTransactionApiModel = {
     remaining_payment?: number | string;
     is_paid?: boolean;
   } | null;
-  unit_transaction_adjustments?: any[];
+  has_refund_transaction?: boolean;
+  warehouse_activity?: {
+    id?: number | string;
+    uuid?: string;
+    person_id?: number | string;
+    cash_id?: number | string;
+    warehouse_id?: number | string;
+    unit_transaction_id?: number | string;
+    activity_number?: string;
+    activity_type?: string;
+    activity_date?: string;
+    description?: string;
+    state?: string;
+  }
 };
 
 type UnitTransactionItemListApiModel = {
@@ -468,8 +481,23 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
         unit_transaction_billing_histories: (item.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map(mapBillingHistoryRow),
       }
       : null,
-    unit_transaction_adjustments: item.unit_transaction_adjustments ?? [],
-    unit_transaction_items: item.unit_transaction_items ?? [],
+    has_refund_transaction: Boolean(item.has_refund_transaction),
+    warehouse_activity: item.warehouse_activity
+      ? {
+        id: toNumber(item.warehouse_activity.id),
+        uuid: item.warehouse_activity.uuid ?? '',
+        person_id: toNumber(item.warehouse_activity.person_id),
+        cash_id: item.warehouse_activity.cash_id ? toNumber(item.warehouse_activity.cash_id) : null,
+        warehouse_id: toNumber(item.warehouse_activity.warehouse_id),
+        unit_transaction_id: item.warehouse_activity.unit_transaction_id ? toNumber(item.warehouse_activity.unit_transaction_id) : null,
+        activity_number: item.warehouse_activity.activity_number ?? '',
+        activity_type: item.warehouse_activity.activity_type ?? '',
+        activity_date: item.warehouse_activity.activity_date ?? '',
+        description: item.warehouse_activity.description ?? null,
+        state: item.warehouse_activity.state ?? '',
+      }
+      : null,
+    unit_transaction_items: item.unit_transaction_items,
   };
 };
 

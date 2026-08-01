@@ -14,7 +14,6 @@ export default function StockUnitPage() {
   const { companyId } = useCompany();
 
   const [search, setSearch] = useState('');
-  // State for the hook's parameters
   const [hookPage, setHookPage] = useState(1);
   const [hookPerPage, setHookPerPage] = useState(25);
   const [stockState, setStockState] = useState<StockStatus | undefined>(undefined);

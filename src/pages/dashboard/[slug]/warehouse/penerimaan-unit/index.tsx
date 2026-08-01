@@ -2,9 +2,7 @@
 import { LoadingState } from '@/components/ui/loading-state';
 
 import { useMemo, useState } from 'react';
-import { Plus } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Button } from '@/components/ui/button';
 import PenerimaanUnitTable from '@/components/features/penerimaan-unit/PenerimaanUnitTable';
 import PenerimaanUnitFormDialog from '@/components/features/penerimaan-unit/PenerimaanUnitFormDialog';
 import { useWarehouseActivities } from '@/hooks/useWarehouseActivity';
@@ -23,7 +21,6 @@ export default function PenerimaanUnitPage() {
   });
 
   const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('warehouse:create');
 
   const allData = useMemo(() => activities?.data ?? [], [activities?.data]);
 
@@ -58,6 +55,14 @@ export default function PenerimaanUnitPage() {
     const err = error as { message?: string } | null;
     return err?.message || 'Gagal memuat data penerimaan unit';
   }, [error, isError]);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <LoadingState variant="page" />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

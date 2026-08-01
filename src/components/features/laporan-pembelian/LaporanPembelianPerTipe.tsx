@@ -96,7 +96,7 @@ export default function LaporanPembelianPerTipe({ data, pagination, isLoading, o
         ),
       },
     ],
-    [pagination.currentPage, pagination.perPage]
+    [pagination.currentPage, pagination.perPage, slug]
   );
 
   return (

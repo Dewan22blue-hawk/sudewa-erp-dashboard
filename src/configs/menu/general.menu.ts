@@ -59,6 +59,14 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: master('/asset'),
         },
         {
+          label: 'Pajak',
+          href: master('/tax'),
+        },
+        {
+          label: 'Blok Gudang',
+          href: master('/warehouse-block'),
+        },
+        {
           label: 'Perlengkapan',
           href: master('/vehicle-equipment'),
         },
@@ -212,16 +220,16 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         },
       ],
     },
-    {
-      label: 'Pengaturan',
-      icon: Settings,
-      children: [
-        {
-          label: 'Pajak',
-          href: settings('/tax'),
-        },
-      ],
-    },
+    // {
+    //   label: 'Pengaturan',
+    //   icon: Settings,
+    //   children: [
+    //     {
+    //       label: 'Pajak',
+    //       href: settings('/tax'),
+    //     },
+    //   ],
+    // },
     {
       label: 'Manajemen Pengguna',
       icon: Shield,

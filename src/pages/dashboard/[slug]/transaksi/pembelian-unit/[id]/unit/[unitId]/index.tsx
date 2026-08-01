@@ -6,7 +6,6 @@ import { DollarSignIcon, FileText, Info, ListTodoIcon, MoreVertical, Plus, Uploa
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { usePurchaseById } from '@/hooks/useUnitTransaction';
-import { useTypeUnits } from '@/hooks/useTypeUnit';
 import {
   useCreateUnitItemDetail,
   useDeleteUnitItemDetail,
@@ -101,7 +100,6 @@ export default function UnitPurchaseDetailPage() {
   const { data: purchase, isLoading: purchaseLoading } = usePurchaseById(purchaseId);
   const { data: unitItem, isLoading: unitItemLoading, isError: unitItemError } = useUnitTransactionItemById(unitItemId);
   const { data: detailResponse } = useUnitItemDetails(unitItemId);
-  const { data: typeUnits } = useTypeUnits();
 
   const createMutation = useCreateUnitItemDetail();
   const updateMutation = useUpdateUnitItemDetail();
@@ -127,6 +125,7 @@ export default function UnitPurchaseDetailPage() {
   });
 
   const details = useMemo(() => detailResponse?.data ?? [], [detailResponse?.data]);
+
   const isPaid = purchase?.unit_transaction_billing?.is_paid;
 
   const filteredDetails = useMemo(() => {
@@ -148,6 +147,13 @@ export default function UnitPurchaseDetailPage() {
   const columns = useMemo(
     () => [
       {
+        header: 'Warna',
+        accessorKey: 'color',
+        sortable: true,
+        alignment: 'left' as const,
+        cell: (details: any) => details.color,
+      },
+      {
         header: 'Nomor Mesin',
         accessorKey: 'machine_number',
         sortable: true,
@@ -164,25 +170,56 @@ export default function UnitPurchaseDetailPage() {
         cell: (details: any) => <CopyBox text={`${details.chassis_number}`} />,
       },
       {
-        header: 'Warna',
-        accessorKey: 'color',
+        header: 'Sub Blok',
+        accessorKey: 'warehouseSubBlock',
+        alignment: 'center' as const,
         sortable: true,
-        alignment: 'left' as const,
-        cell: (details: any) => details.color,
+        tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
+        cell: (details: any) => details.warehouse_sub_block?.name ? details.warehouse_sub_block?.name : <Badge variant='outline' className="font-semibold bg-white">Belum Ditambahkan</Badge>,
       },
       {
         header: 'Status Stok',
         accessorKey: 'in_stock',
         sortable: true,
-        alignment: 'left' as const,
+        alignment: 'center' as const,
+        tooltip: 'Status ketersediaan unit fisik di gudang',
         cell: (details: any) => details.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia</Badge>
       },
       {
         header: 'Kondisi Stok',
         accessorKey: 'status',
         sortable: true,
-        alignment: 'left' as const,
+        alignment: 'center' as const,
+        tooltip: 'Kondisi fisik unit saat ini',
         cell: (details: any) => renderStatus(details.status),
+      },
+      {
+        header: 'Posisi Stok',
+        accessorKey: 'stock_state',
+        sortable: true,
+        alignment: 'center' as const,
+        tooltip: 'Posisi logistik atau status alur stok unit',
+        cell: (details: any) => {
+          const config: Record<string, { label: string; name: string; className: string }> = {
+            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
+            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
+            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
+            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
+            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
+            receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+          };
+          const stateVal = details?.stock_state ?? 'draft';
+          const match = config[stateVal] ?? {
+            label: stateVal.replace(/_/g, ' '),
+            className: 'border-slate-200 bg-slate-50 text-slate-700',
+          };
+
+          return (
+            <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+              {match.name ?? match.label}
+            </Badge>
+          );
+        }
       },
       {
         header: 'aksi',
@@ -209,11 +246,6 @@ export default function UnitPurchaseDetailPage() {
     ],
     [canDelete, canEdit, isPaid],
   );
-
-  const unitTypeName = useMemo(() => {
-    if (!unitItem?.unit_type_id) return '-';
-    return typeUnits?.data?.find((item) => String(item.id) === String(unitItem.unit_type_id))?.name ?? unitItem.unit_type_id;
-  }, [typeUnits, unitItem]);
 
   const qty = Number(unitItem?.qty_total ?? 0);
   const price = Number(unitItem?.price ?? 0);
@@ -396,7 +428,7 @@ export default function UnitPurchaseDetailPage() {
                 <div className="text-sm text-slate-600">
                   <p>Tipe Unit</p>
                   <p className="font-semibold text-slate-900">
-                    <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${unitTypeName}`}>{unitTypeName}</ReferenceLink>
+                    <ReferenceLink href={`/dashboard/${slug}/master/type-unit/${unitItem?.unit_type?.id}`}>{unitItem?.unit_type?.name}</ReferenceLink>
                   </p>
                 </div>
               </CardContent>
@@ -557,7 +589,7 @@ export default function UnitPurchaseDetailPage() {
                         Hapus ({selectedIds.size})
                       </Button>
                     )}
-                    {canCreate && !isPaid && (
+                    {canCreate && (
                       <>
                         <Button onClick={() => setOpenImport(true)} disabled={qty === details.length} variant="outline" className="w-full sm:w-auto font-medium shadow-sm">
                           <Upload className="h-4 w-4 mr-2" />

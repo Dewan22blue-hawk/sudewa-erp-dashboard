@@ -97,6 +97,7 @@ export function SalesPaymentForm({
     const totalPaid = Math.max(totalPaidFromBilling, historyPaid);
     const billingRemaining = Number(billing?.remaining_payment ?? 0);
     const remainingPayment = billing?.is_paid ? 0 : billingRemaining > 0 ? billingRemaining : Math.max(0, totalTagihan - totalPaid);
+    const isPaidAndValid = billing ? billing?.is_paid : false;
 
     const paymentBca = Number(form.watch('bcaPayment') ?? 0); // BCA USD
     const paymentCash = Number(form.watch('cashPayment') ?? 0); // CASH IDR
@@ -226,7 +227,7 @@ export function SalesPaymentForm({
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setDeleteId(item.id)}
-                                disabled={loading}
+                                disabled={loading || !!billing?.is_paid}
                                 type="button"
                             >
                                 <Trash className="w-4 h-4 text-red-500" />
@@ -236,7 +237,7 @@ export function SalesPaymentForm({
                 ]
                 : []),
         ],
-        [loading, onDeleteHistory],
+        [loading, onDeleteHistory, billing],
     );
 
     return (
@@ -324,6 +325,7 @@ export function SalesPaymentForm({
                                     <Input
                                         type="date"
                                         value={form.watch('paymentDate')}
+                                        disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                         onChange={(e) => form.setValue('paymentDate', e.target.value)}
                                     />
                                 </div>
@@ -338,7 +340,7 @@ export function SalesPaymentForm({
                                                     type="text"
                                                     inputMode="decimal"
                                                     value={field.value}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChange={(e) => {
                                                         let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
                                                         const parts = val.split('.');
@@ -364,7 +366,7 @@ export function SalesPaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChangeValue={(val) => {
                                                         const capped = parseAndClampMoneyInput(val, maxBca2);
                                                         field.onChange(capped);
@@ -386,7 +388,7 @@ export function SalesPaymentForm({
                                                 <MoneyInput
                                                     name={field.name}
                                                     value={Number(field.value) || 0}
-                                                    disabled={billingRemaining === 0}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChangeValue={(val) => {
                                                         const capped = parseAndClampMoneyInput(val, maxCash);
                                                         field.onChange(capped);
@@ -416,6 +418,7 @@ export function SalesPaymentForm({
                                                 <Textarea
                                                     placeholder="Catatan pembayaran (opsional)"
                                                     {...field}
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     value={field.value ?? ''}
                                                 />
                                             </FormControl>
@@ -432,13 +435,13 @@ export function SalesPaymentForm({
                                 type="button"
                                 variant="outline"
                                 onClick={onCancel}
-                                disabled={loading || billingRemaining === 0}
+                                disabled={loading}
                             >
                                 Batal
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={loading || !canSubmit || billingRemaining === 0}
+                                disabled={loading || !canSubmit || billing && billingRemaining === 0 || isPaidAndValid}
                                 className="bg-green-600 hover:bg-green-700 text-white min-w-[120px]"
                             >
                                 {loading ? (
@@ -487,6 +490,7 @@ export function SalesPaymentForm({
                                     setDeleteId(null);
                                 }
                             }}
+                            disabled={!!billing?.is_paid}
                             className="rounded-md bg-red-600 hover:bg-red-700"
                         >
                             Hapus

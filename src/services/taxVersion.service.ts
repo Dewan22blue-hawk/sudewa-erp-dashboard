@@ -2,14 +2,14 @@ import { apiClient } from '@/lib/api/client';
 import { ApiResponse, PaginatedResponse, TaxVersion } from './tax.service';
 
 export const getTaxVersions = async (page: number = 1, perPage: number = 25, search: string = '', tax_id?: number) => {
-  const response = await apiClient.get<ApiResponse<PaginatedResponse<TaxVersion>>>(`/wapi/settings/tax-version`, {
+  const response = await apiClient.get<ApiResponse<PaginatedResponse<TaxVersion>>>(`/wapi/master-data/tax-version`, {
     params: { page, limit: perPage, search, tax_id },
   });
   return response.data;
 };
 
 export const getTaxVersionDetail = async (id: number) => {
-  const response = await apiClient.get<ApiResponse<TaxVersion>>(`/wapi/settings/tax-version/${id}`);
+  const response = await apiClient.get<ApiResponse<TaxVersion>>(`/wapi/master-data/tax-version/${id}`);
   return response.data;
 };
 
@@ -30,8 +30,8 @@ export const createTaxVersion = async (data: CreateUpdateTaxVersionDTO) => {
   if (data.effective_from) formData.append('effective_from', data.effective_from);
   if (data.effective_until) formData.append('effective_until', data.effective_until);
   formData.append('is_default', data.is_default ? '1' : '0');
-  
-  const response = await apiClient.post<ApiResponse<TaxVersion>>(`/wapi/settings/tax-version`, formData);
+
+  const response = await apiClient.post<ApiResponse<TaxVersion>>(`/wapi/master-data/tax-version`, formData);
   return response.data;
 };
 
@@ -45,11 +45,11 @@ export const updateTaxVersion = async (id: number, data: CreateUpdateTaxVersionD
   formData.append('is_default', data.is_default ? '1' : '0');
   formData.append('_method', 'PUT');
 
-  const response = await apiClient.post<ApiResponse<TaxVersion>>(`/wapi/settings/tax-version/${id}`, formData);
+  const response = await apiClient.post<ApiResponse<TaxVersion>>(`/wapi/master-data/tax-version/${id}`, formData);
   return response.data;
 };
 
 export const deleteTaxVersion = async (id: number) => {
-  const response = await apiClient.delete<ApiResponse<any>>(`/wapi/settings/tax-version/${id}`);
+  const response = await apiClient.delete<ApiResponse<any>>(`/wapi/master-data/tax-version/${id}`);
   return response.data;
 };

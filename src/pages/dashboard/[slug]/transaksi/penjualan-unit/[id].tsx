@@ -4,14 +4,13 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Wallet, AlertTriangle, Info } from 'lucide-react';
 import { SalesDetailCards } from '@/components/features/sales/detail/SalesDetailCards';
 import { SalesUnitTable } from '@/components/features/sales/detail/SalesUnitTable';
 import { toast } from 'sonner';
-import { useSalesDetail } from '@/hooks/useSales';
+import { useSalesById } from '@/hooks/useSales';
 import { useCurrentBilling, useBillingHistory, useUpdateBillingIsPaid, useUnitBillings } from '@/hooks/useUnitBilling';
 import { useUpdateUnitTransactionState } from '@/hooks/useUnitTransaction';
-import { mapSalesDetailCard, mapSalesDetailToUI } from '@/services/sales.mapper';
+import { mapSalesDetailToUI } from '@/services/sales.mapper';
 import { warehouseActivityService } from '@/services/warehouseActivity.service';
 import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 import { useQueryClient } from '@tanstack/react-query';
@@ -24,98 +23,117 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { formatDate } from '@/lib/utils/format';
 import { LoadingState } from '@/components/ui/loading-state';
+import { useCompany } from '@/contexts/CompanyContext';
+import { CreditCard, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { TextTruncate } from '@/components/ui/text-truncate';
 
-/**
- * Detail Data Penjualan Unit - Image 4
- */
 export default function SalesDetailPage() {
   const router = useRouter();
-  const { id } = router.query;
-  const salesId = Array.isArray(id) ? id[0] : id;
-  const { slug } = router.query;
-  const { data, isLoading } = useSalesDetail(salesId);
-
-  useEffect(() => {
-    if (!isLoading && data && data.raw?.type !== 'sales') {
-      router.push(`/dashboard/${slug}/transaksi/penjualan-unit`);
-    }
-  }, [data, isLoading, router, slug]);
-
   const { hasPermission } = usePermissionGuard();
-  const canCreate = hasPermission('transaction:create');
   const canEdit = hasPermission('transaction:edit');
   const canDelete = hasPermission('transaction:delete');
+  const canCreate = hasPermission('transaction:create');
 
-  const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
-  const salesData = data?.ui ?? null;
-  const rawData = data?.raw ?? null;
-
-  const { data: billings = [] } = useUnitBillings(data?.raw?.id);
-
-  const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(salesId ?? ''));
+  const { slug, id } = router.query;
+  const { data: sales, isLoading, isError } = useSalesById(id as string);
+  const { data: billings = [] } = useUnitBillings(sales?.id);
+  const { data: currentBilling, isLoading: billingLoading } = useCurrentBilling(String(sales?.id ?? ''));
   const billingId = String(currentBilling?.id ?? '');
-  const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(salesId ?? ''));
-  const stockState = String(rawData?.stock_state ?? '').toLowerCase();
-  const isRefunded = stockState === 'outbound_return';
+  const { data: billingHistories = [], isLoading: historyLoading } = useBillingHistory(billingId || undefined, String(sales?.id ?? ''));
+  const updateState = useUpdateUnitTransactionState();
+  const updateBillingIsPaid = useUpdateBillingIsPaid();
 
   const [isMarkAsPaidDialogOpen, setIsMarkAsPaidDialogOpen] = useState(false);
   const [isDeliveryDialogOpen, setIsDeliveryDialogOpen] = useState(false);
+  const { companyId } = useCompany();
   const queryClient = useQueryClient();
-  const updateBillingIsPaid = useUpdateBillingIsPaid();
-  const updateState = useUpdateUnitTransactionState();
 
-  const SALES_PREPARE_STOCK_STATE = 'outbound_in_transit';
-  const SALES_DELIVERED_STOCK_STATE = 'outbound_delivered';
-  const SALES_DELIVERED_STATE_SET = new Set(['outbound_delivered', 'delivered']);
+  useEffect(() => {
+    if (!isLoading && sales && sales?.type !== 'sales') {
+      router.push(`/dashboard/${slug}/transaksi/penjualan-unit`);
+    }
+  }, [sales, isLoading, router, slug]);
 
-  const isAlreadyDelivered = SALES_DELIVERED_STATE_SET.has(stockState);
+  const salesData = useMemo(() => {
+    return sales ? mapSalesDetailToUI(sales as any) : null;
+  }, [sales]);
 
-  const billingSummary = rawData?.billing_summary;
-  const totalTagihan = Number(billingSummary?.grand_total ?? rawData?.unit_transaction_bruto_total ?? 0);
-  const totalPaid = Number(billingSummary?.total_paid ?? 0);
+  const basePath = slug ? `/dashboard/${slug}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
 
+  const billingSummary = sales?.billing_summary;
+  const totalTagihan = Number(billingSummary?.grand_total ?? sales?.unit_transaction_bruto_total ?? sales?.unit_transaction_item_bruto_total ?? 0);
+  const totalPaid = Number(billingSummary?.total_paid ?? billings.reduce(
+    (acc: number, item: any) => acc + Number(item.bca_payment ?? 0) + Number(item.cash_payment ?? 0) + Number(item.bca_payment_2 ?? 0),
+    0,
+  ));
   const hasPaidBilling = billings.some((item: any) => Boolean(item.is_paid));
   const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
+  const currentStockState = String(sales?.stock_state ?? '').toLowerCase();
+  const isRefunded = sales?.has_refund_transaction;
 
-  const canDeliver = isPaid && !isAlreadyDelivered && !isRefunded;
+  const SALES_DELIVERED_STOCK_STATE = 'outbound_delivered';
+  const canDeliver = isPaid && (sales?.warehouse_activity ? sales?.warehouse_activity?.state === 'draft' : true);
+
+  const deliveryButtonText = useMemo(() => {
+    if (updateState.isPending) return 'Memproses...';
+    if (sales?.warehouse_activity?.state === 'done') return 'Selesai Diproses';
+    if (sales?.warehouse_activity?.state === 'process') return 'Sedang Diproses';
+    if (sales?.warehouse_activity?.state === 'draft') return 'Proses Pengiriman';
+    return 'Proses Barang';
+  }, [updateState.isPending, sales?.warehouse_activity?.state]);
+
   const resolvedBillingHistories =
     billingHistories.length > 0
       ? billingHistories
-      : (rawData?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
-        id: String((history as any).id ?? ''),
-        unit_transaction_billing_id: String((history as any).unit_transaction_billing_id ?? rawData?.unit_transaction_billing?.id ?? ''),
-        unit_transaction_id: String(salesId ?? ''),
-        payment_proof: (history as any).payment_proof ?? null,
+      : (sales?.unit_transaction_billing?.unit_transaction_billing_histories ?? []).map((history) => ({
+        id: String(history.id ?? ''),
+        unit_transaction_billing_id: String(history.unit_transaction_billing_id ?? sales?.unit_transaction_billing?.id ?? ''),
+        unit_transaction_id: sales?.id,
+        payment_proof: history.payment_proof ?? null,
         bca_payment_amount: Number((history as any).bca_payment_amount ?? (history as any).bca_payment ?? 0),
         cash_payment_amount: Number((history as any).cash_payment_amount ?? (history as any).cash_payment ?? 0),
         bca_payment_usd_amount: Number((history as any).bca_payment_usd_amount ?? (history as any).bca_payment_2 ?? 0),
-        payment_at: String((history as any).payment_at ?? ''),
-        note: (history as any).note,
-        created_at: (history as any).created_at,
-        updated_at: (history as any).updated_at,
+        payment_at: String(history.payment_at ?? ''),
+        note: history.note,
+        created_at: history.created_at,
+        updated_at: history.updated_at,
         cashes: (history as any).cashes,
       }));
 
-  const columns = useMemo<ColumnDef<any>[]>(
+  useEffect(() => {
+    if (router.query.print === 'true' && !isLoading && sales) {
+      setTimeout(() => {
+        window.print();
+      }, 800);
+    }
+  }, [router.query.print, isLoading, sales]);
+
+  const historyColumns = useMemo<ColumnDef<any>[]>(
     () => [
       {
         header: 'Tanggal',
         alignment: 'left',
-        cell: (item) =>
-          item.payment_at
-            ? formatDate(item?.payment_at)
+        cell: (history) =>
+          history.payment_at
+            ? formatDate(history?.payment_at)
             : '-',
+      },
+      {
+        header: 'Keterangan Bayar',
+        alignment: 'left',
+        cell: (history) => (
+          <TextTruncate text={history?.note ?? '-'} maxLength={20} className="break-all" />
+        ),
       },
       {
         header: 'Bukti Pembayaran',
         alignment: 'left',
-        cell: (item) =>
-          item.payment_proof ? (
+        cell: (history) =>
+          history.payment_proof ? (
             <a
-              href={item.payment_proof}
+              href={history.payment_proof}
               target="_blank"
               rel="noreferrer"
               className="text-blue-600 hover:underline text-xs font-medium"
@@ -129,55 +147,30 @@ export default function SalesDetailPage() {
       {
         header: 'Nominal Pembayaran BCA USD',
         alignment: 'right',
-        cell: (item) => currenciesFormat('usd', Number(item.bca_payment_usd_amount ?? 0))
+        cell: (history) => {
+          const usdPayment = Number(history.bca_payment_usd_amount ?? 0);
+          return usdPayment > 0 ? `$ ${usdPayment.toLocaleString('id-ID')}` : '-';
+        },
       },
       {
         header: 'Nominal Pembayaran BCA IDR',
         alignment: 'right',
-        cell: (item) => currenciesFormat('idr', Number(item.bca_payment_amount ?? 0))
+        cell: (history) => {
+          const bcaPayment = Number(history.bca_payment_amount ?? 0);
+          return bcaPayment > 0 ? `Rp ${bcaPayment.toLocaleString('id-ID')}` : '-';
+        },
       },
       {
         header: 'Nominal Pembayaran CASH IDR',
         alignment: 'right',
-        cell: (item) => currenciesFormat('idr', Number(item.cash_payment_amount ?? 0))
+        cell: (history) => {
+          const cashPayment = Number(history.cash_payment_amount ?? 0);
+          return cashPayment > 0 ? `Rp ${cashPayment.toLocaleString('id-ID')}` : '-';
+        },
       },
     ],
     []
   );
-
-  const mappedDetail = rawData
-    ? {
-      code: rawData.code ?? '-',
-      customerName: rawData.person?.name ?? '-',
-      warehouse: rawData.warehouse?.name ?? '-',
-      total: Number(rawData.unit_transaction_bruto_total ?? 0),
-      dpp: Number(rawData.unit_transaction_item_total_dpp ?? 0),
-      ppn: Number(rawData.unit_transaction_item_total_ppn ?? 0),
-    }
-    : {
-      code: '-',
-      customerName: '-',
-      warehouse: '-',
-      total: 0,
-      dpp: 0,
-      ppn: 0,
-    };
-
-  useEffect(() => {
-    if (!salesId || isLoading) return;
-
-    if (!salesData) {
-      toast.error('Data penjualan tidak ditemukan');
-    }
-  }, [salesData, salesId, isLoading, slug]);
-
-  useEffect(() => {
-    if (router.query.print === 'true' && !isLoading && salesData) {
-      setTimeout(() => {
-        window.print();
-      }, 800);
-    }
-  }, [router.query.print, isLoading, salesData]);
 
   const handleCreateUnit = () => {
     router.push(`${basePath}/${id}/create-unit`);
@@ -188,7 +181,7 @@ export default function SalesDetailPage() {
   };
 
   const handleMarkAsPaid = async () => {
-    const targetBillingId = String(currentBilling?.id || rawData?.unit_transaction_billing?.id || '');
+    const targetBillingId = String(currentBilling?.id || sales?.unit_transaction_billing?.id || billings[0]?.id || '');
     if (!targetBillingId) {
       toast.error('Data billing tidak ditemukan pada transaksi ini.');
       return;
@@ -204,11 +197,11 @@ export default function SalesDetailPage() {
   };
 
   const handleDelivery = async () => {
-    if (!salesId || !data) return;
+    if (!sales?.id) return;
 
     try {
-      const warehouseId = String(rawData?.warehouse?.id ?? (rawData as any)?.warehouse_id ?? '').trim();
-      const personId = String(rawData?.person?.id ?? (rawData as any)?.person_id ?? '').trim();
+      const warehouseId = String(sales.warehouse?.id ?? '').trim();
+      const personId = String(sales.person?.id ?? '').trim();
 
       if (!warehouseId) {
         toast.error('warehouse_id belum tersedia pada transaksi ini.');
@@ -221,9 +214,9 @@ export default function SalesDetailPage() {
         return;
       }
 
-      const items = rawData?.unit_transaction_items ?? [];
+      const items = sales?.unit_transaction_items ?? [];
       if (items.length === 0) {
-        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Kirim Barang.');
+        toast.error('Item transaksi belum tersedia. Tidak dapat melakukan Proses Barang.');
         setIsDeliveryDialogOpen(false);
         return;
       }
@@ -259,26 +252,26 @@ export default function SalesDetailPage() {
         return;
       }
 
-      let stockStateForWarehouse = stockState;
-      if (stockStateForWarehouse !== SALES_PREPARE_STOCK_STATE) {
+      let stockStateForWarehouse = currentStockState;
+      if (stockStateForWarehouse !== 'outbound_in_transit') {
         await updateState.mutateAsync({
-          id: salesId,
-          stockState: SALES_PREPARE_STOCK_STATE,
+          id: sales.id,
+          stockState: 'outbound_in_transit',
           unitTransactionDetails: detailIds,
         });
-        stockStateForWarehouse = SALES_PREPARE_STOCK_STATE;
+        stockStateForWarehouse = 'outbound_in_transit';
       }
 
-      if (stockStateForWarehouse !== SALES_PREPARE_STOCK_STATE) {
+      if (stockStateForWarehouse !== 'outbound_in_transit') {
         toast.error('State transaksi harus outbound_in_transit sebelum membuat warehouse activity.');
         setIsDeliveryDialogOpen(false);
         return;
       }
 
-      const description = String(`Pengiriman Stok Transaksi beli ${data?.raw?.code} Sebanyak ${detailIds?.length} Unit`);
+      const description = String(`Pengiriman Stok Transaksi beli ${sales?.code} Sebanyak ${detailIds?.length} Unit`);
 
       const activityId = await warehouseActivityService.createIssueActivity({
-        unitTransactionId: String(salesId),
+        unitTransactionId: String(sales.id),
         warehouseId,
         personId,
         description,
@@ -288,13 +281,13 @@ export default function SalesDetailPage() {
       await warehouseActivityService.dispatchStock(activityId, detailIds);
 
       await updateState.mutateAsync({
-        id: salesId,
+        id: sales.id,
         stockState: SALES_DELIVERED_STOCK_STATE,
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['sales-transaction', salesId] });
+      await queryClient.invalidateQueries({ queryKey: ['sales-by-id', companyId, sales.id] });
       await queryClient.invalidateQueries({ queryKey: ['sales-transactions'] });
-      await queryClient.invalidateQueries({ queryKey: ['purchase-unit-items', salesId] });
+      await queryClient.invalidateQueries({ queryKey: ['sales-unit-items', sales.id] });
       await queryClient.invalidateQueries({ queryKey: ['stock-units'] });
 
       toast.success('Status penjualan diperbarui ke delivered dan stok berhasil dikirim.');
@@ -313,6 +306,17 @@ export default function SalesDetailPage() {
     );
   }
 
+  if (isError || !sales) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
+          <p className="text-muted-foreground">Penjualan tidak ditemukan</p>
+          <Button onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}>Kembali ke List</Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -325,8 +329,8 @@ export default function SalesDetailPage() {
           onBack={() => router.push(`/dashboard/${slug}/transaksi/penjualan-unit`)}
           subtitle={
             <>
-              <span>Kode Jual: </span>
-              <span className="font-semibold text-blue-600">{salesData.kodeJual}</span>
+              <span>Kode Jual:</span>
+              <span className="text-blue-600 font-semibold">{sales.code}</span>
               {isPaid ? (
                 <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">
                   Lunas
@@ -336,26 +340,18 @@ export default function SalesDetailPage() {
                   Belum Lunas
                 </Badge>
               )}
-              {isAlreadyDelivered ? (
-                <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 font-semibold">
-                  Stok Terkirim
-                </Badge>
-              ) : null}
             </>
           }
           actions={
             <>
-              <Button
-                disabled={isRefunded}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={handlePayment}>
+              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 {isPaid ? 'Sudah Dibayar' : 'Bayar'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                disabled={isPaid || !rawData?.unit_transaction_billing}
+                disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || sales?.unit_transaction_billing == null}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => setIsMarkAsPaidDialogOpen(true)}
               >
@@ -365,40 +361,32 @@ export default function SalesDetailPage() {
               <Button
                 variant="outline"
                 className="bg-white hover:bg-gray-50 border-gray-200"
-                disabled={!canDeliver || updateState.isPending}
+                disabled={!canDeliver}
                 onClick={() => setIsDeliveryDialogOpen(true)}
               >
-                {isAlreadyDelivered ? 'Sudah Terkirim' : updateState.isPending ? 'Memproses...' : 'Kirim Barang'}
+                {deliveryButtonText}
               </Button>
             </>
           }
         />
 
-        {/* Print Header - Visible only on Print */}
-        <div className="hidden print:block mb-8">
-          <h1 className="text-2xl font-bold mb-2">Detail Penjualan Unit</h1>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-semibold">Kode Jual</p>
-              <p className="text-lg">{mappedDetail.code}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Dicetak pada: {new Date().toLocaleDateString('id-ID')}</p>
-            </div>
-          </div>
-        </div>
-
         {isRefunded ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 print:hidden">
-            Transaksi ini sudah direfund. Status stok saat ini: <span className="font-semibold">outbound_return</span>.
+          <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">
+            <AlertTriangle className="h-5 w-5 text-amber-655 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-amber-900">Transaksi Sudah Direfund</p>
+              <p className="text-xs mt-0.5 text-amber-700/95">
+                Status stok saat ini adalah <span className="font-mono font-medium bg-amber-100 px-1.5 py-0.5 rounded text-amber-900">outbound_return</span>. Proses Proses Barang dinonaktifkan.
+              </p>
+            </div>
           </div>
         ) : null}
 
-        {/* 3 Info Cards */}
+        {/* 3-COLUMN CARDS */}
         <SalesDetailCards data={salesData} billingHistories={resolvedBillingHistories} />
 
-        {/* Detail Unit Table */}
-        <SalesUnitTable lineItems={salesData.lineItems} salesId={salesData.id} onAddUnit={handleCreateUnit} canEdit={canEdit} canDelete={canDelete} canCreate={canCreate} isPaid={isPaid} />
+        {/* UNIT TABLE */}
+        <SalesUnitTable lineItems={salesData.lineItems} salesId={sales.id} onAddUnit={handleCreateUnit} canEdit={canEdit} canDelete={canDelete} canCreate={canCreate} isPaid={isPaid} />
 
         {/* PAYMENT HISTORY TABLE */}
         <div className="space-y-3">
@@ -409,8 +397,8 @@ export default function SalesDetailPage() {
 
           <BaseTable
             data={resolvedBillingHistories}
-            columns={columns}
-            loading={isLoading || billingLoading || historyLoading}
+            columns={historyColumns}
+            loading={historyLoading}
           />
         </div>
       </div>
@@ -455,11 +443,11 @@ export default function SalesDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {/* CONFIRMATION DIALOG KIRIM BARANG */}
+      {/* CONFIRMATION DIALOG Proses Barang */}
       <Dialog open={isDeliveryDialogOpen} onOpenChange={setIsDeliveryDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Konfirmasi Kirim Barang</DialogTitle>
+            <DialogTitle>Konfirmasi Proses Barang</DialogTitle>
             <DialogDescription className="pt-2">
               Apakah Anda yakin ingin mengirim barang ini?
             </DialogDescription>
@@ -469,7 +457,7 @@ export default function SalesDetailPage() {
                   <Info />
                 </span>
                 <span>
-                  Dengan klik kirim barang maka akan mengurangi stock <b>Warehouse</b> dan barang akan dikirim ke pembeli.
+                  Dengan klik Proses Barang maka akan mengurangi stock <b>Warehouse</b> dan barang akan dikirim ke pembeli.
                 </span>
               </div>
             </div>
@@ -489,7 +477,7 @@ export default function SalesDetailPage() {
               onClick={handleDelivery}
               disabled={updateState.isPending}
             >
-              {updateState.isPending ? 'Memproses...' : 'Ya, Kirim Barang'}
+              {updateState.isPending ? 'Memproses...' : 'Ya, Proses Barang'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { formatCurrency } from '@/lib/utils/currency';
 import { useGetWarehouseStockDetail } from '@/hooks/useLaporanWarehouse';
 import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -19,6 +18,7 @@ import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
 import { CopyBox } from '@/components/ui/copy-box';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 type StockDetailTabProps = {
   perPage: number;
@@ -57,7 +57,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
   });
 
   const rawRows = useMemo(() => response?.data || [], [response?.data]);
-  
+
   const rows = useMemo(() => {
     let result = [...rawRows];
 
@@ -112,7 +112,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
       return;
     }
 
-    const header = ['NO', 'KODE UNIT', 'SUPPLIER', 'TIPE UNIT', 'WARNA', 'NO MESIN', 'NO RANGKA', 'HARGA BELI', 'TERSEDIA', 'STOCK STATUS', 'STATUS'];
+    const header = ['NO', 'KODE UNIT', 'TIPE UNIT', 'WARNA', 'NO MESIN', 'NO RANGKA', 'HARGA BELI', 'TERSEDIA', 'STOCK STATUS', 'STATUS'];
     const lines = [toCsvLine(header)];
 
     rows.forEach((item, index) => {
@@ -166,15 +166,6 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         cell: (item) => <CopyBox text={item.unit_type?.code || '-'} />
       },
       {
-        header: 'SUPPLIER',
-        accessorKey: 'person',
-        sortable: true,
-        alignment: 'left',
-        cell: (item) => item.person ? <ReferenceLink href={`/dashboard/${slugStr}/master/supplier?search=${item.person}`}>
-          {item.person}
-        </ReferenceLink> : '-'
-      },
-      {
         header: 'TIPE UNIT',
         accessorKey: 'unit_type.name',
         sortable: true,
@@ -209,7 +200,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         accessorKey: 'purchase_price',
         sortable: true,
         alignment: 'right',
-        cell: (item) => formatCurrency(item.purchase_price),
+        cell: (item) => currenciesFormat('idr', item.purchase_price),
       },
       {
         header: 'TERSEDIA',
@@ -242,7 +233,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
         <TableCell colSpan={7} className="px-4 py-4 pr-10 text-right text-slate-900">
           GRAND TOTAL
         </TableCell>
-        <TableCell className="px-4 py-4 text-right text-slate-900">{formatCurrency(grandTotalPurchase)}</TableCell>
+        <TableCell className="px-4 py-4 text-right text-slate-900">{currenciesFormat('idr', grandTotalPurchase)}</TableCell>
         <TableCell colSpan={3}></TableCell>
       </TableRow>
     ),

@@ -52,16 +52,18 @@ type AccountGroupItemResponse = LaravelApiResponse<AccountGroupApiModel>;
 type DeleteResponse = LaravelApiResponse<null>;
 
 export const getAccountGroups = async (params: PaginationParams & { company_id?: string | number }): Promise<AccountGroupListResponse> => {
+  // We fetch without pagination parameters so the backend returns all data,
+  // allowing us to perform robust client-side search and pagination.
   const response = await apiClient.get<PaginatedAccountGroupResponse>(basePath, {
     params: {
-      ...buildLaravelPaginationQuery(params),
       company_id: params.company_id,
+      per_page: 9999, // Fallback if backend strictly requires it to return large sets
     },
   });
 
   const data = ensureSuccess(response.data);
   const isDirectArray = Array.isArray(data);
-  const items = isDirectArray ? data : (data.data ?? []);
+  const items: AccountGroupApiModel[] = isDirectArray ? data : ((data as any).data ?? []);
 
   const scopedData = params.company_id
     ? items.filter((item) => {
@@ -69,15 +71,30 @@ export const getAccountGroups = async (params: PaginationParams & { company_id?:
         return String(item.company_id) === String(params.company_id);
       })
     : items;
-  const isFrontendFallback = params.company_id ? (scopedData.length !== items.length) : false;
+
+  let filteredData = scopedData;
+  if (params.search && params.search.trim() !== '') {
+    const keyword = params.search.toLowerCase().trim();
+    filteredData = filteredData.filter((item) => {
+      const code = (item.group_code ?? item.code ?? '').toLowerCase();
+      const name = (item.name ?? item.description ?? '').toLowerCase();
+      return code.includes(keyword) || name.includes(keyword);
+    });
+  }
+
+  // Always perform client-side pagination because we fetched per_page: 9999
+  const page = params.page ?? 1;
+  const perPage = params.perPage ?? 10;
+  const start = (page - 1) * perPage;
+  const paginatedData = filteredData.slice(start, start + perPage);
 
   return toPaginatedResult(
     {
-      data: scopedData,
-      current_page: isDirectArray ? 1 : data.current_page,
-      per_page: isDirectArray ? items.length : (data.per_page ?? data.perPage ?? params.perPage ?? 10),
-      total: isDirectArray ? items.length : (isFrontendFallback ? scopedData.length : data.total),
-      last_page: isDirectArray ? 1 : (isFrontendFallback ? Math.max(1, Math.ceil(scopedData.length / Math.max(data.per_page ?? data.perPage ?? params.perPage ?? 1, 1))) : data.last_page),
+      data: paginatedData,
+      current_page: page,
+      per_page: perPage,
+      total: filteredData.length,
+      last_page: Math.max(1, Math.ceil(filteredData.length / perPage)),
     },
     mapAccountGroup,
   );

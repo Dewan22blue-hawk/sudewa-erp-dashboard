@@ -10,17 +10,15 @@ import { MoneyInput } from '@/components/ui/money-input';
 import { formatMoneyInput } from '@/lib/utils/money-input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Save, Check, ChevronsUpDown } from 'lucide-react';
+import { Save, Check, ChevronsUpDown } from 'lucide-react';
 import { editUnitSchema, EditUnitFormData } from './edit-unit.schema';
-import { PRODUCT_OPTIONS } from './edit-unit.data';
 import { ProductOption } from './edit-unit.types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { useUnitFormula } from '@/hooks/useUnitFormula';
-import { useTaxes, useTaxDefault } from '@/hooks/useTax';
+import { useTaxDefault } from '@/hooks/useTax';
 import { useTypeUnits } from '@/hooks/useTypeUnit';
-import type { Tax } from '@/@types/tax.types';
 
 interface EditUnitFormProps {
   defaultValues: EditUnitFormData;
@@ -43,10 +41,7 @@ export function EditUnitForm({
   onSubmit = () => { },
   onCancel,
   readOnly = false,
-  showAddUnitButton = false,
-  onAddUnitClick,
   prependFields,
-  hideCustomerField = false,
   submitDisabled = false,
   cancelDisabled = false,
   productOptions,
@@ -55,13 +50,10 @@ export function EditUnitForm({
 }: EditUnitFormProps) {
   const [isUsd, setIsUsd] = useState(Boolean(defaultValues?.hargaUsd && Number(defaultValues.hargaUsd) > 0));
 
-  const [openDppTaxSelect, setOpenDppTaxSelect] = useState(false);
-  const [openPpnTaxSelect, setOpenPpnTaxSelect] = useState(false);
   const [selectedDppTaxVersionId, setSelectedDppTaxVersionId] = useState<string | number | null>(defaultValues?.dppTaxVersionId ?? null);
   const [selectedPpnTaxVersionId, setSelectedPpnTaxVersionId] = useState<string | number | null>(defaultValues?.ppnTaxVersionId ?? null);
   const [openTypeSelect, setOpenTypeSelect] = useState(false);
 
-  const { data: taxesData } = useTaxes();
   const { data: defaultDppTax } = useTaxDefault('dpp');
   const { data: defaultPpnTax } = useTaxDefault('ppn');
   const { data: typeUnitData } = useTypeUnits();
@@ -72,11 +64,6 @@ export function EditUnitForm({
     if (list && Array.isArray((list as any).data)) return (list as any).data;
     return [];
   }, [typeUnitData]);
-
-  const taxOptions = useMemo<Tax[]>(() => {
-    const list = (taxesData as any)?.data;
-    return Array.isArray(list) ? list : [];
-  }, [taxesData]);
 
   useEffect(() => {
     if (defaultDppTax?.id && selectedDppTaxVersionId == null) {
@@ -89,22 +76,6 @@ export function EditUnitForm({
       setSelectedPpnTaxVersionId(defaultPpnTax.id);
     }
   }, [defaultPpnTax, selectedPpnTaxVersionId]);
-
-  const dppTaxVersion = useMemo(() => {
-    for (const tax of taxOptions) {
-      const found = tax.tax_versions?.find((v) => String(v.id) === String(selectedDppTaxVersionId));
-      if (found) return { tax, version: found };
-    }
-    return null;
-  }, [taxOptions, selectedDppTaxVersionId]);
-
-  const ppnTaxVersion = useMemo(() => {
-    for (const tax of taxOptions) {
-      const found = tax.tax_versions?.find((v) => String(v.id) === String(selectedPpnTaxVersionId));
-      if (found) return { tax, version: found };
-    }
-    return null;
-  }, [taxOptions, selectedPpnTaxVersionId]);
 
   const form = useForm<EditUnitFormData>({
     resolver: zodResolver(editUnitSchema),
@@ -134,8 +105,8 @@ export function EditUnitForm({
     bbn_price: biayaBbn,
     expedition_fee: biayaEkspedisi,
     other_fee: biayaLain,
-    dpp_tax_id: dppTaxVersion?.version.id,
-    ppn_tax_id: ppnTaxVersion?.version.id,
+    dpp_tax_id: selectedDppTaxVersionId ?? undefined,
+    ppn_tax_id: selectedPpnTaxVersionId ?? undefined,
   });
 
   const toNumber = (value: unknown): number => {
@@ -143,14 +114,12 @@ export function EditUnitForm({
     return Number.isFinite(normalized) ? normalized : 0;
   };
 
-  useEffect(() => {
-    form.setValue('hppSatuan', Number(formula?.hpp_per_unit_price ?? defaultValues?.hppSatuan ?? 0));
-    form.setValue('dppSatuan', Number(formula?.dpp_per_unit_price ?? defaultValues?.dppSatuan ?? 0));
-    form.setValue('ppnSatuan', Number(formula?.ppn_per_unit_price ?? defaultValues?.ppnSatuan ?? 0));
-    form.setValue('totalHpp', Number(formula?.hpp_total_price ?? defaultValues?.totalHpp ?? 0));
-    form.setValue('totalDpp', Number(formula?.dpp_total_price ?? defaultValues?.totalDpp ?? 0));
-    form.setValue('totalPpn', Number(formula?.ppn_total_price ?? defaultValues?.totalPpn ?? 0));
-  }, [formula, defaultValues, form]);
+  const hppSatuanVal = Number(formula?.hpp_per_unit_price ?? defaultValues?.hppSatuan ?? 0);
+  const dppSatuanVal = Number(formula?.dpp_per_unit_price ?? defaultValues?.dppSatuan ?? 0);
+  const ppnSatuanVal = Number(formula?.ppn_per_unit_price ?? defaultValues?.ppnSatuan ?? 0);
+  const totalHppVal = Number(formula?.hpp_total_price ?? defaultValues?.totalHpp ?? 0);
+  const totalDppVal = Number(formula?.dpp_total_price ?? defaultValues?.totalDpp ?? 0);
+  const totalPpnVal = Number(formula?.ppn_total_price ?? defaultValues?.totalPpn ?? 0);
 
   const handleFormSubmit = (values: EditUnitFormData) => {
     onSubmit({
@@ -176,20 +145,6 @@ export function EditUnitForm({
           <>
             {/* ROW 1: Tipe Unit, Qty, Harga */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* <FormField
-                control={form.control}
-                name="customer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Customer</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="PT XX" className="bg-transparent max-w-sm" disabled={readOnly} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-
               <FormField
                 control={form.control}
                 name="tipeUnit"
@@ -263,12 +218,6 @@ export function EditUnitForm({
                             ))}
                           </SelectContent>
                         </Select>
-                      )}
-
-                      {showAddUnitButton && !readOnly && (
-                        <Button type="button" onClick={onAddUnitClick} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
-                          <Plus className="h-4 w-4" />
-                        </Button>
                       )}
                     </div>
                     <FormMessage />
@@ -508,177 +457,79 @@ export function EditUnitForm({
 
             {/* ROW 3: HPP Satuan, DPP Satuan, PPN Satuan */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FormField
-                control={form.control}
-                name="hppSatuan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
-                    <FormControl>
-                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel className="text-sm font-medium">HPP Satuan</FormLabel>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(hppSatuanVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
+              </FormItem>
 
-              <FormField
-                control={form.control}
-                name="dppSatuan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
-                    <FormControl>
-                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel className="text-sm font-medium">DPP Satuan</FormLabel>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(dppSatuanVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
+              </FormItem>
 
-              <FormField
-                control={form.control}
-                name="ppnSatuan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
-                    <FormControl>
-                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel className="text-sm font-medium">PPN Satuan</FormLabel>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(ppnSatuanVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
+              </FormItem>
             </div>
 
             {/* ROW 4: Total HPP, Total DPP + Tax Selector, Total PPN + Tax Selector */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FormField
-                control={form.control}
-                name="totalHpp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
-                    <FormControl>
-                      <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Total HPP</FormLabel>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(totalHppVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
+              </FormItem>
 
               <FormItem>
                 <FormLabel className="text-sm font-medium">Total DPP</FormLabel>
-                <div className="flex gap-2">
-                  <Popover open={openDppTaxSelect} onOpenChange={setOpenDppTaxSelect}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        role="combobox"
-                        aria-expanded={openDppTaxSelect}
-                        aria-controls="dpp-tax-list"
-                        disabled={readOnly}
-                        className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
-                      >
-                        <span className={cn('truncate', !dppTaxVersion && 'text-muted-foreground')}>
-                          {dppTaxVersion ? `${dppTaxVersion.tax.name}` : 'Pilih DPP'}
-                        </span>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Cari pajak..." />
-                        <CommandList id="dpp-tax-list">
-                          <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
-                          <CommandGroup>
-                            {taxOptions.map((tax) =>
-                              tax.tax_versions?.map((ver) => (
-                                <CommandItem
-                                  key={`${tax.id}-${ver.id}`}
-                                  value={`${tax.name} ${ver.name}`}
-                                  onSelect={() => {
-                                    setSelectedDppTaxVersionId(ver.id);
-                                    setOpenDppTaxSelect(false);
-                                  }}
-                                >
-                                  <Check className={cn('mr-2 h-4 w-4', selectedDppTaxVersionId === ver.id ? 'opacity-100' : 'opacity-0')} />
-                                  <span className="truncate">{tax.name} - {ver.name}</span>
-                                </CommandItem>
-                              ))
-                            )}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <div className="flex-1">
-                    <FormField
-                      control={form.control}
-                      name="totalDpp"
-                      render={({ field }) => (
-                        <FormControl>
-                          <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                        </FormControl>
-                      )}
-                    />
-                  </div>
-                </div>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(totalDppVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
               </FormItem>
 
               <FormItem>
                 <FormLabel className="text-sm font-medium">Total PPN</FormLabel>
-                <div className="flex gap-2">
-                  <Popover open={openPpnTaxSelect} onOpenChange={setOpenPpnTaxSelect}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        role="combobox"
-                        aria-expanded={openPpnTaxSelect}
-                        aria-controls="ppn-tax-list"
-                        disabled={readOnly}
-                        className="flex h-10 w-[45%] min-w-0 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 truncate"
-                      >
-                        <span className={cn('truncate', !ppnTaxVersion && 'text-muted-foreground')}>
-                          {ppnTaxVersion ? `${ppnTaxVersion.tax.name}` : 'Pilih PPN'}
-                        </span>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Cari pajak..." />
-                        <CommandList id="ppn-tax-list">
-                          <CommandEmpty>Pajak tidak ditemukan.</CommandEmpty>
-                          <CommandGroup>
-                            {taxOptions.map((tax) =>
-                              tax.tax_versions?.map((ver) => (
-                                <CommandItem
-                                  key={`${tax.id}-${ver.id}`}
-                                  value={`${tax.name} ${ver.name}`}
-                                  onSelect={() => {
-                                    setSelectedPpnTaxVersionId(ver.id);
-                                    setOpenPpnTaxSelect(false);
-                                  }}
-                                >
-                                  <Check className={cn('mr-2 h-4 w-4', selectedPpnTaxVersionId === ver.id ? 'opacity-100' : 'opacity-0')} />
-                                  <span className="truncate">{tax.name} - {ver.name}</span>
-                                </CommandItem>
-                              ))
-                            )}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <div className="flex-1">
-                    <FormField
-                      control={form.control}
-                      name="totalPpn"
-                      render={({ field }) => (
-                        <FormControl>
-                          <MoneyInput name={field.name} value={Number(field.value) || 0} onChangeValue={(val) => field.onChange(val)} onBlur={field.onBlur} disabled={readOnly} />
-                        </FormControl>
-                      )}
-                    />
-                  </div>
-                </div>
+                <FormControl>
+                  <Input
+                    value={formatMoneyInput(String(Math.round(totalPpnVal)))}
+                    className="bg-transparent"
+                    disabled
+                    readOnly
+                  />
+                </FormControl>
               </FormItem>
             </div>
           </>

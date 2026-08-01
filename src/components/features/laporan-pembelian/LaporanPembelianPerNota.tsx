@@ -142,7 +142,7 @@ export default function LaporanPembelianPerNota({ data, pagination, isLoading, o
         ),
       },
     ],
-    [pagination.currentPage, pagination.perPage]
+    [pagination.currentPage, pagination.perPage, slug]
   );
 
   return (

@@ -14,6 +14,7 @@ import {
   receiptStock,
   updateWarehouseActivity,
   deleteWarehouseActivity,
+  updateWarehouseActivityState,
 } from '@/services/warehouse.service';
 
 const warehouseActivitiesKey = 'warehouse-activities';
@@ -87,6 +88,21 @@ export const useDeleteWarehouseActivity = () => {
     mutationFn: (id: string) => deleteWarehouseActivity(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey] });
+    },
+  });
+};
+
+export const useWarehouseActivityStateUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ activityId, state }: { activityId: string | number; state: 'draft' | 'process' | 'done' }) =>
+      updateWarehouseActivityState(activityId, state),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey] });
+      queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey, 'detail', String(variables.activityId)] });
+      queryClient.invalidateQueries({ queryKey: ['sales-by-id'] });
+      queryClient.invalidateQueries({ queryKey: ['purchase-by-id'] });
     },
   });
 };

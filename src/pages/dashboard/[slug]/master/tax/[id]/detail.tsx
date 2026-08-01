@@ -123,12 +123,12 @@ export default function TaxDetailPage() {
         <div className="space-y-6">
           <PageHeader
             breadcrumbs={[
-              { label: 'Data Pajak', onClick: () => router.push(`/dashboard/${slug}/settings/tax`) },
+              { label: 'Data Pajak', onClick: () => router.push(`/dashboard/${slug}/master/tax`) },
               { label: 'Detail' }
             ]}
             title="Detail Pajak"
             subtitle="Lihat detail informasi pajak dan riwayat versinya"
-            onBack={() => router.push(`/dashboard/${slug}/settings/tax`)}
+            onBack={() => router.push(`/dashboard/${slug}/master/tax`)}
           />
 
           <Card className="border-0 shadow-sm rounded-xl">
