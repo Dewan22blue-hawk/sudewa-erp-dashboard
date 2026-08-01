@@ -1191,3 +1191,62 @@ export const getMasterDataList = async (params: PaginationParams & { company_id?
   );
 };
 ```
+
+---
+
+## 25. Penanganan Konflik HTTP Status Code & Penjagaan Toleransi Akses Menu (CORS / Redirect Loop)
+
+### Latar Belakang & Gejala Bug
+Pengguna dengan izin terbatas (misal, staf gudang yang hanya memiliki akses menu `Warehouse`) mengalami kegagalan saat masuk ke Dashboard, ditandai dengan pesan error:
+`Failed to fetch permissions test: Error: Failed to fetch permissions`
+Dan konsol peramban menampilkan error parse string kosong (`SyntaxError: JSON.parse: unexpected end of data`) serta respon status `0`.
+
+Hal ini disebabkan oleh dua faktor utama:
+1. **Inversi Status Kode HTTP di Backend**:
+   - Backend (Laravel Exception Handler) mengembalikan status **`401 Unauthorized`** ketika pengguna ditolak hak aksesnya oleh Spatie (`UnauthorizedException`), dan mengembalikan status **`403 Forbidden`** ketika pengguna unauthenticated (token hilang/invalid). Hal ini terbalik secara standar RESTful API.
+2. **Auto-Logout / Redirect Interceptor di Frontend**:
+   - Axios response interceptor di frontend mendeteksi status `401` lalu menghapus token JWT dan mengalihkan halaman ke `/login`.
+   - Karena pengguna warehouse ditolak memuat beberapa statistik halaman dashboard (seperti `/stats/billing-stats` yang memerlukan izin finansial), request tersebut menghasilkan error `401` (yang aslinya adalah penolakan izin `403`), memicu penghapusan token secara sepihak dan pembatalan (*abort*) seluruh request aktif (status `0`), termasuk pengambilan izin menu `/wapi/auth/has-permissions`.
+
+---
+
+### Solusi Standar & Pencegahan
+
+#### 1. Perbaikan Kode Status di Laravel Handler (`app/Exceptions/Handler.php`)
+Pastikan *Exceptions* terpetakan dengan kode status RESTful yang benar:
+- **`401 Unauthorized` (Unauthenticated)**: Digunakan saat token tidak sah, kedaluwarsa, atau tidak terkirim.
+  ```php
+  if ($exception instanceof \Illuminate\Auth\AuthenticationException || 
+      $exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException || 
+      $exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException || 
+      $exception instanceof \Tymon\JWTAuth\Exceptions\JWTException ||
+      $exception instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException) {
+      return $this->responseError(null, 'Unauthenticated. Your session has expired or is invalid.', 401);
+  }
+  ```
+- **`403 Forbidden` (Unauthorized / No Permission)**: Digunakan saat pengguna terverifikasi namun tidak memiliki hak akses/izin (*role/permission*) Spatie.
+  ```php
+  if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException || 
+      $exception instanceof \Illuminate\Auth\AccessDeniedException || 
+      $exception instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException) {
+      return $this->responseError(null, 'You do not have the required permissions to access this resource.', 403);
+  }
+  ```
+
+#### 2. Toleransi Pemuatan Data Dashboard / Multi-API (`dashboard.service.ts`)
+Agar halaman utama/dashboard aman diakses oleh semua level pengguna:
+- **Jangan gunakan Promise.all mentah** yang langsung terputus (*fail-fast*) jika salah satu request API melempar error status `403`.
+- Bungkus panggilan API individual dengan penanganan *catch* lokal (`safeGet`) untuk mereturn objek *fallback* kosong secara elegan sehingga UI tidak kolaps.
+  ```typescript
+  const safeGet = async <T>(url: string, config: any, fallback: T): Promise<T> => {
+    try {
+      const response = await apiClient.get<{ status: boolean; data: T }>(url, config);
+      return response.data.data;
+    } catch (err) {
+      console.warn(`[DashboardService] Failed to fetch from ${url}, using fallback:`, err);
+      return fallback;
+    }
+  };
+  ```
+```
+```
