@@ -25,17 +25,23 @@ export const dashboardService = {
     // Fetch real data dari API secara paralel dengan penanganan error masing-masing
     const [stats, customerStats, productStats, transactionStats] = await Promise.all([
       safeGet<BillingStatsRaw>('/wapi/stats/billing-stats', { params: defaultParams }, {
-        opening_balance: { debet: {}, kredit: {} },
-        mutation: { debet: {}, kredit: {} },
+        opening_balance: {
+          debet: { bca_idr: 0, bca_usd: 0 },
+          kredit: { bca_idr: 0, bca_usd: 0 }
+        },
+        mutation: {
+          debet: { bca_idr: 0, bca_usd: 0 },
+          kredit: { bca_idr: 0, bca_usd: 0 }
+        },
         percentage: []
       }),
       safeGet<CustomerStatsRaw>('/wapi/stats/customer-stats', { params: defaultParams }, {
         summary: { total_customer: 0, total_revenue: 0, average_revenue_per_customer: 0 },
-        customers: { data: [] }
+        customers: { current_page: 1, data: [], total: 0 }
       }),
       safeGet<ProductStatsRaw>('/wapi/stats/unit-type-stats', { params: defaultParams }, {
         summary: { total_unit_type: 0, total_unit_type_sold: 0 },
-        data: { data: [] }
+        data: { current_page: 1, data: [], total: 0 }
       }),
       safeGet<TransactionStatsRaw>('/wapi/transaction/unit-transaction/unit-transaction', {
         params: {
@@ -46,7 +52,9 @@ export const dashboardService = {
           ...defaultParams,
         },
       }, {
-        data: []
+        current_page: 1,
+        data: [],
+        total: 0
       })
     ]);
 
