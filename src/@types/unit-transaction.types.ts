@@ -126,6 +126,7 @@ export interface UnitTransactionItemDetail {
   transaction_bbn_total: number;
   transaction_other_fee: number;
   warehouse_sub_block: WarehouseSubBlock;
+  is_sold_unit: boolean | undefined;
   expedition_fee_total: number;
   total_operational_fee?: number;
   has_refund_transaction?: boolean;
@@ -325,6 +326,8 @@ export interface WarehouseStockUnit {
   warehouse_id?: string;
   in_stock?: boolean;
   status?: string | undefined;
+  warehouse_sub_block?: WarehouseSubBlock;
+  stock_state?: string | null;
 }
 
 export interface UnitTransactionItemSalesAssignment {

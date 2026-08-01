@@ -107,6 +107,8 @@ export const useBulkUpdateUnitItemDetails = () => {
     mutationFn: (payload: {
       unit_transaction_item_details_ids: number[];
       stock_state: string;
+      transaction_type?: string | null;
+      refund_activity?: boolean | null;
       warehouse_sub_block_id?: number | null;
     }) => unitItemDetailService.bulkUpdateState(payload),
     onSuccess: () => {
@@ -114,6 +116,8 @@ export const useBulkUpdateUnitItemDetails = () => {
       queryClient.invalidateQueries({ queryKey: ['unit-transaction-item'] });
       queryClient.invalidateQueries({ queryKey: ['unit-item-details-by-transaction'] });
       queryClient.invalidateQueries({ queryKey: ['warehouse-activities'] });
+      queryClient.invalidateQueries({ queryKey: ['refund_activity'] });
+      queryClient.invalidateQueries({ queryKey: ['transaction_type'] });
     },
   });
 };

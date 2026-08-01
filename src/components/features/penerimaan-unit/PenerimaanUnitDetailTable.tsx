@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, ArrowDown, Settings } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Settings } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { WarehouseActivityUnitDetail } from '@/@types/warehouse.types';
@@ -23,12 +22,11 @@ import { cn } from '@/lib/utils';
 interface Props {
   data?: WarehouseActivityUnitDetail[];
   personId?: string;
-  onTerima: (ids: number[]) => Promise<void>;
-  onDelete: (ids: number[]) => Promise<void>;
+  activityState?: string;
   isLoading?: boolean;
 }
 
-export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, isLoading = false }: Props) {
+export default function PenerimaanUnitDetailTable({ data, activityState, isLoading = false }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
@@ -62,6 +60,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
       state: item?.stockState,
       warehouseSubBlock: item?.warehouseSubBlock,
       received: item.diterima,
+      isSoldUnit: item.isSoldUnit,
     }));
   }, [data]);
 
@@ -110,21 +109,11 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
     setCurrentPage(1);
   }, [itemsPerPage, search, receivedFilter]);
 
-  const isSelectionDisabled = useCallback((item: any) => {
-    return false; // Enable checkbox for all items to allow bulk process
-  }, []);
+  const stringSelectedIds = useMemo(() => new Set(selected.map(String)), [selected]);
 
-  const toggleSelect = useCallback((item: any) => {
-    const id = item.id;
-    setSelected((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
+  const handleSelectedIdsChange = useCallback((ids: Set<string>) => {
+    setSelected(Array.from(ids).map(Number));
   }, []);
-
-  const toggleAll = useCallback(() => {
-    if (paginatedRows.length === 0) return;
-    const allIds = paginatedRows.map((d) => d.id);
-    const isAllSelected = allIds.every((id) => selected.includes(id));
-    setSelected((prev) => (isAllSelected ? prev.filter((id) => !allIds.includes(id)) : Array.from(new Set([...prev, ...allIds]))));
-  }, [paginatedRows, selected]);
 
   const handleSubmitProcess = async () => {
     if (selected.length === 0) return;
@@ -144,27 +133,6 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
-      {
-        header: (
-          <Checkbox
-            checked={
-              paginatedRows.length > 0 &&
-              paginatedRows.every((d) => selected.includes(d.id))
-            }
-            onCheckedChange={() => toggleAll()}
-          />
-        ),
-        alignment: 'center',
-        sticky: 'left',
-        className: 'w-[50px] min-w-[50px] max-w-[50px]',
-        headerClassName: 'w-[50px] min-w-[50px] max-w-[50px]',
-        cell: (item) => (
-          <Checkbox
-            checked={selected.includes(item.id)}
-            onCheckedChange={() => toggleSelect(item)}
-          />
-        ),
-      },
       {
         header: 'NO PEMBELIAN',
         accessorKey: 'purchaseCode',
@@ -252,7 +220,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
             return <Badge className="border-amber-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
           }
           if (item.in_stock === false) {
-            return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia {item?.isSoldUnit && '/ Terjual'}</Badge>;
           }
           return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
         }
@@ -274,6 +242,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
           const stateVal = item?.state ?? 'draft';
           const match = config[stateVal] ?? {
             label: stateVal.replace(/_/g, ' '),
+            name: stateVal.replace(/_/g, ' '),
             className: 'border-slate-200 bg-slate-50 text-slate-700',
           };
 
@@ -285,7 +254,7 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         }
       }
     ],
-    [slug, selected, paginatedRows, toggleAll, toggleSelect]
+    [slug]
   );
 
   return (
@@ -299,6 +268,11 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
         showLimitChange
         perPage={itemsPerPage}
         onPerPageChange={setItemsPerPage}
+        showCheckbox={activityState !== 'done'}
+        selectedIds={stringSelectedIds}
+        onSelectedIdsChange={handleSelectedIdsChange}
+        getRowId={(item) => String(item.id)}
+        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done' || item?.isSoldUnit === true}
         meta={{
           currentPage: safePage,
           perPage: itemsPerPage,
@@ -346,10 +320,10 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
             <DialogTitle className="text-xl font-bold text-slate-800">Proses Data Unit ({selected.length} Unit Terpilih)</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 my-4">
+          <div className="space-y-6 my-4 overflow-x-scroll">
             {/* Selected Vehicles Table */}
             <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
-              <div className="max-h-60 overflow-y-auto">
+              <div className="max-h-60 overflow-y-auto overflow-x-scroll">
                 <table className="w-full text-sm text-left border-collapse">
                   <thead className="bg-[#f8f9fa] text-slate-600 uppercase text-xs font-semibold border-b border-slate-200 sticky top-0 z-10">
                     <tr>
@@ -358,16 +332,26 @@ export default function PenerimaanUnitDetailTable({ data, onTerima, onDelete, is
                       <th className="px-4 py-3">Warna</th>
                       <th className="px-4 py-3">No Mesin</th>
                       <th className="px-4 py-3">No Rangka</th>
+                      <th className="px-4 py-3">Sub Blok</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {rows.filter((row) => selected.includes(row.id)).map((row) => (
                       <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-slate-900">{row.purchaseCode || '-'}</td>
-                        <td className="px-4 py-3 text-slate-600">{row.unitTypeName || '-'}</td>
+                        <td className="px-4 py-3 font-medium text-slate-900">
+                          <CopyBox text={row.purchaseCode ?? "-"} />
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          <ReferenceLink href={`/dashboard/${slug}/master?search=${row?.unitTypeName}`}>
+                            {row.unitTypeName}
+                          </ReferenceLink>
+                        </td>
                         <td className="px-4 py-3 text-slate-600">{row.color || '-'}</td>
                         <td className="px-4 py-3 text-slate-500 font-mono text-xs"><CopyBox text={row.machineNumber || ''} /></td>
                         <td className="px-4 py-3 text-slate-500 font-mono text-xs"><CopyBox text={row.chassisNumber || ''} /></td>
+                        <td className="px-4 py-3 text-slate-500 font-mono text-xs">
+                          {row.warehouseSubBlock ? <CopyBox text={row.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

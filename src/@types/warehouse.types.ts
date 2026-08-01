@@ -18,6 +18,7 @@ export interface WarehouseActivityUnitDetail {
   diterima: boolean;
   stockState: string;
   warehouseSubBlock?: string;
+  isSoldUnit?: boolean;
 }
 
 export interface WarehouseActivity {
@@ -36,6 +37,7 @@ export interface WarehouseActivity {
   tanggal: string;
   state: string;
   keterangan: string;
+  isRefundActivity?: boolean;
 }
 
 export interface WarehouseActivityListResponse {

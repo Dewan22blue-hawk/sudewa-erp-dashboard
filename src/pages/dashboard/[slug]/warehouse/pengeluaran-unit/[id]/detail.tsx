@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'sonner';
-import { ChevronRight, ArrowLeft, FileText, Package } from 'lucide-react';
+import { ChevronRight, ArrowLeft, FileText, Package, Pencil } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import PengeluaranUnitDetailTable from '@/components/features/pengeluaran-unit/PengeluaranUnitDetailTable';
 import { useDispatchPengeluaranStock } from '@/hooks/usePengeluaranUnit';
-import { useWarehouseActivityDetail } from '@/hooks/useWarehouseActivity';
+import { useWarehouseActivityDetail, useWarehouseActivityStateUpdate } from '@/hooks/useWarehouseActivity';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CopyBox } from '@/components/ui/copy-box';
@@ -13,13 +13,55 @@ import { formatDate } from '@/lib/utils/format';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function PengeluaranUnitDetailPage() {
   const router = useRouter();
   const { id, slug } = router.query as { id?: string; slug?: string };
 
   const { data: detailData, isLoading } = useWarehouseActivityDetail(id);
-  const dispatchMutation = useDispatchPengeluaranStock();
+
+  const [isUpdateStateDialogOpen, setIsUpdateStateDialogOpen] = useState(false);
+  const [selectedState, setSelectedState] = useState<'draft' | 'process' | 'done'>('draft');
+
+  const updateStateMutation = useWarehouseActivityStateUpdate();
+
+  useEffect(() => {
+    if (detailData?.state) {
+      const s = detailData.state.toLowerCase();
+      if (s === 'draft' || s === 'process' || s === 'done') {
+        setSelectedState(s as 'draft' | 'process' | 'done');
+      }
+    }
+  }, [detailData]);
+
+  const handleUpdateState = async () => {
+    if (!id) return;
+    try {
+      await updateStateMutation.mutateAsync({
+        activityId: id,
+        state: selectedState,
+      });
+      toast.success('Status pengeluaran berhasil diperbarui');
+      setIsUpdateStateDialogOpen(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'Gagal memperbarui status pengeluaran');
+    }
+  };
 
   useEffect(() => {
     if (!isLoading && detailData && detailData.activity_type !== 'issue') {
@@ -44,47 +86,6 @@ export default function PengeluaranUnitDetailPage() {
   }
 
   const details = detailData?.unit_transaction_details ?? [];
-
-  const handleKirim = async (ids: number[]) => {
-    if (!id) return;
-    if (ids.length === 0) {
-      toast.error('Pilih minimal satu unit');
-      return;
-    }
-
-    try {
-      await dispatchMutation.mutateAsync({
-        warehouseActivityId: id,
-        detailIds: ids,
-      });
-      toast.success('Dispatch stock berhasil diproses');
-    } catch (error: unknown) {
-      const apiError = error as { message?: string; details?: unknown };
-      const detailsError = apiError?.details;
-
-      if (Array.isArray(detailsError)) {
-        toast.error(apiError?.message || 'Sebagian data detail tidak valid untuk proses release/issue stock');
-        return;
-      }
-
-      if (detailsError && typeof detailsError === 'object') {
-        const detailText = Object.entries(detailsError as Record<string, unknown>)
-          .map(([key, value]) => `${key}: ${Array.isArray(value) ? String(value[0]) : String(value)}`)
-          .join(', ')
-          .trim();
-
-        toast.error(detailText || apiError?.message || 'Gagal memproses release/issue stock');
-        return;
-      }
-
-      toast.error(apiError?.message || 'Gagal memproses release/issue stock');
-    }
-  };
-
-  const handleDelete = async (_ids: number[]) => {
-    void _ids;
-    toast.error('Endpoint hapus detail belum tersedia pada API warehouse activity');
-  };
 
   return (
     <DashboardLayout>
@@ -156,7 +157,14 @@ export default function PengeluaranUnitDetailPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">Status Pengeluaran</span>
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+                    <button
+                      onClick={() => setIsUpdateStateDialogOpen(true)}
+                      className="p-1 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                      title="Ubah Status Pengeluaran"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
                     {detailData?.state ? (
                       <Badge variant="outline" className={`font-semibold ${stateInfo.bg}`}>
                         {stateInfo.text}
@@ -194,9 +202,68 @@ export default function PengeluaranUnitDetailPage() {
         </div>
 
         <div className="bg-white rounded-md border sm:p-5 space-y-4">
-          <PengeluaranUnitDetailTable data={details} onKirim={handleKirim} onDelete={handleDelete} isLoading={isLoading} />
+          <PengeluaranUnitDetailTable data={details} isRefundActivity={detailData?.isRefundActivity} activityState={detailData?.state} isLoading={isLoading} />
         </div>
       </div>
+
+      {/* DIALOG UPDATE STATUS */}
+      <Dialog open={isUpdateStateDialogOpen} onOpenChange={setIsUpdateStateDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] p-6 rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-800">Ubah Status Pengeluaran</DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Pilih status baru untuk aktivitas pengeluaran unit ini.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 my-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-700">Status Baru</label>
+              <Select
+                value={selectedState}
+                onValueChange={(val) => setSelectedState(val as 'draft' | 'process' | 'done')}
+              >
+                <SelectTrigger className="w-full bg-white border-slate-200 h-10 rounded-lg">
+                  <SelectValue placeholder="Pilih status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">
+                    <div className="flex flex-col text-left py-1">
+                      <span className="font-medium text-slate-800 text-sm">Draft (Draf)</span>
+                      <span className="text-[11px] text-slate-500 font-normal">Dokumen baru dibuat dan belum diproses</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="process">
+                    <div className="flex flex-col text-left py-1">
+                      <span className="font-medium text-slate-800 text-sm">Process (Proses)</span>
+                      <span className="text-[11px] text-slate-500 font-normal">Sedang dalam proses pengerjaan/pengeluaran barang</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="done">
+                    <div className="flex flex-col text-left py-1">
+                      <span className="font-medium text-slate-800 text-sm">Done (Selesai)</span>
+                      <span className="text-[11px] text-slate-500 font-normal">Aktivitas pengeluaran unit telah selesai dilakukan</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0 border-t pt-4">
+            <Button variant="outline" className="rounded-lg" onClick={() => setIsUpdateStateDialogOpen(false)}>
+              Batal
+            </Button>
+            <Button
+              onClick={handleUpdateState}
+              disabled={updateStateMutation.isPending}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5"
+            >
+              {updateStateMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
