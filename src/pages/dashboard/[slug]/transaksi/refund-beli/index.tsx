@@ -21,6 +21,7 @@ import { Trash2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDeleteRefund } from '@/hooks/useRefundAdministrasi';
 import { toast } from 'sonner';
+import { formatDate } from '@/lib/utils/format';
 
 const DeleteFinanceRefundAction = ({ item, transactionType }: { item: UnitTransactionRefund, transactionType: 'sales' | 'purchase' }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,13 +85,6 @@ const DeleteFinanceRefundAction = ({ item, transactionType }: { item: UnitTransa
       </Dialog>
     </>
   );
-};
-
-const formatDate = (value?: string) => {
-  if (!value) return '-';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID');
 };
 
 export default function TransaksiRefundBeliPage() {
