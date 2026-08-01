@@ -172,9 +172,7 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
                     <FormLabel>Biaya</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Rp.</span>
                         <MoneyInput 
-                          className="pl-9" 
                           value={field.value ?? 0} 
                           onChangeValue={(value) => field.onChange(value)} 
                           placeholder="Tambahkan biaya" 
