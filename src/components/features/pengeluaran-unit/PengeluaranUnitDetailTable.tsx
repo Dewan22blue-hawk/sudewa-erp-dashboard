@@ -241,7 +241,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
             prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
             purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
             in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold' },
-            receipt: { label: 'Receipt', name: 'Dikirim', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+            receipt: { label: 'Receipt', name: 'Terkirim', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
           };
 
           const stateVal = item?.state ?? 'draft';
@@ -253,7 +253,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
 
           return (
             <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
-              {match.name}
+              {item?.isSoldUnit ? 'Diterima' : match.name}
             </Badge>
           );
         }

@@ -253,7 +253,7 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
 
           return (
             <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
-              {match.name}
+              {item?.isSoldUnit ? 'Terkirim' : match.name}
             </Badge>
           );
         }
