@@ -344,14 +344,14 @@ export default function SalesDetailPage() {
           }
           actions={
             <>
-              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
+              <Button disabled={isRefunded || !canCreate} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={handlePayment}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 {isPaid ? 'Sudah Dibayar' : 'Bayar'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || sales?.unit_transaction_billing == null}
+                disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || sales?.unit_transaction_billing == null || !canCreate}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => setIsMarkAsPaidDialogOpen(true)}
               >
@@ -361,7 +361,7 @@ export default function SalesDetailPage() {
               <Button
                 variant="outline"
                 className="bg-white hover:bg-gray-50 border-gray-200"
-                disabled={!canDeliver}
+                disabled={!canDeliver || !canCreate}
                 onClick={() => setIsDeliveryDialogOpen(true)}
               >
                 {deliveryButtonText}
@@ -435,7 +435,7 @@ export default function SalesDetailPage() {
               type="button"
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
               onClick={handleMarkAsPaid}
-              disabled={updateBillingIsPaid.isPending}
+              disabled={updateBillingIsPaid.isPending || !canCreate}
             >
               {updateBillingIsPaid.isPending ? 'Memproses...' : 'Ya, Tandai Lunas'}
             </Button>

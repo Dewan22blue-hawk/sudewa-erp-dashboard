@@ -6,6 +6,7 @@ export interface PenerimaanUnit {
   keterangan?: string;
   state?: string;
   isSoldUnit?: boolean;
+  state_note?: string;
   activity_date?: string;
   person?: {
     id: string;

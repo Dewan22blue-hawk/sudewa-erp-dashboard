@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import Head from 'next/head';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function WarehouseBlockPage() {
   const router = useRouter();
@@ -18,6 +19,11 @@ export default function WarehouseBlockPage() {
   const [perPage, setPerPage] = useState(25);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -107,7 +113,7 @@ export default function WarehouseBlockPage() {
         <div className="space-y-6">
           <PageHeader
             title="Data Blok Gudang"
-            subtitle="Kelola master data blok gudang dan sub-bloknya"
+            subtitle="Kelola master data blok gudang dan sub-blok data"
           />
 
           <WarehouseBlockTable
@@ -128,6 +134,9 @@ export default function WarehouseBlockPage() {
             onAdd={handleAdd}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            canCreate={canCreate}
+            canEdit={canEdit}
+            canDelete={canDelete}
             onViewDetail={handleViewDetail}
           />
         </div>

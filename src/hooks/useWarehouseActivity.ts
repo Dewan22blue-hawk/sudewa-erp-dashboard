@@ -96,8 +96,15 @@ export const useWarehouseActivityStateUpdate = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ activityId, state }: { activityId: string | number; state: 'draft' | 'process' | 'done' }) =>
-      updateWarehouseActivityState(activityId, state),
+    mutationFn: ({
+      activityId,
+      state,
+      state_note,
+    }: {
+      activityId: string | number;
+      state: 'draft' | 'process' | 'done';
+      state_note?: string;
+    }) => updateWarehouseActivityState(activityId, state, state_note),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey] });
       queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey, 'detail', String(variables.activityId)] });

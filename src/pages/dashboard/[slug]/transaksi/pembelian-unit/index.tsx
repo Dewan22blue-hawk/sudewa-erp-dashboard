@@ -71,6 +71,7 @@ export default function PurchasePage() {
             setPage(1);
           }}
           canEdit={canEdit}
+          canCreate={canCreate}
           canDelete={canDelete}
           loading={isLoading || isFetching}
           search={search}

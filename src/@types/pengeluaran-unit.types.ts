@@ -27,6 +27,7 @@ export interface PengeluaranUnit {
   warehouse: WarehouseOption | null;
   person: PersonOption | null;
   state?: string;
+  state_note?: string;
 }
 
 export interface DispatchUnitTableRow {

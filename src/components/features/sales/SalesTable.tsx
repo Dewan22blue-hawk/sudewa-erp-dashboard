@@ -35,6 +35,7 @@ export interface SalesTableProps {
   search?: string;
   canEdit?: boolean;
   canDelete?: boolean;
+  canCreate?: boolean;
   onSearchChange?: (value: string) => void;
   loading?: boolean;
 }
@@ -51,6 +52,7 @@ export function SalesTable({
   search,
   canEdit,
   canDelete,
+  canCreate,
   onSearchChange,
 }: SalesTableProps) {
   const router = useRouter();
@@ -304,6 +306,7 @@ export function SalesTable({
               {canEdit && (
                 <>
                   <DropdownMenuItem
+                    disabled={!canEdit}
                     className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                     onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/edit/${item.id}` : `/transaksi/penjualan-unit/edit/${item.id}`)}
                   >
@@ -312,7 +315,7 @@ export function SalesTable({
                   <DropdownMenuItem
                     className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                     onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}/refund` : `/transaksi/penjualan-unit/${item.id}/refund`)}
-                    disabled={isRefunded(item)}
+                    disabled={isRefunded(item) || !canEdit}
                   >
                     <RotateCcw className="mr-2 h-4 w-4" /> Refund Jual
                   </DropdownMenuItem>
@@ -333,7 +336,7 @@ export function SalesTable({
                     }
                     onDelete(item.id);
                   }}
-                  disabled={item.isPaid}
+                  disabled={item.isPaid || !canDelete}
                   className={cn(
                     "rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer",
                     item.isPaid && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-red-600 focus:bg-transparent"
@@ -391,7 +394,7 @@ export function SalesTable({
       </div>
 
       {onAdd && (
-        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+        <Button onClick={onAdd} disabled={!canCreate} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah Data
         </Button>

@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import type { WarehouseSubBlock } from '@/services/warehouseBlock.service';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function WarehouseBlockDetailPage() {
   const router = useRouter();
@@ -25,6 +26,11 @@ export default function WarehouseBlockDetailPage() {
   const [perPage, setPerPage] = useState(25);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -139,11 +145,11 @@ export default function WarehouseBlockDetailPage() {
 
   // Client-side filtering and pagination for Sub Blocks
   const allSubBlocks = block?.warehouse_sub_blocks || [];
-  const filteredSubBlocks = allSubBlocks.filter((sb) => 
-    sb.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+  const filteredSubBlocks = allSubBlocks.filter((sb) =>
+    sb.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     (sb.description || '').toLowerCase().includes(debouncedSearch.toLowerCase())
   );
-  
+
   const startIdx = (page - 1) * perPage;
   const paginatedSubBlocks = filteredSubBlocks.slice(startIdx, startIdx + perPage);
   const totalPages = Math.ceil(filteredSubBlocks.length / perPage) || 1;
@@ -199,7 +205,7 @@ export default function WarehouseBlockDetailPage() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Daftar Sub Blok Gudang</h2>
               <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                Kelola sub blok untuk 
+                Kelola sub blok untuk
                 {block?.name ? (
                   <Badge variant="outline" className="bg-slate-50 text-slate-700">
                     Blok {block.name}
@@ -230,6 +236,9 @@ export default function WarehouseBlockDetailPage() {
               onDelete={handleDelete}
               onMakeDefault={handleMakeDefault}
               onToggleActive={handleToggleActive}
+              canCreate={canCreate}
+              canEdit={canEdit}
+              canDelete={canDelete}
             />
           </div>
         </div>

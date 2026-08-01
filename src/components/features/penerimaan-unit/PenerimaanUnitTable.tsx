@@ -19,6 +19,7 @@ import { ReferenceLink } from '@/components/ui/reference-link';
 import { Badge } from '@/components/ui/badge';
 import { TextTruncate } from '@/components/ui/text-truncate';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -65,11 +66,13 @@ export default function PenerimaanUnitTable({
   onPageChange,
   headerActions,
 }: Props) {
+  console.log(data)
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
 
-  const [editingActivity, setEditingActivity] = useState<{ id: string | number; state: 'draft' | 'process' | 'done' } | null>(null);
+  const [editingActivity, setEditingActivity] = useState<{ id: string | number; state: 'draft' | 'process' | 'done'; state_note?: string } | null>(null);
   const [selectedState, setSelectedState] = useState<'draft' | 'process' | 'done'>('draft');
+  const [stateNote, setStateNote] = useState('');
 
   const updateStateMutation = useWarehouseActivityStateUpdate();
 
@@ -80,6 +83,11 @@ export default function PenerimaanUnitTable({
         setSelectedState(s as 'draft' | 'process' | 'done');
       }
     }
+    if (editingActivity?.state_note) {
+      setStateNote(editingActivity.state_note);
+    } else {
+      setStateNote('');
+    }
   }, [editingActivity]);
 
   const handleUpdateState = async () => {
@@ -88,6 +96,7 @@ export default function PenerimaanUnitTable({
       await updateStateMutation.mutateAsync({
         activityId: editingActivity.id,
         state: selectedState,
+        state_note: stateNote,
       });
       toast.success('Status penerimaan berhasil diperbarui');
       setEditingActivity(null);
@@ -96,10 +105,10 @@ export default function PenerimaanUnitTable({
     }
   };
 
-  const handleOpenStateDialog = (activityId: string | number, state: string) => {
+  const handleOpenStateDialog = (activityId: string | number, state: string, stateNote?: string) => {
     const s = state?.toLowerCase();
     const cleanState = s === 'draft' || s === 'process' || s === 'done' ? (s as 'draft' | 'process' | 'done') : 'draft';
-    setEditingActivity({ id: activityId, state: cleanState });
+    setEditingActivity({ id: activityId, state: cleanState, state_note: stateNote });
   };
 
   const formatDate = (val?: string) => {
@@ -146,7 +155,7 @@ export default function PenerimaanUnitTable({
         return (
           <div className="flex items-center gap-1.5">
             <button
-              onClick={() => handleOpenStateDialog(item.id, item.state || 'draft')}
+              onClick={() => handleOpenStateDialog(item.id, item.state || 'draft', item.state_note)}
               className="p-1 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
               title="Ubah Status"
             >
@@ -203,7 +212,7 @@ export default function PenerimaanUnitTable({
               Detail
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => handleOpenStateDialog(item.id, item.state || 'draft')}
+              onClick={() => handleOpenStateDialog(item.id, item.state || 'draft', item.state_note)}
               className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
             >
               Ubah Status
@@ -272,6 +281,16 @@ export default function PenerimaanUnitTable({
                   </SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-700">Catatan Status</label>
+              <Textarea
+                placeholder="Masukkan catatan perubahan status..."
+                value={stateNote}
+                onChange={(e) => setStateNote(e.target.value)}
+                className="w-full min-h-[80px] bg-white border-slate-200 rounded-lg p-2 text-sm focus:outline-none"
+              />
             </div>
           </div>
 
