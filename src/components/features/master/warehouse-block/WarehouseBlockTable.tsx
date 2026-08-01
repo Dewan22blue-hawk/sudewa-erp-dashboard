@@ -110,7 +110,7 @@ export const WarehouseBlockTable = ({
         ),
       },
     ],
-    [onEdit, onDelete, onViewDetail],
+    [onEdit, onDelete, onViewDetail, canEdit, canDelete],
   );
 
   return (
