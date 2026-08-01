@@ -37,7 +37,7 @@ function processFile(filePath) {
     /<Loader2 className="h-4 w-4 animate-spin" \/>/g,
     /<Loader2 className="h-4 w-4 animate-spin text-slate-400" \/>/g,
   ];
-  
+
   for (const pattern of inlineLoaderPatterns) {
     if (pattern.test(content)) {
       content = content.replace(pattern, '<LoadingState variant="inline" text={null} />');
@@ -56,7 +56,7 @@ function processFile(filePath) {
         content = "import { LoadingState } from '@/components/ui/loading-state';\n" + content;
       }
     }
-    
+
     const loader2Count = (content.match(/Loader2/g) || []).length;
     if (loader2Count === 1) { // Only the import remains
       content = content.replace(/,\s*Loader2/, '');
@@ -65,7 +65,6 @@ function processFile(filePath) {
     }
 
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Updated: ${filePath}`);
   }
 }
 

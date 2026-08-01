@@ -49,9 +49,8 @@ function processFile(filePath) {
         content = "import { LoadingState } from '@/components/ui/loading-state';\n" + content;
       }
     }
-    
+
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Updated: ${filePath}`);
   }
 }
 

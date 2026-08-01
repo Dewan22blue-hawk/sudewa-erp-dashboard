@@ -77,7 +77,6 @@ export default function EditTypeUnitPage() {
       toast.success('Data berhasil diperbarui');
       router.push(`/dashboard/${slug}/master/type-unit`);
     } catch (error) {
-      console.error('Failed to update type unit:', error);
       toast.error('Gagal memperbarui data tipe unit');
     }
   };

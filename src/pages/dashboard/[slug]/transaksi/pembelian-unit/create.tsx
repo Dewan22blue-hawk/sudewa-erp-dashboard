@@ -141,11 +141,6 @@ export default function CreatePurchasePage() {
         other_fee: otherFeeNumber,
       };
 
-      if (process.env.NODE_ENV !== 'production') {
-        // Log untuk debug jika validasi backend gagal
-        console.debug('create purchase payload', payload);
-      }
-
       const response = await mutation.mutateAsync(payload);
 
       toast.success(`Pembelian berhasil dibuat dengan nomor Transaksi ${response?.code}`);
@@ -192,7 +187,6 @@ export default function CreatePurchasePage() {
       const detailJson = err?.response?.data ? JSON.stringify(err.response.data) : '';
       toast.error(detail || apiMessage || 'Gagal membuat pembelian');
       if (process.env.NODE_ENV !== 'production') {
-        console.error('create purchase error', err?.response?.data || err);
         if (detailJson) console.error('create purchase error detail', detailJson);
       }
     }

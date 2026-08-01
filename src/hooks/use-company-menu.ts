@@ -38,7 +38,7 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
                 setStoredPermissions(perms || []);
             })
             .catch((err) => {
-                console.error('Failed to fetch permissions:', err);
+                console.error('Failed to fetch permissions test:', err);
             })
             .finally(() => {
                 setIsLoading(false);
