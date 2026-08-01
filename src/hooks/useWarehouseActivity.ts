@@ -110,6 +110,7 @@ export const useWarehouseActivityStateUpdate = () => {
       queryClient.invalidateQueries({ queryKey: [warehouseActivitiesKey, 'detail', String(variables.activityId)] });
       queryClient.invalidateQueries({ queryKey: ['sales-by-id'] });
       queryClient.invalidateQueries({ queryKey: ['purchase-by-id'] });
+      queryClient.invalidateQueries({ queryKey: ['pengeluaran-unit'] });
     },
   });
 };

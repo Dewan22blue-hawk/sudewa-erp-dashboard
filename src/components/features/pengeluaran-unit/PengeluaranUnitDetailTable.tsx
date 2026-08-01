@@ -22,10 +22,11 @@ import { cn } from '@/lib/utils';
 interface Props {
   data?: WarehouseActivityUnitDetail[];
   activityState?: string;
+  isRefundActivity?: boolean;
   isLoading?: boolean;
 }
 
-export default function PengeluaranUnitDetailTable({ data, activityState, isLoading = false }: Props) {
+export default function PengeluaranUnitDetailTable({ data, isRefundActivity, activityState, isLoading = false }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
@@ -34,7 +35,6 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
   const [currentPage, setCurrentPage] = useState(1);
   const [selected, setSelected] = useState<number[]>([]);
   const [dispatchedIds, setDispatchedIds] = useState<number[]>([]);
-  console.log(activityState)
 
   // Modal State
   const [isOpenProcessModal, setIsOpenProcessModal] = useState(false);
@@ -191,7 +191,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
         sortable: true,
         alignment: 'center',
         tooltip: 'Status ketersediaan unit fisik di gudang',
-        cell: (item) => item?.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia {item?.isSoldUnit && '/ Terjual'}</Badge>
+        cell: (item) => item?.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia {item?.isSoldUnit && isRefundActivity ? '/ Dikembalikan' : '/ Terjual'}</Badge>
       },
       {
         header: 'Kondisi Stok',
@@ -253,7 +253,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
 
           return (
             <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
-              {item?.isSoldUnit ? 'Diterima' : match.name}
+              {item?.isSoldUnit ? (isRefundActivity ? 'Dikembalikan' : 'Diterima') : match.name}
             </Badge>
           );
         }
@@ -277,7 +277,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isLoad
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}
-        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done' || item?.isSoldUnit === true}
+        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done'}
         meta={{
           currentPage: safePage,
           perPage: itemsPerPage,

@@ -184,7 +184,7 @@ export function SalesTable({
         accessorKey: 'created_at',
         sortable: true,
         alignment: 'center',
-        cell: (item) => formatDate(item?.created_at) || '-',
+        cell: (item) => item?.created_at || '-',
       },
       {
         header: 'Customer',

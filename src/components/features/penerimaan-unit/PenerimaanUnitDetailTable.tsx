@@ -277,7 +277,7 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}
-        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done' || item?.isSoldUnit === true}
+        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done'}
         meta={{
           currentPage: safePage,
           perPage: itemsPerPage,
