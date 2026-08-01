@@ -28,6 +28,7 @@ export interface PurchaseTableProps {
   search?: string;
   canEdit?: boolean;
   canDelete?: boolean;
+  canCreate?: boolean;
   onSearchChange?: (value: string) => void;
   loading?: boolean;
 }
@@ -44,6 +45,7 @@ export default function PurchaseTable({
   search,
   canEdit,
   canDelete,
+  canCreate,
   onSearchChange,
 }: PurchaseTableProps) {
   const router = useRouter();
@@ -359,7 +361,7 @@ export default function PurchaseTable({
       </div>
 
       {/* RIGHT CONTROLS */}
-      {onAdd && (
+      {onAdd && canCreate && (
         <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah Data

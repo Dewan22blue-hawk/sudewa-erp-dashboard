@@ -228,7 +228,7 @@ export function SalesUnitTable({ lineItems, salesId, onAddUnit, canCreate, canEd
                   <Button
                     size="sm"
                     variant="destructive"
-                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending || isPaid}
+                    disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending || isPaid || !canCreate}
                     onClick={() => !isPaid ? setIsBulkDeleteOpen(true) : undefined}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />

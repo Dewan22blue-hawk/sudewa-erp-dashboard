@@ -29,6 +29,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { Textarea } from '@/components/ui/textarea';
+
 export default function PengeluaranUnitDetailPage() {
   const router = useRouter();
   const { id, slug } = router.query as { id?: string; slug?: string };
@@ -37,6 +39,7 @@ export default function PengeluaranUnitDetailPage() {
 
   const [isUpdateStateDialogOpen, setIsUpdateStateDialogOpen] = useState(false);
   const [selectedState, setSelectedState] = useState<'draft' | 'process' | 'done'>('draft');
+  const [stateNote, setStateNote] = useState('');
 
   const updateStateMutation = useWarehouseActivityStateUpdate();
 
@@ -47,6 +50,11 @@ export default function PengeluaranUnitDetailPage() {
         setSelectedState(s as 'draft' | 'process' | 'done');
       }
     }
+    if (detailData?.state_note) {
+      setStateNote(detailData.state_note);
+    } else {
+      setStateNote('');
+    }
   }, [detailData]);
 
   const handleUpdateState = async () => {
@@ -55,6 +63,7 @@ export default function PengeluaranUnitDetailPage() {
       await updateStateMutation.mutateAsync({
         activityId: id,
         state: selectedState,
+        state_note: stateNote,
       });
       toast.success('Status pengeluaran berhasil diperbarui');
       setIsUpdateStateDialogOpen(false);
@@ -172,6 +181,14 @@ export default function PengeluaranUnitDetailPage() {
                     ) : '-'}
                   </span>
                 </div>
+                {
+                  detailData?.state_note && (
+                    <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+                      <span className="text-xs text-slate-400">Catatan Status</span>
+                      <span className="text-slate-900">{detailData?.state_note}</span>
+                    </div>
+                  )
+                }
               </div>
             </CardContent>
           </Card>
@@ -247,6 +264,16 @@ export default function PengeluaranUnitDetailPage() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-700">Catatan Status</label>
+              <Textarea
+                placeholder="Masukkan catatan perubahan status..."
+                value={stateNote}
+                onChange={(e) => setStateNote(e.target.value)}
+                className="w-full min-h-[80px] bg-white border-slate-200 rounded-lg p-2 text-sm focus:outline-none"
+              />
             </div>
           </div>
 

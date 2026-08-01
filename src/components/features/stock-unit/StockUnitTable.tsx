@@ -112,7 +112,7 @@ export default function StockUnitTable({
       alignment: 'center',
       sortable: true,
       tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
-      cell: (item) => item.warehouseSubBlock?.name ? item.warehouseSubBlock?.name : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>,
+      cell: (item) => item.warehouseSubBlock?.name ? <CopyBox text={item.warehouseSubBlock.name} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>,
     },
     {
       header: 'Status Stok',
@@ -153,7 +153,7 @@ export default function StockUnitTable({
 
         return (
           <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
-            {match.name}
+            {item?.isSoldUnit ? 'Terkirim' : match.name}
           </Badge>
         );
       }

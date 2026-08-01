@@ -23,6 +23,9 @@ interface WarehouseSubBlockTableProps {
   onToggleActive: (subBlock: WarehouseSubBlock) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 export const WarehouseSubBlockTable = ({
@@ -40,6 +43,9 @@ export const WarehouseSubBlockTable = ({
   onToggleActive,
   onPageChange,
   onPerPageChange,
+  canCreate,
+  canEdit,
+  canDelete,
 }: WarehouseSubBlockTableProps) => {
   const columns = useMemo<ColumnDef<WarehouseSubBlock>[]>(
     () => [
@@ -100,7 +106,7 @@ export const WarehouseSubBlockTable = ({
             <DropdownMenuContent align="end" className="min-w-[150px] rounded-xl border-slate-200 p-1.5 shadow-lg">
               <DropdownMenuItem
                 onClick={() => onMakeDefault(item)}
-                disabled={String(item.is_default) === '1' || String(item.is_default) === 'true' || item.is_default === true}
+                disabled={String(item.is_default) === '1' || String(item.is_default) === 'true' || item.is_default === true && !canEdit}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
@@ -108,6 +114,7 @@ export const WarehouseSubBlockTable = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onToggleActive(item)}
+                disabled={!canEdit}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               >
                 {String(item.is_active) === '1' || String(item.is_active) === 'true' || item.is_active === true ? (
@@ -124,6 +131,7 @@ export const WarehouseSubBlockTable = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onEdit(item)}
+                disabled={!canEdit}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               >
                 <Pencil className="mr-2 h-4 w-4" />
@@ -131,6 +139,7 @@ export const WarehouseSubBlockTable = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDelete(item)}
+                disabled={!canDelete}
                 className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
               >
                 <Trash className="mr-2 h-4 w-4" />
@@ -141,7 +150,7 @@ export const WarehouseSubBlockTable = ({
         ),
       },
     ],
-    [onEdit, onDelete, onMakeDefault, onToggleActive],
+    [onEdit, onDelete, onMakeDefault, onToggleActive, canCreate, canEdit, canDelete],
   );
 
   return (

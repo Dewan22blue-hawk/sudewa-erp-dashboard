@@ -71,6 +71,7 @@ export default function SalesPage() {
           }}
           canEdit={canEdit}
           canDelete={canDelete}
+          canCreate={canCreate}
           loading={isLoading || isFetching}
           search={search}
           onSearchChange={(val) => { setSearch(val); setPage(1); }}
