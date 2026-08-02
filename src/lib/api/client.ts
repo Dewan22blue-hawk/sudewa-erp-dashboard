@@ -49,13 +49,18 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<ApiError>) => {
     // Handle 401 Unauthorized (token rejected by backend)
     if (error.response?.status === 401) {
-      // Clear token dan redirect ke login
-      if (typeof window !== 'undefined') {
-        console.warn('[API Client] Received 401 - clearing token and redirecting to login');
-        removeAccessToken();
-        clearStoredCompanyId();
-        clearStoredPermissions();
-        window.location.href = '/login';
+      const isLoginRequest = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('login');
+      const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/login';
+
+      // Clear token dan redirect ke login hanya jika bukan request login atau tidak sedang di halaman login
+      if (!isLoginRequest && !isLoginPage) {
+        if (typeof window !== 'undefined') {
+          console.warn('[API Client] Received 401 - clearing token and redirecting to login');
+          removeAccessToken();
+          clearStoredCompanyId();
+          clearStoredPermissions();
+          window.location.href = '/login';
+        }
       }
     }
 

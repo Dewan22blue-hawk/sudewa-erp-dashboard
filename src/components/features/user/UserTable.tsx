@@ -2,26 +2,36 @@ import { useCallback, useMemo, useState } from 'react';
 import { User } from '@/@types/user.types';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import {  MoreVertical, Plus, Info } from 'lucide-react';
+import { MoreVertical, Plus, Info } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
 import { useActivateUser, useDeactivateUser } from '@/hooks/useUser';
+import { getUserPassword } from '@/services/user.service';
 import { toast } from 'sonner';
 import { CopyBox } from '@/components/ui/copy-box';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { LoadingState } from '@/components/ui/loading-state';
+import { ReferenceLink } from '@/components/ui/reference-link';
+import { useRouter } from 'next/router';
 
 interface Props {
   data: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onAdd?: () => void;
+  isLoading?: boolean;
+  canCreate?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
-export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
+export function UserTable({ data, onEdit, onDelete, onAdd, isLoading, canCreate, canEdit, canDelete }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+
+  const router = useRouter();
+  const { slug } = router.query;
 
   const activateMutation = useActivateUser();
   const deactivateMutation = useDeactivateUser();
@@ -67,6 +77,21 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
     }
   }, [activateMutation, deactivateMutation]);
 
+  const [fetchingPasswordId, setFetchingPasswordId] = useState<number | string | null>(null);
+
+  const handleCopyPassword = useCallback(async (userId: number | string) => {
+    setFetchingPasswordId(userId);
+    try {
+      const password = await getUserPassword(userId);
+      await navigator.clipboard.writeText(password);
+      toast.success('Password berhasil disalin ke clipboard');
+    } catch (error: any) {
+      toast.error(error?.message || 'Gagal menyalin password');
+    } finally {
+      setFetchingPasswordId(null);
+    }
+  }, []);
+
   const handleSearchChange = (val: string) => {
     setSearch(val);
     setCurrentPage(1);
@@ -98,9 +123,13 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         className: 'w-[25%]',
       },
       {
-        header: 'Role',
+        header: 'Hak Akses',
         alignment: 'left',
-        cell: (item) => item.roles?.map((r) => r.name).join(', ') || '-',
+        cell: (item) => item.roles ? (
+          <ReferenceLink href={`/dashboard/${slug}/settings/roles?search=${item.roles?.map((r) => r.name).join(',')}`}>
+            {item.roles?.map((r) => r.name).join(', ')}
+          </ReferenceLink>
+        ) : '-',
       },
       {
         header: 'Status',
@@ -111,7 +140,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
           const isActivating = activateMutation.isPending && activateMutation.variables === item.id;
           const isDeactivating = deactivateMutation.isPending && deactivateMutation.variables === item.id;
           const isUpdating = isActivating || isDeactivating;
-          const isAdmin = item.roles?.some((r) => r.name.toLowerCase() === 'admin');
+          const isAdmin = Boolean(item?.roles?.some((r) => r.name.toLowerCase() === 'admin'));
 
           if (isUpdating) {
             return (
@@ -141,7 +170,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
               <Switch
                 checked={isActive}
                 onCheckedChange={(checked) => handleToggleStatus(item, checked)}
-                disabled={activateMutation.isPending || deactivateMutation.isPending || isAdmin}
+                disabled={activateMutation.isPending || deactivateMutation.isPending || !canEdit || isAdmin}
               />
               <span className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-slate-400'}`}>
                 {isActive ? 'Aktif' : 'Nonaktif'}
@@ -156,7 +185,6 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         sticky: 'right',
         className: 'w-[80px]',
         cell: (item) => {
-          const isAdmin = item.roles?.some((r) => r.name.toLowerCase() === 'admin');
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -165,12 +193,19 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[150px] rounded-md border-slate-200 p-1.5 shadow-lg">
-                <DropdownMenuItem onClick={() => onEdit(item)} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
+                <DropdownMenuItem onClick={() => onEdit(item)} disabled={!canEdit} className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer">
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  onClick={() => handleCopyPassword(item.id)}
+                  disabled={!canEdit || fetchingPasswordId !== null}
+                  className="rounded-lg px-3 py-2 text-sm cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+                >
+                  {fetchingPasswordId === item.id ? 'Menyalin...' : 'Salin Password'}
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={() => onDelete(item)}
-                  disabled={isAdmin}
+                  disabled={!canDelete}
                   className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
                 >
                   Hapus
@@ -181,20 +216,20 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
         },
       },
     ],
-    [onEdit, onDelete, activateMutation.isPending, deactivateMutation.isPending, activateMutation.variables, deactivateMutation.variables, handleToggleStatus]
+    [onEdit, onDelete, activateMutation.isPending, deactivateMutation.isPending, activateMutation.variables, deactivateMutation.variables, handleToggleStatus, fetchingPasswordId, handleCopyPassword, canEdit, canDelete, slug]
   );
 
   const headerActions = useMemo(
     () =>
       onAdd ? (
         <div className="flex flex-wrap items-center gap-2">
-          <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+          <Button onClick={canCreate ? onAdd : () => { }} disabled={!canCreate} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
             <Plus className="h-4 w-4 mr-2" />
             Tambah Data
           </Button>
         </div>
       ) : undefined,
-    [onAdd]
+    [onAdd, canCreate]
   );
 
   return (
@@ -202,6 +237,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
       data={currentData}
       columns={columns}
       search={search}
+      loading={isLoading}
       onSearchChange={handleSearchChange}
       showLimitChange={true}
       perPage={itemsPerPage}

@@ -551,6 +551,7 @@ export default function UnitPurchaseDetailPage() {
               <BaseTable
                 data={filteredDetails}
                 columns={columns}
+                loading={purchaseLoading}
                 headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
                 defaultSort={{ key: 'payment_date', direction: 'desc' }}
                 showCheckbox={!isPaid}

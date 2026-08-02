@@ -23,22 +23,20 @@ export const useLogin = () => {
 
       return response;
     } catch (err: any) {
-      let message = err?.message || err?.response?.data?.message || 'Login failed';
+      const rawMessage = err?.response?.data?.message || err?.message || '';
+      const msgLower = typeof rawMessage === 'string' ? rawMessage.toLowerCase() : '';
       const status = err?.response?.status;
-      const msgLower = typeof message === 'string' ? message.toLowerCase() : '';
-      
-      const isAuthError = 
-        status === 401 || 
-        status === 400 || 
-        status === 404 || 
-        msgLower.includes('unauthorized') || 
-        msgLower.includes('invalid') || 
-        msgLower.includes('credential') || 
-        msgLower.includes('wrong') || 
-        msgLower.includes('fail');
+      let message = '';
 
-      if (isAuthError) {
-        message = 'Email atau password yang Anda masukkan salah. Silakan periksa kembali dan coba lagi.';
+      if (msgLower.includes('not activated') || msgLower.includes('belum diaktifkan') || msgLower.includes('deactivated')) {
+        message = 'Akun Anda belum aktif. Silakan hubungi administrator untuk mengaktifkan akun Anda.';
+      } else if (
+        msgLower.includes('invalid') || 
+        msgLower.includes('wrong') || 
+        msgLower.includes('credential') || 
+        status === 401
+      ) {
+        message = 'User ID/Email atau Kata Sandi yang Anda masukkan salah. Silakan periksa kembali.';
       } else {
         message = 'Terjadi kesalahan pada sistem. Silakan coba beberapa saat lagi.';
       }

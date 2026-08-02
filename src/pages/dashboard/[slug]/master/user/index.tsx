@@ -7,6 +7,7 @@ import { UserTable } from '@/components/features/user/UserTable';
 import { UserFormDialog } from '@/components/features/user/UserFormDialog';
 import { DeleteUserDialog } from '@/components/features/user/DeleteUserDialog';
 import { User } from '@/@types/user.types';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function UserPage() {
   const { data: users = [], isLoading, isError } = useUsers();
@@ -14,6 +15,11 @@ export default function UserPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [openForm, setOpenForm] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('transaction:create');
+  const canEdit = hasPermission('transaction:edit');
+  const canDelete = hasPermission('transaction:delete');
 
   // Handlers
   const handleEdit = (user: User) => {
@@ -42,24 +48,6 @@ export default function UserPage() {
     if (!open) setSelectedUser(null);
   };
 
-  // --- RENDER ---
-
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6">
-          <PageHeader
-            title="Pengguna"
-            subtitle="Kelola data Pengguna"
-          />
-          <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
-            <div className="text-muted-foreground animate-pulse">Loading...</div>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
   if (isError) {
     return (
       <DashboardLayout>
@@ -87,7 +75,7 @@ export default function UserPage() {
 
         {/* TABLE CARD */}
         <div className="">
-          <UserTable data={users} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleCreate} />
+          <UserTable data={users} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleCreate} isLoading={isLoading} canEdit={canEdit} canDelete={canDelete} canCreate={canCreate} />
         </div>
 
         <UserFormDialog open={openForm} onOpenChange={handleOpenFormChange} user={selectedUser} />
