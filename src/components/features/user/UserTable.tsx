@@ -216,7 +216,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd, isLoading, canCreate,
         },
       },
     ],
-    [onEdit, onDelete, activateMutation.isPending, deactivateMutation.isPending, activateMutation.variables, deactivateMutation.variables, handleToggleStatus, fetchingPasswordId, handleCopyPassword, canEdit, canDelete]
+    [onEdit, onDelete, activateMutation.isPending, deactivateMutation.isPending, activateMutation.variables, deactivateMutation.variables, handleToggleStatus, fetchingPasswordId, handleCopyPassword, canEdit, canDelete, slug]
   );
 
   const headerActions = useMemo(

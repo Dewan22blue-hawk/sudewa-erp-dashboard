@@ -289,12 +289,12 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                   <FormControl>
                     <div className="flex items-center space-x-3 h-9">
                       <Switch
-                        checked={field.value}
+                        checked={Boolean(field.value)}
                         onCheckedChange={field.onChange}
                         disabled={isBusy}
                       />
-                      <span className={`text-sm font-medium ${field.value ? 'text-green-600' : 'text-slate-400'}`}>
-                        {field.value ? 'Aktif' : 'Nonaktif'}
+                      <span className={`text-sm font-medium ${Boolean(field.value) ? 'text-green-600' : 'text-slate-400'}`}>
+                        {Boolean(field.value) ? 'Aktif' : 'Nonaktif'}
                       </span>
                     </div>
                   </FormControl>
