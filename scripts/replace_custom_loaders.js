@@ -33,7 +33,7 @@ function processFile(filePath) {
   }
 
   // Also replace any <Card className="rounded-md p-6"><LoadingState variant="page" /></Card> with just <LoadingState variant="page" /> if it looks weird, but let's just leave the card or let it be.
-  
+
   if (modified) {
     if (!content.includes('import { LoadingState }')) {
       const importMatches = [...content.matchAll(/^import .* from '.*';?$/gm)];
@@ -45,9 +45,8 @@ function processFile(filePath) {
         content = "import { LoadingState } from '@/components/ui/loading-state';\n" + content;
       }
     }
-    
+
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Updated: ${filePath}`);
   }
 }
 

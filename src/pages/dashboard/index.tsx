@@ -23,7 +23,6 @@ export default function DashboardIndex() {
               router.replace('/select-company');
             }
           } catch (error) {
-            console.error('Failed to fetch companies for redirect', error);
             router.replace('/select-company');
           }
         } else {

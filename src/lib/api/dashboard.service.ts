@@ -12,27 +12,51 @@ export const dashboardService = {
     if (startDate) defaultParams.start_date = startDate;
     if (endDate) defaultParams.end_date = endDate;
 
-    // Fetch real data dari API secara paralel
-    const [statsResponse, customerResponse, productResponse, transactionResponse] = await Promise.all([
-      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: defaultParams }),
-      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: defaultParams }),
-      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: defaultParams }),
-      apiClient.get<{ status: boolean; data: TransactionStatsRaw }>('/wapi/transaction/unit-transaction/unit-transaction', {
+    const safeGet = async <T>(url: string, config: any, fallback: T): Promise<T> => {
+      try {
+        const response = await apiClient.get<{ status: boolean; data: T }>(url, config);
+        return response.data.data;
+      } catch (err) {
+        console.warn(`[DashboardService] Failed to fetch from ${url}, using fallback:`, err);
+        return fallback;
+      }
+    };
+
+    // Fetch real data dari API secara paralel dengan penanganan error masing-masing
+    const [stats, customerStats, productStats, transactionStats] = await Promise.all([
+      safeGet<BillingStatsRaw>('/wapi/stats/billing-stats', { params: defaultParams }, {
+        opening_balance: {
+          debet: { bca_idr: 0, bca_usd: 0 },
+          kredit: { bca_idr: 0, bca_usd: 0 }
+        },
+        mutation: {
+          debet: { bca_idr: 0, bca_usd: 0 },
+          kredit: { bca_idr: 0, bca_usd: 0 }
+        },
+        percentage: []
+      }),
+      safeGet<CustomerStatsRaw>('/wapi/stats/customer-stats', { params: defaultParams }, {
+        summary: { total_customer: 0, total_revenue: 0, average_revenue_per_customer: 0 },
+        customers: { current_page: 1, data: [], total: 0 }
+      }),
+      safeGet<ProductStatsRaw>('/wapi/stats/unit-type-stats', { params: defaultParams }, {
+        summary: { total_unit_type: 0, total_unit_type_sold: 0 },
+        data: { current_page: 1, data: [], total: 0 }
+      }),
+      safeGet<TransactionStatsRaw>('/wapi/transaction/unit-transaction/unit-transaction', {
         params: {
           sort_order: 'desc',
           per_page: 5,
-          // type: 'purchase', // Removed to get all transactions for history
           page: 1,
           is_paid: true,
           ...defaultParams,
         },
+      }, {
+        current_page: 1,
+        data: [],
+        total: 0
       })
     ]);
-
-    const stats = statsResponse.data.data;
-    const customerStats = customerResponse.data.data;
-    const productStats = productResponse.data.data;
-    const transactionStats = transactionResponse.data.data;
 
     // Transform ke AccountOverview
     const accounts = dashboardService.transformToAccounts(stats);

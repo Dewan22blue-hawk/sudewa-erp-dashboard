@@ -138,17 +138,17 @@ export default function StockUnitTable({
       tooltip: 'Posisi logistik atau status alur stok unit',
       cell: (item) => {
         const config: Record<string, { label: string; name: string; className: string }> = {
-          draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
-          cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
-          prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
-          purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
-          in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
-          receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+          draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-semibold' },
+          cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+          prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+          purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+          in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold' },
+          receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
         };
         const stateVal = item?.stockStatus ?? 'draft';
         const match = config[stateVal] ?? {
           label: stateVal.replace(/_/g, ' '),
-          className: 'border-slate-200 bg-slate-50 text-slate-700',
+          className: 'border-slate-200 bg-slate-50 text-slate-700 font-semibold',
         };
 
         return (

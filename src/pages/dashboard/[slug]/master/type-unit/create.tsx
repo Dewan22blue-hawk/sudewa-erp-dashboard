@@ -49,7 +49,6 @@ export default function CreateTypeUnitPage() {
       toast.success('Data berhasil ditambahkan');
       router.push(`/dashboard/${slug}/master/type-unit`);
     } catch (error) {
-      console.error('Failed to create type unit:', error);
       toast.error('Gagal menambahkan data tipe unit');
     }
   };

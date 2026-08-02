@@ -185,7 +185,6 @@ export default function EditUnitPage() {
       toast.success('Data berhasil disimpan!');
       router.push(basePath);
     } catch (error) {
-      console.error('Error updating unit:', error);
       toast.error('Gagal menyimpan data. Silakan coba lagi.');
     }
   };
