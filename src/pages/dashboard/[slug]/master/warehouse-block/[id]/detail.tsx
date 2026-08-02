@@ -294,8 +294,8 @@ export default function WarehouseBlockDetailPage() {
           title="Import Sub Blok Gudang"
           description="Download template untuk memastikan format data sesuai sebelum melakukan import"
           templateUrl="https://docs.google.com/spreadsheets/d/1dix-TR6FpAstJUggUpCG_-AVAoZYPMunGqS3DNF-U8s/edit?usp=sharing"
-          onImport={(file) => importMutation.mutate(file)}
-          isImporting={importMutation.isPending}
+          onImport={async (file) => { await importMutation.mutateAsync(file); }}
+          isPending={importMutation.isPending}
         />
 
         <AlertDialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
