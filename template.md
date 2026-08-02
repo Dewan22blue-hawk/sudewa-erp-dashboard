@@ -1248,5 +1248,29 @@ Agar halaman utama/dashboard aman diakses oleh semua level pengguna:
     }
   };
   ```
-```
+
+#### 3. Pencegahan Reload/Refresh pada Halaman Login (`client.ts`)
+Agar info error login salah atau status tidak aktif tidak menghilang akibat halaman ter-refresh secara otomatis oleh interceptor:
+- **Kondisi Interceptor**: Jangan lakukan pembersihan token dan pemaksaan pengalihan `window.location.href = '/login'` apabila request berasal dari endpoint login (`/auth/login`) atau peramban memang sudah berada di halaman `/login`.
+  ```typescript
+  apiClient.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError<ApiError>) => {
+      if (error.response?.status === 401) {
+        const isLoginRequest = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('login');
+        const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/login';
+
+        if (!isLoginRequest && !isLoginPage) {
+          if (typeof window !== 'undefined') {
+            removeAccessToken();
+            clearStoredCompanyId();
+            clearStoredPermissions();
+            window.location.href = '/login';
+          }
+        }
+      }
+      // ...
+    }
+  );
+  ```
 ```
