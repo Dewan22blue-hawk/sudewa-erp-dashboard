@@ -3,7 +3,7 @@ import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreVertical, Pencil, Plus, Trash, CheckCircle, PowerOff, Power } from 'lucide-react';
+import { MoreVertical, Pencil, Plus, Trash, CheckCircle, PowerOff, Power, Upload, Download } from 'lucide-react';
 import { CopyBox } from '@/components/ui/copy-box';
 import type { WarehouseSubBlock } from '@/services/warehouseBlock.service';
 import type { PaginationMeta } from '@/@types/pagination.types';
@@ -26,6 +26,9 @@ interface WarehouseSubBlockTableProps {
   canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
+  onImport?: () => void;
+  onExport?: () => void;
+  isExporting?: boolean;
 }
 
 export const WarehouseSubBlockTable = ({
@@ -46,6 +49,9 @@ export const WarehouseSubBlockTable = ({
   canCreate,
   canEdit,
   canDelete,
+  onImport,
+  onExport,
+  isExporting,
 }: WarehouseSubBlockTableProps) => {
   const columns = useMemo<ColumnDef<WarehouseSubBlock>[]>(
     () => [
@@ -173,10 +179,24 @@ export const WarehouseSubBlockTable = ({
       }}
       onPageChange={onPageChange}
       headerActions={
-        <Button onClick={canCreate ? onAdd : undefined} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={!canCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Data
-        </Button>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {onExport && (
+            <Button variant="outline" className="w-full sm:w-auto" onClick={onExport} disabled={isExporting}>
+              <Download className="mr-2 h-4 w-4" />
+              {isExporting ? 'Proses...' : 'Export'}
+            </Button>
+          )}
+          {canCreate && onImport && (
+            <Button variant="outline" className="w-full sm:w-auto" onClick={onImport}>
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </Button>
+          )}
+          <Button onClick={canCreate ? onAdd : undefined} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={!canCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Data
+          </Button>
+        </div>
       }
     />
   );

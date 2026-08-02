@@ -251,7 +251,7 @@ export const unitItemDetailService = {
     const requestParams = {
       unit_transaction_item_id: unitTransactionItemId,
       page: params.page ?? 1,
-      per_page: params.perPage ?? 50,
+      per_page: params.perPage ?? 9999,
     };
 
     const response = await withPathFallback(
@@ -353,7 +353,7 @@ export const unitItemDetailService = {
     await apiClient.delete('/wapi/transaction/unit-transaction/unit-transaction-item-detail/bulk-delete', {
       data: {
         unit_transaction_item_id: Number(unitTransactionItemId),
-        unit_transaction_item_details_id: ids.map(id => Number(id)),
+        unit_transaction_item_details_ids: ids.map(id => Number(id)),
       }
     });
   },

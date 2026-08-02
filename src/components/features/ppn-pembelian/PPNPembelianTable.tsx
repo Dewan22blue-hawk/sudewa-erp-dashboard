@@ -248,7 +248,7 @@ export default function PPNPembelianTable({
       <BaseTable
         data={data}
         columns={columns}
-        loading={isLoading}
+        loading={isLoading || isFetching}
         sortBy={sortBy}
         sortDirection={sortDirection}
         onSortChange={(key) => onSortChange(key)}

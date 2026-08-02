@@ -1187,14 +1187,72 @@ export const getMasterDataList = async (params: PaginationParams & { company_id?
       total: filteredData.length,
       last_page: Math.max(1, Math.ceil(filteredData.length / perPage)),
     },
-    mapModel
   );
 };
 ```
 
 ---
 
-## 25. Penanganan Konflik HTTP Status Code & Penjagaan Toleransi Akses Menu (CORS / Redirect Loop)
+## 25. Standarisasi Input Nominal (Currency Input: IDR & USD)
+
+**Aturan**: Seluruh field input yang berkaitan dengan nominal uang, harga, biaya, atau transaksi (kas) **wajib** menggunakan komponen `MoneyInput` (dari `@/components/ui/money-input.tsx`). 
+Format tampilan mata uang sudah diatur secara dinamis dengan prefix `"Rp. "` untuk Rupiah dan `"$ "` untuk mata uang asing, ditambah penanganan *decimal point* (titik desimal) secara otomatis pada USD.
+
+**Dilarang Keras**:
+1. Menambahkan tulisan teks statis (teks absolut/span) "Rp" atau "$" yang difloating di atas atau di sebelah field input. 
+2. Menambahkan *padding left* (`pl-7`, `pl-9`) secara manual pada input untuk memberikan ruang buat tulisan "Rp" / "$". 
+3. Membuat fungsionalitas parsing / stripping karakter non-angka secara manual berulang-ulang dengan Regex di setiap `onChange` (kecuali di dalam berkas helper utility).
+
+**Standar Komponen `MoneyInput`**:
+- Untuk input bertipe **Rupiah (IDR)**, cukup panggil `<MoneyInput />` secara rutin (secara logis defaultnya `'IDR'`).
+- Untuk input bertipe **Dolar (USD)**, sertakan properti `currency="USD"`.
+
+**Contoh Implementasi**:
+
+```tsx
+import { MoneyInput } from '@/components/ui/money-input';
+
+// 1. Untuk Transaksi Rupiah (Otomatis mendapatkan prefix "Rp. ")
+<FormField
+  control={form.control}
+  name="paymentIdr"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Pembayaran IDR</FormLabel>
+      <FormControl>
+        <MoneyInput 
+          value={field.value ?? 0} 
+          onChangeValue={field.onChange} 
+          placeholder="0" 
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
+// 2. Untuk Transaksi USD (Otomatis mendapatkan prefix "$ " dan properti desimal)
+<FormField
+  control={form.control}
+  name="paymentUsd"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Pembayaran USD</FormLabel>
+      <FormControl>
+        <MoneyInput 
+          currency="USD" 
+          value={field.value ?? 0} 
+          onChangeValue={field.onChange} 
+          placeholder="0.00" 
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+```
+
+## 26. Penanganan Konflik HTTP Status Code & Penjagaan Toleransi Akses Menu (CORS / Redirect Loop)
 
 ### Latar Belakang & Gejala Bug
 Pengguna dengan izin terbatas (misal, staf gudang yang hanya memiliki akses menu `Warehouse`) mengalami kegagalan saat masuk ke Dashboard, ditandai dengan pesan error:
@@ -1248,7 +1306,6 @@ Agar halaman utama/dashboard aman diakses oleh semua level pengguna:
     }
   };
   ```
-
 #### 3. Pencegahan Reload/Refresh pada Halaman Login (`client.ts`)
 Agar info error login salah atau status tidak aktif tidak menghilang akibat halaman ter-refresh secara otomatis oleh interceptor:
 - **Kondisi Interceptor**: Jangan lakukan pembersihan token dan pemaksaan pengalihan `window.location.href = '/login'` apabila request berasal dari endpoint login (`/auth/login`) atau peramban memang sudah berada di halaman `/login`.
@@ -1273,4 +1330,3 @@ Agar info error login salah atau status tidak aktif tidak menghilang akibat hala
     }
   );
   ```
-```

@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { getWarehouseBlockDetail } from '@/services/warehouseBlock.service';
-import { createWarehouseSubBlock, updateWarehouseSubBlock, deleteWarehouseSubBlock, makeDefaultWarehouseSubBlock } from '@/services/warehouseSubBlock.service';
+import { createWarehouseSubBlock, updateWarehouseSubBlock, deleteWarehouseSubBlock, makeDefaultWarehouseSubBlock, importWarehouseSubBlock, exportWarehouseSubBlock } from '@/services/warehouseSubBlock.service';
 import { WarehouseSubBlockTable } from '@/components/features/master/warehouse-sub-block/WarehouseSubBlockTable';
 import { WarehouseSubBlockForm, type WarehouseSubBlockFormValues } from '@/components/features/master/warehouse-sub-block/WarehouseSubBlockForm';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -42,6 +43,8 @@ export default function WarehouseBlockDetailPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedSubBlock, setSelectedSubBlock] = useState<WarehouseSubBlock | undefined>();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: blockData, isLoading: isBlockLoading } = useQuery({
     queryKey: ['warehouse-block', blockId],
@@ -111,6 +114,36 @@ export default function WarehouseBlockDetailPage() {
       toast.error(error?.response?.data?.message || 'Gagal menghapus sub blok gudang');
     },
   });
+
+  const importMutation = useMutation({
+    mutationFn: importWarehouseSubBlock,
+    onSuccess: () => {
+      toast.success('Berhasil mengimpor detail sub blok');
+      setIsImportModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || 'Gagal mengimpor detail sub blok');
+    }
+  });
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const data = await exportWarehouseSubBlock();
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `sub_blok_gudang.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Gagal mengekspor data');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleAdd = () => {
     setSelectedSubBlock(undefined);
@@ -236,6 +269,9 @@ export default function WarehouseBlockDetailPage() {
               onDelete={handleDelete}
               onMakeDefault={handleMakeDefault}
               onToggleActive={handleToggleActive}
+              onImport={() => setIsImportModalOpen(true)}
+              onExport={handleExport}
+              isExporting={isExporting}
               canCreate={canCreate}
               canEdit={canEdit}
               canDelete={canDelete}
@@ -250,6 +286,16 @@ export default function WarehouseBlockDetailPage() {
           baseWarehouseBlockId={blockId}
           onSubmit={handleSubmit}
           isSubmitting={createMutation.isPending || updateMutation.isPending || makeDefaultMutation.isPending}
+        />
+
+        <DataImportModal
+          open={isImportModalOpen}
+          onOpenChange={setIsImportModalOpen}
+          title="Import Sub Blok Gudang"
+          description="Download template untuk memastikan format data sesuai sebelum melakukan import"
+          templateUrl="https://docs.google.com/spreadsheets/d/1dix-TR6FpAstJUggUpCG_-AVAoZYPMunGqS3DNF-U8s/edit?usp=sharing"
+          onImport={async (file) => { await importMutation.mutateAsync(file); }}
+          isPending={importMutation.isPending}
         />
 
         <AlertDialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>

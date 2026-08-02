@@ -113,9 +113,8 @@ export default function UnitPurchaseDetailPage() {
   const [editingItem, setEditingItem] = useState<{ id: string | number } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string | number } | null>(null);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [openBulkDeleteModal, setOpenBulkDeleteModal] = useState(false);
 
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
 
   const [formValues, setFormValues] = useState({
@@ -138,11 +137,6 @@ export default function UnitPurchaseDetailPage() {
       );
     });
   }, [details, search]);
-
-  const pagedDetails = useMemo(() => {
-    const start = (page - 1) * perPage;
-    return filteredDetails.slice(start, start + perPage);
-  }, [filteredDetails, page, perPage]);
 
   const columns = useMemo(
     () => [
@@ -353,20 +347,19 @@ export default function UnitPurchaseDetailPage() {
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
 
-    if (confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.size} detail unit terpilih?`)) {
-      try {
-        setIsBulkDeleting(true);
-        await bulkDeleteMutation.mutateAsync({
-          unitItemId,
-          ids: Array.from(selectedIds),
-        });
-        toast.success('Beberapa detail unit berhasil dihapus');
-        setSelectedIds(new Set());
-      } catch (err: any) {
-        toast.error(parseApiError(err));
-      } finally {
-        setIsBulkDeleting(false);
-      }
+    try {
+      setIsBulkDeleting(true);
+      await bulkDeleteMutation.mutateAsync({
+        unitItemId,
+        ids: Array.from(selectedIds),
+      });
+      toast.success('Beberapa detail unit berhasil dihapus');
+      setSelectedIds(new Set());
+      setOpenBulkDeleteModal(false);
+    } catch (err: any) {
+      toast.error(parseApiError(err));
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -556,7 +549,7 @@ export default function UnitPurchaseDetailPage() {
               </div>
 
               <BaseTable
-                data={pagedDetails}
+                data={filteredDetails}
                 columns={columns}
                 loading={purchaseLoading}
                 headerRowClassName="bg-[#f8f9fa] border-b border-gray-200"
@@ -565,23 +558,13 @@ export default function UnitPurchaseDetailPage() {
                 selectedIds={selectedIds}
                 onSelectedIdsChange={setSelectedIds}
                 search={search}
-                onSearchChange={(val) => { setSearch(val); setPage(1); }}
-                onPageChange={setPage}
-                showLimitChange={true}
-                perPage={perPage}
-                onPerPageChange={(val) => { setPerPage(val); setPage(1); }}
-                meta={{
-                  currentPage: page,
-                  perPage: perPage,
-                  lastPage: Math.ceil(filteredDetails.length / perPage) || 1,
-                  total: filteredDetails.length,
-                }}
+                onSearchChange={(val) => { setSearch(val); }}
                 headerActions=
                 {(
                   <div className="flex items-center gap-2">
                     {selectedIds.size > 0 && canDelete && !isPaid && (
                       <Button
-                        onClick={handleBulkDelete}
+                        onClick={() => setOpenBulkDeleteModal(true)}
                         disabled={isBulkDeleting}
                         variant="destructive"
                         className="w-full sm:w-auto bg-[#EF4444] hover:bg-[#DC2626] text-white"
@@ -652,6 +635,21 @@ export default function UnitPurchaseDetailPage() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleDelete}>
               {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={openBulkDeleteModal} onOpenChange={setOpenBulkDeleteModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus {selectedIds.size} Detail Unit</AlertDialogTitle>
+            <AlertDialogDescription>Apakah Anda yakin ingin menghapus {selectedIds.size} detail unit terpilih? Data yang dihapus tidak bisa dikembalikan.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleBulkDelete} disabled={isBulkDeleting}>
+              {isBulkDeleting ? 'Menghapus...' : 'Hapus'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
