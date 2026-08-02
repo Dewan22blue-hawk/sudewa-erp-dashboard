@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { User } from '@/@types/user.types';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import {  MoreVertical, Plus, Info } from 'lucide-react';
+import { MoreVertical, Plus, Info } from 'lucide-react';
 import { useTableSort } from '@/hooks/useTableSort';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Switch } from '@/components/ui/switch';
@@ -11,15 +11,18 @@ import { toast } from 'sonner';
 import { CopyBox } from '@/components/ui/copy-box';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { LoadingState } from '@/components/ui/loading-state';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Card } from '@/components/ui/card';
 
 interface Props {
   data: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onAdd?: () => void;
+  isLoading?: boolean;
 }
 
-export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
+export function UserTable({ data, onEdit, onDelete, onAdd, isLoading }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
@@ -202,6 +205,7 @@ export function UserTable({ data, onEdit, onDelete, onAdd }: Props) {
       data={currentData}
       columns={columns}
       search={search}
+      loading={isLoading}
       onSearchChange={handleSearchChange}
       showLimitChange={true}
       perPage={itemsPerPage}

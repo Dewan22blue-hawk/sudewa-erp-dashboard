@@ -147,8 +147,8 @@ export default function PermissionsPage() {
       <Dialog open={!!selectedId} onOpenChange={(open) => !open && setSelectedId(null)}>
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detail Permission</DialogTitle>
-            <DialogDescription>Informasi lengkap permission yang dipilih.</DialogDescription>
+            <DialogTitle>Detail Izin Akses</DialogTitle>
+            <DialogDescription>Informasi lengkap Izin Akses yang dipilih.</DialogDescription>
           </DialogHeader>
 
           {detailLoading ? (
@@ -213,7 +213,7 @@ export default function PermissionsPage() {
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Shield className="h-4 w-4 text-slate-500" />
-                  Roles yang memiliki permission ini
+                  Hak Akses yang memiliki Izin Akses ini
                 </h4>
                 {detail.roles && detail.roles.length > 0 ? (
                   <div className="space-y-2">
@@ -224,7 +224,7 @@ export default function PermissionsPage() {
                       >
                         <span className="text-sm font-medium text-gray-900">{role.name}</span>
                         <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs">
-                          {role.guard_name || 'api'}
+                          Aplikasi Web
                         </Badge>
                       </div>
                     ))}

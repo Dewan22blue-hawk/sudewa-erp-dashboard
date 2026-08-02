@@ -74,8 +74,8 @@ export default function RoleDetailPage() {
             { label: 'Hak Akses', onClick: () => router.push(`/dashboard/${slug}/settings/roles`) },
             { label: 'Detail' }
           ]}
-          title="Detail Peran"
-          subtitle="Lihat informasi peran, kelola penugasan pengguna, dan daftar izin akses."
+          title="Detail Hak Akses"
+          subtitle="Lihat informasi hak akses, kelola penugasan pengguna, dan daftar izin akses."
           onBack={handleBack}
         />
 

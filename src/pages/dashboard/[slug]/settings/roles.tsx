@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { ApiResponseError } from '@/lib/api/response';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
+import { CopyBox } from '@/components/ui/copy-box';
 
 export default function RolesPage() {
   const router = useRouter();
@@ -66,20 +67,20 @@ export default function RolesPage() {
         accessorKey: 'name',
         sortable: true,
         alignment: 'left',
+        cell: (item) => <CopyBox text={item?.name} />
       },
       {
-        header: 'Guard',
-        accessorKey: 'guard_name',
+        header: 'Akses',
         sortable: true,
         alignment: 'left',
-        cell: (item) => (item as any).guard_name || '-',
+        cell: () => 'Aplikasi Web'
       },
       {
-        header: 'Users',
+        header: 'Pengguna',
         accessorKey: 'users_count',
         sortable: true,
         alignment: 'left',
-        cell: (item) => (item as any).users_count,
+        cell: (item) => (item as any).users_count + ' Pengguna',
       },
       {
         header: 'Aksi',

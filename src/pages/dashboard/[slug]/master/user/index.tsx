@@ -42,24 +42,6 @@ export default function UserPage() {
     if (!open) setSelectedUser(null);
   };
 
-  // --- RENDER ---
-
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6">
-          <PageHeader
-            title="Pengguna"
-            subtitle="Kelola data Pengguna"
-          />
-          <Card className="rounded-md p-8 flex justify-center items-center h-[300px]">
-            <div className="text-muted-foreground animate-pulse">Loading...</div>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
   if (isError) {
     return (
       <DashboardLayout>
@@ -87,7 +69,7 @@ export default function UserPage() {
 
         {/* TABLE CARD */}
         <div className="">
-          <UserTable data={users} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleCreate} />
+          <UserTable data={users} onEdit={handleEdit} onDelete={handleDelete} onAdd={handleCreate} isLoading={isLoading} />
         </div>
 
         <UserFormDialog open={openForm} onOpenChange={handleOpenFormChange} user={selectedUser} />
