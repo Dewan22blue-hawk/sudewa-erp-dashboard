@@ -52,7 +52,7 @@ export default function LoginPage() {
       const response = await login({ login: userId, email: userId, password });
       if (response?.status) {
         // Successfully logged in
-        router.push('/select-company');
+        window.location.href = '/select-company';
       }
     } catch (err) {
       // Error is handled by useLogin and accessible via `error` state

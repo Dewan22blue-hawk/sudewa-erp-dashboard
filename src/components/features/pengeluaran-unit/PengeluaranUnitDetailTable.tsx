@@ -387,15 +387,17 @@ export default function PengeluaranUnitDetailTable({ data, isRefundActivity, act
                     <SelectValue placeholder={subBlocksLoading ? "Memuat sub blok..." : "Pilih sub blok gudang"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {subBlocksResponse?.data?.data?.map((sb: any) => (
-                      <SelectItem key={sb.id} value={String(sb.id)}>
-                        {sb.name}
-                      </SelectItem>
-                    )) || (
-                        <SelectItem value="none" disabled>
-                          Tidak ada sub blok aktif
+                    {subBlocksResponse?.data?.data && subBlocksResponse.data.data.length > 0 ? (
+                      subBlocksResponse.data.data.map((sb: any) => (
+                        <SelectItem key={sb.id} value={String(sb.id)}>
+                          {sb.name}
                         </SelectItem>
-                      )}
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>
+                        Sub blok gudang tidak ditemukan.
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
