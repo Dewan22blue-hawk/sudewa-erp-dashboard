@@ -1,10 +1,9 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SparepartTransaction } from '@/@types/sparepart-transaction.types';
-import { CheckCircle, Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/router';
-import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
@@ -15,12 +14,11 @@ import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { formatDate } from '@/lib/utils/format';
-import { useSuppliers } from '@/hooks/useSupplier';
+import { useCustomers } from '@/hooks/useCustomer';
 import { useSpareparts } from '@/hooks/useSparepart';
-import { useUpdateSparepartTransactionBillingPaymentStatus } from '@/hooks/useSparepartTransaction';
 import { useCompany } from '@/contexts/CompanyContext';
 
-export interface PurchaseSparepartTableProps {
+export interface SalesSparepartTableProps {
   data: SparepartTransaction[];
   meta?: PaginationMeta;
   onDelete: (id: string) => void;
@@ -36,7 +34,7 @@ export interface PurchaseSparepartTableProps {
   loading?: boolean;
 }
 
-export default function PurchaseSparepartTable({
+export default function SalesSparepartTable({
   data,
   meta,
   onDelete,
@@ -50,31 +48,21 @@ export default function PurchaseSparepartTable({
   canDelete,
   canCreate,
   onSearchChange,
-}: PurchaseSparepartTableProps) {
+}: SalesSparepartTableProps) {
   const router = useRouter();
   const [localSearch, setLocalSearch] = useState(search || '');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { companyId } = useCompany();
-  const { data: suppliers } = useSuppliers({ company_id: companyId });
-  const { data: spareparts } = useSpareparts({ company_id: companyId });
-  const updatePaymentStatusMutation = useUpdateSparepartTransactionBillingPaymentStatus();
+  const { data: customers } = useCustomers({ company_id: companyId ?? undefined });
+  const { data: spareparts } = useSpareparts({ company_id: companyId ?? undefined });
 
-  const handleMarkAsPaid = async (billingId: string) => {
-    try {
-      await updatePaymentStatusMutation.mutateAsync({ id: billingId, is_paid: true });
-      toast.success("Transaksi berhasil ditandai lunas");
-    } catch {
-      toast.error("Gagal menandai transaksi lunas");
-    }
-  };
-
-  const getSupplierName = useCallback((item: SparepartTransaction) => {
+  const getCustomerName = useCallback((item: SparepartTransaction) => {
     if (item.person?.name) return item.person.name;
-    if (item.supplier?.name) return item.supplier.name;
+    if (item.customer?.name) return item.customer.name;
     if (!item.person_id) return '-';
-    return suppliers?.data?.find((s: any) => String(s.id) === String(item.person_id))?.name || String(item.person_id);
-  }, [suppliers]);
+    return customers?.data?.find((s: any) => String(s.id) === String(item.person_id))?.name || String(item.person_id);
+  }, [customers]);
 
   const getSparepartName = useCallback((item: SparepartTransaction) => {
     if (item.sparepart?.name) return item.sparepart.name;
@@ -138,12 +126,12 @@ export default function PurchaseSparepartTable({
         cell: (item) => formatDate(item?.transaction_date || item?.created_at) || '-',
       },
       {
-        header: 'Supplier',
+        header: 'Customer',
         accessorKey: 'person.name',
         sortable: true,
         cell: (item) => (
-          <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${encodeURIComponent(getSupplierName(item))}`}>
-            {getSupplierName(item) === String(item.person_id) ? `Supplier #${item.person_id}` : getSupplierName(item)}
+          <ReferenceLink href={`/dashboard/${slug}/master/customer?search=${encodeURIComponent(getCustomerName(item))}`}>
+            {getCustomerName(item) === String(item.person_id) ? `Customer #${item.person_id}` : getCustomerName(item)}
           </ReferenceLink>
         ),
       },
@@ -233,17 +221,12 @@ export default function PurchaseSparepartTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-sparepart/${item.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-sparepart/${item.id}`)}>
                 <Eye className="mr-2 h-4 w-4" /> Detail
               </DropdownMenuItem>
               {canEdit && (
-                <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-sparepart/edit/${item.id}`)}>
+                <DropdownMenuItem onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-sparepart/edit/${item.id}`)}>
                   <Pencil className="mr-2 h-4 w-4" /> Edit
-                </DropdownMenuItem>
-              )}
-              {canEdit && !item.billing_summary?.is_paid && item.sparepart_transaction_billing?.id && (
-                <DropdownMenuItem onClick={() => handleMarkAsPaid(String(item.sparepart_transaction_billing.id))}>
-                  <CheckCircle className="mr-2 h-4 w-4" /> Tandai Lunas
                 </DropdownMenuItem>
               )}
               {canDelete && (

@@ -89,6 +89,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/transaksi/pembelian-sparepart'),
         },
         {
+          label: 'Penjualan Sparepart',
+          href: base('/transaksi/penjualan-sparepart'),
+        },
+        {
           label: 'Penjualan Unit',
           href: base('/transaksi/penjualan-unit'),
         },

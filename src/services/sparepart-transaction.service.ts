@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, mapLaravelPaginationMeta, type LaravelApiResponse } from '@/lib/api/response';
-import { PaginationParams } from '@/@types/pagination.types';
+import { PaginationParams, PaginationMeta } from '@/@types/pagination.types';
 import {
   SparepartTransaction,
   SparepartTransactionResponse,
@@ -111,6 +111,17 @@ export const sparepartTransactionService = {
 
   async deleteSparepartTransaction(id: string): Promise<void> {
     await apiClient.delete<LaravelApiResponse<null>>(`${basePath}/${id}`);
+  },
+
+  async updateBillingPaymentStatus(billingId: string, isPaid: boolean): Promise<void> {
+    const data = new URLSearchParams();
+    data.append('is_paid', String(isPaid));
+
+    await apiClient.put<LaravelApiResponse<null>>(`/wapi/transaction/sparepart-transaction/sparepart-transaction-billing/${billingId}`, data, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
   },
 
   // --- Sparepart Transaction Billing History ---

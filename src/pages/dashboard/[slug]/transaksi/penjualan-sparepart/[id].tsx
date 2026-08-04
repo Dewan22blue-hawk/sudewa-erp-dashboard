@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatMoneyInput } from '@/lib/utils/money-input';
 import { formatDate } from '@/lib/utils/format';
-import { useSparepartTransaction, useCreateSparepartTransactionBillingHistory, useUpdateSparepartTransactionBillingHistory, useDeleteSparepartTransactionBillingHistory, useUpdateSparepartTransactionBillingPaymentStatus } from '@/hooks/useSparepartTransaction';
+import { useSparepartTransaction, useCreateSparepartTransactionBillingHistory, useUpdateSparepartTransactionBillingHistory, useDeleteSparepartTransactionBillingHistory } from '@/hooks/useSparepartTransaction';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Eye, Edit, Trash2, Plus, MoreVertical } from 'lucide-react';
+import { Eye, Edit, Trash2, Plus, MoreVertical } from 'lucide-react';
 import { PaymentModal } from '@/components/features/sparepart-transaction/PaymentModal';
 import DeletePaymentDialog from '@/components/features/sparepart-transaction/DeletePaymentDialog';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { currenciesFormat } from '@/components/ui/currenciesFormat';
 import { CopyBox } from '@/components/ui/copy-box';
 
-export default function DetailPurchaseSparepartPage() {
+export default function DetailSalesSparepartPage() {
   const router = useRouter();
   const { slug, id } = router.query;
   
@@ -27,13 +27,12 @@ export default function DetailPurchaseSparepartPage() {
   const createPaymentMutation = useCreateSparepartTransactionBillingHistory();
   const updatePaymentMutation = useUpdateSparepartTransactionBillingHistory();
   const deletePaymentMutation = useDeleteSparepartTransactionBillingHistory();
-  const updatePaymentStatusMutation = useUpdateSparepartTransactionBillingPaymentStatus();
 
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
 
-  const handleBack = () => router.push(`/dashboard/${slug}/transaksi/pembelian-sparepart`);
+  const handleBack = () => router.push(`/dashboard/${slug}/transaksi/penjualan-sparepart`);
 
   const openAddPayment = () => {
     setSelectedPayment(null);
@@ -92,16 +91,6 @@ export default function DetailPurchaseSparepartPage() {
       toast.error("Gagal menghapus pembayaran");
     }
   }
-
-  const handleMarkAsPaid = async () => {
-    if (!transaction?.sparepart_transaction_billing?.id) return;
-    try {
-      await updatePaymentStatusMutation.mutateAsync({ id: String(transaction.sparepart_transaction_billing.id), is_paid: true });
-      toast.success("Transaksi berhasil ditandai lunas");
-    } catch {
-      toast.error("Gagal menandai transaksi lunas");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -182,7 +171,7 @@ export default function DetailPurchaseSparepartPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <PageHeader 
-          title="Detail Pembelian Sparepart" 
+          title="Detail Penjualan Sparepart" 
           subtitle={
             <div className="flex items-center gap-2 flex-wrap mt-2">
               <span className="text-sm font-medium text-slate-500">Kode Transaksi:</span>
@@ -199,11 +188,11 @@ export default function DetailPurchaseSparepartPage() {
           }
           onBack={handleBack}
           breadcrumbs={[
-            { label: 'Pembelian Sparepart', onClick: handleBack },
+            { label: 'Penjualan Sparepart', onClick: handleBack },
             { label: 'Detail Transaksi' },
           ]}
           actions={
-            <Button variant="outline" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-sparepart/edit/${transaction.id}`)}>
+            <Button variant="outline" onClick={() => router.push(`/dashboard/${slug}/transaksi/penjualan-sparepart/edit/${transaction.id}`)}>
               <Edit className="mr-2 h-4 w-4" />
               Edit Data
             </Button>
@@ -227,7 +216,7 @@ export default function DetailPurchaseSparepartPage() {
                      <p className="text-base text-slate-900 font-medium">{transaction.nota_number || '-'}</p>
                    </div>
                    <div>
-                     <p className="text-sm font-medium text-slate-500 mb-1">Supplier</p>
+                     <p className="text-sm font-medium text-slate-500 mb-1">Customer</p>
                      <p className="text-base text-slate-900 font-medium">{transaction.person?.name || '-'}</p>
                    </div>
                    <div>
@@ -257,26 +246,12 @@ export default function DetailPurchaseSparepartPage() {
              <Card className="shadow-none border-gray-200">
                <CardHeader className="bg-slate-50/50 border-b border-gray-100 py-4 px-6 flex flex-row items-center justify-between">
                  <CardTitle className=" text-lg font-semibold">Riwayat Pembayaran</CardTitle>
-                 <div className="flex items-center gap-2">
-                   {!isPaid && transaction?.sparepart_transaction_billing?.id && (
-                     <Button 
-                       onClick={handleMarkAsPaid} 
-                       variant="outline" 
-                       className="border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100" 
-                       size="sm"
-                       disabled={updatePaymentStatusMutation.isPending}
-                     >
-                       <CheckCircle className="mr-2 h-4 w-4" />
-                       Tandai Lunas
-                     </Button>
-                   )}
-                   {remainingPayment > 0 && (
-                     <Button onClick={openAddPayment} className="bg-[#1e3a5f] hover:bg-[#152e4d]" size="sm">
-                       <Plus className="mr-2 h-4 w-4" />
-                       Bayar
-                     </Button>
-                   )}
-                 </div>
+                 {remainingPayment > 0 && (
+                   <Button onClick={openAddPayment} className="bg-[#1e3a5f] hover:bg-[#152e4d]" size="sm">
+                     <Plus className="mr-2 h-4 w-4" />
+                     Bayar
+                   </Button>
+                 )}
                </CardHeader>
                <CardContent className="p-6 pt-6">
                   <div className="overflow-x-auto">
@@ -315,7 +290,7 @@ export default function DetailPurchaseSparepartPage() {
                   <div className="h-px bg-slate-200 my-2"></div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-slate-700">TOTAL PEMBELIAN</span>
+                    <span className="text-sm font-semibold text-slate-700">TOTAL PENJUALAN</span>
                     <span className="font-bold text-base text-slate-900">{currenciesFormat('idr', transaction.transaction_netto_total)}</span>
                   </div>
                 </CardContent>
