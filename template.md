@@ -1330,3 +1330,66 @@ Agar info error login salah atau status tidak aktif tidak menghilang akibat hala
     }
   );
   ```
+
+---
+
+## Standarisasi Searchable Select (Combobox) untuk Form
+
+**Aturan**: Untuk field/dropdown opsi yang memiliki banyak item (Gudang, Supplier, Sparepart), letakkan komponen navigasi menggunakan **Popover + Command** dari Shadcn UI. Elemen untuk trigger drop-down *wajib* disisipkan dengan *native* `<button type="button">` dan dilekatkan di dalam blok `<FormControl>`. Penggunaan `<Button>` atau `<FormControl>` tanpa membungkus `PopoverTrigger` tidak direkomendasikan karena dapat merusak *ref forwarding* dan malah mengirimkan status *form submit*.
+
+**Hierarki yang Tepat:**
+```tsx
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { ChevronsUpDown, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+<FormField control={form.control} name="item_id" render={({ field }) => (
+  <FormItem>
+    <FormLabel>Pilih Item</FormLabel>
+    <Popover open={open} onOpenChange={setOpen}>
+      {/* ⚠️ PENTING: letakkan target asChild popover secara hierarki di dalam FormControl, dan gunakan tag HTML <button type="button"> */}
+      <FormControl>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
+          >
+            <span className="truncate">
+              {field.value ? options?.find((w) => String(w.id) === String(field.value))?.name : "Pilih..."}
+            </span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </button>
+        </PopoverTrigger>
+      </FormControl>
+      
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Cari opsi..." />
+          <CommandList>
+            <CommandEmpty>Tidak ditemukan.</CommandEmpty>
+            <CommandGroup>
+              {options?.map((opt) => (
+                <CommandItem
+                  key={opt.id}
+                  value={`${opt.name} ${opt.id}`} // value gabungan memudahkan pencarian berdasarkan kode & nama
+                  onSelect={() => {
+                    form.setValue("item_id", opt.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check className={cn("mr-2 h-4 w-4", String(field.value) === String(opt.id) ? "opacity-100" : "opacity-0")} />
+                  {opt.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+    <FormMessage />
+  </FormItem>
+)} />
+```

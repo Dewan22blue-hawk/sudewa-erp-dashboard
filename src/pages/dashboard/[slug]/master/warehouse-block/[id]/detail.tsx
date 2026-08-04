@@ -74,13 +74,9 @@ export default function WarehouseBlockDetailPage() {
   const createMutation = useMutation({
     mutationFn: createWarehouseSubBlock,
     onSuccess: (response, variables) => {
-      if (variables.is_default && response.data?.id) {
-        makeDefaultMutation.mutate({ id: response.data.id, data: variables });
-      } else {
-        toast.success('Berhasil menambahkan sub blok gudang baru');
-        setIsFormOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
-      }
+      toast.success('Berhasil menambahkan sub blok gudang baru');
+      setIsFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Gagal menambahkan sub blok gudang');
@@ -90,13 +86,9 @@ export default function WarehouseBlockDetailPage() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => updateWarehouseSubBlock(id, data),
     onSuccess: (response, variables) => {
-      if (variables.data.is_default && !selectedSubBlock?.is_default) {
-        makeDefaultMutation.mutate({ id: variables.id, data: variables.data });
-      } else {
-        toast.success('Berhasil mengubah data sub blok gudang');
-        setIsFormOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
-      }
+      toast.success('Berhasil mengubah data sub blok gudang');
+      setIsFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Gagal mengubah sub blok gudang');
