@@ -92,6 +92,7 @@ deploy-prod:
       echo "REKSO BUMI MINONGKO PIPELINE!"
       
       echo "Bismillah, cekelanku!"
+      source ~/.bashrc
       financedash
       sleep 5
 
