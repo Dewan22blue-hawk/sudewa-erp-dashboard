@@ -92,6 +92,7 @@ deploy-prod:
       echo "REKSO BUMI MINONGKO PIPELINE!"
       
       echo "Bismillah, cekelanku!"
+      financedash
       sleep 5
 
       EOF
