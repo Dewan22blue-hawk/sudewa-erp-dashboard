@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import SalesSparepartTable from '@/components/features/sparepart-transaction/SalesSparepartTable';
 import DeleteSalesSparepartDialog from '@/components/features/sparepart-transaction/DeleteSalesSparepartDialog';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 import { useSparepartTransactions, useDeleteSparepartTransaction } from '@/hooks/useSparepartTransaction';
 import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -23,14 +23,14 @@ export default function SalesSparepartPage() {
   const [perPage, setPerPage] = useState(25);
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isFetching } = useSparepartTransactions({ 
-    page, 
-    perPage, 
+  const { data, isLoading, isFetching } = useSparepartTransactions({
+    page,
+    perPage,
     search,
     type: 'sales',
-    company_id: companyId 
+    company_id: companyId
   });
-  
+
   const deleteMutation = useDeleteSparepartTransaction();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -50,11 +50,10 @@ export default function SalesSparepartPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <PageHeader 
-            title="Penjualan Sparepart" 
-            description="Kelola dan lacak semua penjualan sparepart" 
+          <PageHeader
+            title="Penjualan Sparepart"
             breadcrumbs={[
-              { label: 'Administrasi', href: '#' },
+              { label: 'Administrasi' },
               { label: 'Penjualan Sparepart' },
             ]}
           />
@@ -80,11 +79,11 @@ export default function SalesSparepartPage() {
           onSearchChange={(val) => { setSearch(val); setPage(1); }}
         />
 
-        <DeleteSalesSparepartDialog 
-          open={!!selectedId} 
-          onClose={() => setSelectedId(null)} 
-          onConfirm={handleDelete} 
-          loading={deleteMutation.isPending} 
+        <DeleteSalesSparepartDialog
+          open={!!selectedId}
+          onClose={() => setSelectedId(null)}
+          onConfirm={handleDelete}
+          loading={deleteMutation.isPending}
         />
       </div>
     </DashboardLayout>

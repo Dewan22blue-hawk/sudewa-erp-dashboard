@@ -30,20 +30,19 @@ export default function CreateSalesSparepartPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <PageHeader 
-          title="Tambah Penjualan Sparepart" 
-          description="Masukkan data penjualan sparepart baru ke dalam sistem"
+        <PageHeader
+          title="Tambah Penjualan Sparepart"
           onBack={handleCancel}
           breadcrumbs={[
             { label: 'Penjualan Sparepart', onClick: handleCancel },
             { label: 'Tambah Data' },
           ]}
         />
-        
+
         <div className="bg-white rounded-md border border-gray-200 p-6 shadow-sm">
-          <SalesSparepartForm 
-            onSubmit={handleSubmit} 
-            onCancel={handleCancel} 
+          <SalesSparepartForm
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
           />
         </div>
       </div>

@@ -30,7 +30,7 @@ interface Props {
 
 export function PaymentModal({ open, onClose, onSubmit, defaultValues, loading }: Props) {
   const form = useForm<PaymentFormData>({
-    resolver: zodResolver(paymentSchema),
+    resolver: zodResolver(paymentSchema) as any,
     defaultValues: {
       payment_at: new Date().toISOString().split('T')[0],
       cash_payment_amount: 0,

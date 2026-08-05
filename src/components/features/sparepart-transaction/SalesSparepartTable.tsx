@@ -55,19 +55,19 @@ export default function SalesSparepartTable({
 
   const { companyId } = useCompany();
   const { data: customers } = useCustomers({ company_id: companyId ?? undefined });
-  const { data: spareparts } = useSpareparts({ company_id: companyId ?? undefined });
+  const { data: spareparts } = useSpareparts(companyId ?? undefined);
 
   const getCustomerName = useCallback((item: SparepartTransaction) => {
     if (item.person?.name) return item.person.name;
-    if (item.customer?.name) return item.customer.name;
+    if ((item as any).customer?.name) return (item as any).customer.name;
     if (!item.person_id) return '-';
     return customers?.data?.find((s: any) => String(s.id) === String(item.person_id))?.name || String(item.person_id);
   }, [customers]);
 
   const getSparepartName = useCallback((item: SparepartTransaction) => {
     if (item.sparepart?.name) return item.sparepart.name;
-    if (item.spare_part?.name) return item.spare_part.name;
-    if (item.sparePart?.name) return item.sparePart.name;
+    if ((item as any).sparepart?.name) return (item as any).sparepart.name;
+    if ((item as any).sparepart?.name) return (item as any).sparepart.name;
     if (!item.sparepart_id) return '-';
     return spareparts?.data?.find((s: any) => String(s.id) === String(item.sparepart_id))?.name || String(item.sparepart_id);
   }, [spareparts]);
@@ -252,7 +252,7 @@ export default function SalesSparepartTable({
         ),
       },
     ],
-    [slug, canEdit, canDelete, onDelete, getBillingLabel, router]
+    [slug, canEdit, canDelete, onDelete, getBillingLabel, router, getCustomerName, getSparepartName]
   );
 
   const headerActions = (

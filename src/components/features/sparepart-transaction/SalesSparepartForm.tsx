@@ -29,14 +29,14 @@ export function SalesSparepartForm({ defaultValues, onSubmit, onCancel, readOnly
   const { companyId } = useCompany();
   const { data: warehouses } = useWarehouseOptions();
   const { data: customers } = useCustomers({ company_id: companyId ?? undefined });
-  const { data: spareparts } = useSpareparts({ company_id: companyId ?? undefined });
+  const { data: spareparts } = useSpareparts(companyId ?? undefined);
 
   const [openWarehouse, setOpenWarehouse] = useState(false);
   const [openCustomer, setOpenCustomer] = useState(false);
   const [openSparepart, setOpenSparepart] = useState(false);
 
   const form = useForm<SalesSparepartFormData>({
-    resolver: zodResolver(salesSparepartSchema),
+    resolver: zodResolver(salesSparepartSchema) as any,
     defaultValues: {
       warehouse_id: defaultValues?.warehouse_id || 0,
       person_id: defaultValues?.person_id || 0,
@@ -111,6 +111,7 @@ export function SalesSparepartForm({ defaultValues, onSubmit, onCancel, readOnly
                     <button
                       type="button"
                       role="combobox"
+                      aria-controls="warehouse-popover"
                       aria-expanded={openWarehouse}
                       disabled={readOnly}
                       className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
@@ -159,6 +160,7 @@ export function SalesSparepartForm({ defaultValues, onSubmit, onCancel, readOnly
                     <button
                       type="button"
                       role="combobox"
+                      aria-controls="customer-popover"
                       aria-expanded={openCustomer}
                       disabled={readOnly}
                       className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
@@ -208,6 +210,7 @@ export function SalesSparepartForm({ defaultValues, onSubmit, onCancel, readOnly
                     <button
                       type="button"
                       role="combobox"
+                      aria-controls="sparepart-popover"
                       aria-expanded={openSparepart}
                       disabled={readOnly}
                       className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
@@ -305,13 +308,13 @@ export function SalesSparepartForm({ defaultValues, onSubmit, onCancel, readOnly
           <FormItem>
             <FormLabel>Total Bruto</FormLabel>
             <FormControl>
-               <MoneyInput disabled value={bruto} />
+               <MoneyInput disabled value={bruto} onChangeValue={() => {}} />
             </FormControl>
           </FormItem>
           <FormItem>
             <FormLabel>Total Netto</FormLabel>
             <FormControl>
-               <MoneyInput disabled value={netto} />
+               <MoneyInput disabled value={netto} onChangeValue={() => {}} />
             </FormControl>
           </FormItem>
         </div>
