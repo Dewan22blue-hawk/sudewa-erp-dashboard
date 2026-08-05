@@ -86,7 +86,8 @@ type UnitTransactionApiModel = {
     activity_date?: string;
     description?: string;
     state?: string;
-  }
+  };
+  is_unit_type_detail_valid?: boolean | string | number;
 };
 
 type UnitTransactionItemListApiModel = {
@@ -220,6 +221,17 @@ const mapUnitTransaction = (item: UnitTransactionApiModel): UnitTransaction => (
   paymentAt: item.unit_transaction_billing?.payment_at ?? null,
   isRefunded: item?.has_returned_data ?? null,
   remainingPayment: toNumber(item.billing_summary?.remaining_payment),
+  isUnitTypeDetailValid: item.is_unit_type_detail_valid === true || item.is_unit_type_detail_valid === 1 || String(item.is_unit_type_detail_valid) === 'true',
+  billing_summary: item.billing_summary
+    ? {
+      grand_total: toNumber(item.billing_summary.grand_total),
+      total_cash_payment: toNumber(item.billing_summary.total_cash_payment),
+      total_bca_payment: toNumber(item.billing_summary.total_bca_payment),
+      total_paid: toNumber(item.billing_summary.total_paid),
+      remaining_payment: toNumber(item.billing_summary.remaining_payment),
+      is_paid: Boolean(item.billing_summary?.is_paid),
+    }
+    : null,
 });
 
 const buildUnitTransactionFromRows = (rows: UnitTransactionItemListApiModel[]): UnitTransaction[] => {
@@ -498,6 +510,7 @@ const mapUnitTransactionDetail = (item: UnitTransactionApiModel): UnitTransactio
       }
       : null,
     unit_transaction_items: item.unit_transaction_items,
+    isUnitTypeDetailValid: item.is_unit_type_detail_valid === true || item.is_unit_type_detail_valid === 1 || String(item.is_unit_type_detail_valid) === 'true',
   };
 };
 

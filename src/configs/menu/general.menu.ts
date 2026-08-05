@@ -81,20 +81,30 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/transaksi/arus-transaksi'),
         },
         {
-          label: 'Pembelian Unit',
-          href: base('/transaksi/pembelian-unit'),
+          label: 'Transaksi Unit Tipe',
+          children: [
+            {
+              label: 'Pembelian Unit',
+              href: base('/transaksi/pembelian-unit'),
+            },
+            {
+              label: 'Penjualan Unit',
+              href: base('/transaksi/penjualan-unit'),
+            },
+          ]
         },
         {
-          label: 'Pembelian Sparepart',
-          href: base('/transaksi/pembelian-sparepart'),
-        },
-        {
-          label: 'Penjualan Sparepart',
-          href: base('/transaksi/penjualan-sparepart'),
-        },
-        {
-          label: 'Penjualan Unit',
-          href: base('/transaksi/penjualan-unit'),
+          label: 'Transaksi Sparepart',
+          children: [
+            {
+              label: 'Pembelian Sparepart',
+              href: base('/transaksi/pembelian-sparepart'),
+            },
+            {
+              label: 'Penjualan Sparepart',
+              href: base('/transaksi/penjualan-sparepart'),
+            },
+          ]
         },
         {
           label: 'Bukti Potong',

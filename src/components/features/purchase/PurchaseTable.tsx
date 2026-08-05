@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UnitTransaction } from '@/@types/unit-transaction.types';
-import { Eye, MoreVertical, Pencil, Plus, Search, Trash2, RotateCcw } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Plus, Search, Trash2, RotateCcw, AlertTriangle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { Input } from '@/components/ui/input';
@@ -170,9 +171,39 @@ export default function PurchaseTable({
         header: 'No. Transaksi',
         accessorKey: 'code',
         sortable: true,
-        cell: (item) => (
-          <CopyBox text={item.code} />
-        ),
+        cell: (item) => {
+          const showUnBilled = item.unit_transaction_billing?.is_paid === false;
+          const showUnVerified = item.isUnitTypeDetailValid === false;
+
+          let tooltipText = '';
+          if (showUnBilled && showUnVerified) {
+            tooltipText = 'Tagihan belum lunas dan detail tipe unit belum lengkap/belum valid';
+          } else if (showUnBilled) {
+            tooltipText = 'Tagihan belum lunas';
+          } else if (showUnVerified) {
+            tooltipText = 'Detail tipe unit belum lengkap/belum valid';
+          }
+
+          return (
+            <div className="flex items-center gap-2">
+              {(showUnBilled || showUnVerified) && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="cursor-help text-amber-500 hover:text-amber-600 transition-colors flex items-center shrink-0">
+                        <AlertTriangle className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                      {tooltipText}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              <CopyBox text={item.code} />
+            </div>
+          );
+        },
       },
       {
         header: 'Tanggal',

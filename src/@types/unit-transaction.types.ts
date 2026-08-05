@@ -80,6 +80,8 @@ export interface UnitTransaction {
   isRefunded: boolean | string | null;
   paymentAt: string | null;
   remainingPayment: number;
+  isUnitTypeDetailValid?: boolean;
+  billing_summary?: UnitTransactionBillingSummary | null;
 }
 
 export interface UnitTransactionResponse {
@@ -166,6 +168,7 @@ export interface UnitTransactionDetail {
   unit_transaction_billing?: UnitTransactionBilling | null;
   unit_transaction_adjustments?: any[];
   unit_transaction_items?: any[];
+  isUnitTypeDetailValid?: boolean;
   pivot: {
     unit_transaction_item_detail_id: number;
   };

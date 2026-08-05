@@ -84,7 +84,7 @@ export default function PurchaseDetailPage() {
   const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
   const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
   const isRefunded = purchase?.has_refund_transaction;
-  const canReceive = isPaid && (purchase?.warehouse_activity ? purchase?.warehouse_activity?.state === 'draft' : true);
+  const canReceive = isPaid && purchase?.isUnitTypeDetailValid === true && (purchase?.warehouse_activity ? purchase?.warehouse_activity?.state === 'draft' : true);
 
   const receiveButtonText = useMemo(() => {
     if (updateState.isPending) return 'Memproses...';
@@ -180,6 +180,9 @@ export default function PurchaseDetailPage() {
       toast.error(readApiError(error));
     }
   };
+
+  console.log(purchase)
+
 
   const handleReceipt = async () => {
     if (!purchase?.id) return;

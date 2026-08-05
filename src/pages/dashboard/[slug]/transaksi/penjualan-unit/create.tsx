@@ -48,7 +48,7 @@ export default function CreateSalesPage() {
   const { data: unitTypeData, isLoading: isLoadingUnitTypes } = useTypeUnits({
     sort_by: 'created_at',
     sort_order: 'asc',
-    in_stock: 'true',
+    // in_stock: 'true',
     company_id: companyId || 1
   });
   const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
@@ -217,14 +217,6 @@ export default function CreateSalesPage() {
     };
 
     try {
-      const selectedTypeUnit = await getTypeUnitById(unitTypeId, { companyId: companyIdNumber });
-      const availableStock = Number(selectedTypeUnit.availableStock ?? 0);
-
-      if (availableStock < qty) {
-        toast.error('Stock tidak mencukupi');
-        return;
-      }
-
       // Create transaction and its unit item atomically
       const createdSales = await createSalesMutation.mutateAsync(transactionPayload);
       const createdId = createdSales?.id;

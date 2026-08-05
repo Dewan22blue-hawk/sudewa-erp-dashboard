@@ -82,7 +82,7 @@ const readCheckRightAmountError = (error: any): string => {
     })
     .join('; ');
 
-  return `Pembayaran belum bisa diproses. Detail unit belum lengkap ${detailText}.`;
+  return `Data pada Detail Unit Tipe belum lengkap ${detailText}.`;
 };
 
 const getInvalidItemIds = (error: any): string[] => {
@@ -235,38 +235,6 @@ export default function PaymentPage() {
       if (validationResult.error) {
         const message = readCheckRightAmountError(validationResult.error);
         setValidationMessage(message);
-        const invalidItemIds = getInvalidItemIds(validationResult.error);
-
-        const shouldIgnoreLegacyValidationMismatch = await hasCompleteSalesAssignmentsFromLatestSnapshot(
-          String(salesId),
-          salesDetail?.raw,
-          invalidItemIds,
-        );
-        const shouldIgnoreWithItemService =
-          !shouldIgnoreLegacyValidationMismatch && invalidItemIds.length > 0
-            ? await hasCompleteAssignmentsFromUnitItems(invalidItemIds)
-            : false;
-
-        if (shouldIgnoreLegacyValidationMismatch || shouldIgnoreWithItemService) {
-          setValidationMessage(undefined);
-        } else {
-
-          if (invalidItemIds.length > 0) {
-            const basePath = slugValue ? `/dashboard/${slugValue}/transaksi/penjualan-unit` : '/transaksi/penjualan-unit';
-
-            toast.error(message, {
-              action: {
-                label: 'Lengkapi Detail',
-                onClick: () => {
-                  router.push(`${basePath}/${salesId}/unit/${invalidItemIds[0]}`);
-                },
-              },
-            });
-            return;
-          }
-
-          throw new Error(message);
-        }
       }
 
       const refreshedBilling = await refetchCurrentBilling();

@@ -75,13 +75,14 @@ const readCheckRightAmountError = (error: any): string => {
 
     const detailText = invalidArray
         .map((item: any) => {
+            console.log(item)
             const itemId = item?.item_id ?? item?.unit_transaction_item_id ?? '-';
             const diff = item?.difference ?? (Number(item?.qty_input ?? 0) - Number(item?.qty_actual ?? 0));
             return `Item ${itemId}: kurang ${Number(diff) > 0 ? Number(diff) : 0} unit`;
         })
         .join('; ');
 
-    return `Pembayaran belum bisa diproses. Detail unit belum lengkap asd ${detailText}.`;
+    return `Data pada Detail Unit Tipe belum lengkap ${detailText}.`;
 };
 
 const getInvalidItemIds = (error: any): string[] => {

@@ -74,7 +74,7 @@ export default function SalesDetailPage() {
   const isRefunded = sales?.has_refund_transaction;
 
   const SALES_DELIVERED_STOCK_STATE = 'outbound_delivered';
-  const canDeliver = isPaid && (sales?.warehouse_activity ? sales?.warehouse_activity?.state === 'draft' : true);
+  const canDeliver = isPaid && sales?.isUnitTypeDetailValid === true && (sales?.warehouse_activity ? sales?.warehouse_activity?.state === 'draft' : true);
 
   const deliveryButtonText = useMemo(() => {
     if (updateState.isPending) return 'Memproses...';
