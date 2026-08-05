@@ -92,8 +92,9 @@ deploy-prod:
       echo "REKSO BUMI MINONGKO PIPELINE!"
       
       echo "Bismillah, cekelanku!"
-      source ~/.bashrc
-      financedash
+      
+      cd /home/wajira-team/production/finance-dash && git pull origin master && docker container stop wajira-finance-dashboard && docker container rm wajira-finance-dashboard && docker rmi wajira-finance-dashboard:latest &&       docker compose -f docker-compose.prod.yaml build --no-cache && docker compose -f docker-compose.prod.yaml up -d && docker compose restart
+      
       sleep 5
 
       EOF
