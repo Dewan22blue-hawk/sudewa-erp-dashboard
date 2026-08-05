@@ -18,7 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Plus, Search, Eye, Pencil, Trash2, RotateCcw, Printer } from 'lucide-react';
+import { MoreVertical, Plus, Search, Eye, Pencil, Trash2, RotateCcw, Printer, AlertTriangle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -177,7 +178,39 @@ export function SalesTable({
         accessorKey: 'code',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <CopyBox text={item.code} />,
+        cell: (item) => {
+          const showUnBilled = item.billing_summary?.is_paid === false || item.isPaid === false;
+          const showUnVerified = item.isUnitTypeDetailValid === false;
+
+          let tooltipText = '';
+          if (showUnBilled && showUnVerified) {
+            tooltipText = 'Tagihan belum lunas dan detail tipe unit belum lengkap/belum valid';
+          } else if (showUnBilled) {
+            tooltipText = 'Tagihan belum lunas';
+          } else if (showUnVerified) {
+            tooltipText = 'Detail tipe unit belum lengkap/belum valid';
+          }
+
+          return (
+            <div className="flex items-center gap-2">
+              {(showUnBilled || showUnVerified) && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="cursor-help text-amber-500 hover:text-amber-600 transition-colors flex items-center shrink-0">
+                        <AlertTriangle className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
+                      {tooltipText}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              <CopyBox text={item.code} />
+            </div>
+          );
+        },
       },
       {
         header: 'Tanggal',
