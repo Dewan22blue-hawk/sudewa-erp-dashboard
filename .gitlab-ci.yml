@@ -1,11 +1,11 @@
-# stages:
-#   - build
-#   - test
-#   - deploy
+stages:
+  # - build
+  # - test
+  - deploy
 
-# workflow:
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "push"
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
 
 # # =========================
 # # GLOBAL BEFORE SCRIPT
@@ -27,13 +27,13 @@
 #   rules:
 #     - if: '$CI_COMMIT_BRANCH == "development"'
 
-# .default-prod: &default-prod
-#   tags:
-#     - cloud
-#     - wajira
-#     - production
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "master"'
+.default-prod: &default-prod
+  tags:
+    - cloud
+    - wajira
+    - production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
 
 
 # # =========================
@@ -75,32 +75,27 @@
 #   script:
 #     - echo "Testing production (optional)"
 
-# deploy-prod:
-#   <<: *default-prod
-#   stage: deploy
-#   environment:
-#     name: production
-#   script:
-#     - echo "🚀 Deploy Production Started"
+deploy-prod:
+  <<: *default-prod
+  stage: deploy
+  environment:
+    name: production
+  script:
+    - echo "BISMILLAHIROHMANIROHIM"
+    - echo "Suro diro joyo diningrat, lebur dening pangastuti."
+    - echo "Brokohan kakang kawah Adi Ari-adi, Mugi-mugi Gusti pinaring kalancaran, tebih saking error 500, cinaketaken kaliyan status ijo mbranang puniko."
 
-#     - |
-#       sudo -u wajira-team bash << 'EOF'
-#       set -e
+    - |
+      sudo -u wajira-team bash << 'EOF'
+      set -e
 
-#       cd /home/wajira-team/production/finance-dash
+      echo "REKSO BUMI MINONGKO PIPELINE!"
+      
+      echo "Bismillah, cekelanku!"
+      sleep 5
 
-#       echo "📥 Pull latest code"
-#       git pull origin master
-
-#       echo "🐳 Rebuild container"
-#       docker compose -f docker-compose.prod.yaml down -v
-#       docker rmi wajira-finance-dashboard:latest
-#       docker compose -f docker-compose.prod.yaml build --no-cache
-#       docker compose -f docker-compose.prod.yaml up -d
-
-#       echo "⏳ Wait container ready"
-#       sleep 5
-
-#       EOF
-
-#     - echo "✅ Deploy Done"
+      EOF
+  before_script:
+    - echo "Niat ingsun ngresiki bug, masang kode ingkang pener minulya manuungsa..."
+  after_script:
+    - echo "Gusti Pinaringan, pipeline ijo mbranang, sukses rahayu, rahayu wilujeng!"
