@@ -1,5 +1,5 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 import { PurchaseSparepartForm } from '@/components/features/sparepart-transaction/PurchaseSparepartForm';
 import { useSparepartTransaction, useUpdateSparepartTransaction } from '@/hooks/useSparepartTransaction';
 import { useRouter } from 'next/router';
@@ -9,7 +9,7 @@ import { LoadingState } from '@/components/ui/loading-state';
 export default function EditPurchaseSparepartPage() {
   const router = useRouter();
   const { slug, id } = router.query;
-  
+
   const { data: transaction, isLoading } = useSparepartTransaction(id as string, !!id);
   const updateMutation = useUpdateSparepartTransaction();
 
@@ -44,19 +44,18 @@ export default function EditPurchaseSparepartPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <PageHeader 
-          title="Edit Pembelian Sparepart" 
-          description={`Ubah data transaksi ${transaction?.code || ''}`}
+        <PageHeader
+          title="Edit Pembelian Sparepart"
           onBack={handleCancel}
           breadcrumbs={[
             { label: 'Pembelian Sparepart', onClick: handleCancel },
             { label: 'Edit Data' },
           ]}
         />
-        
+
         <div className="bg-white rounded-md border border-gray-200 p-6 shadow-sm">
           {!isLoading && transaction ? (
-            <PurchaseSparepartForm 
+            <PurchaseSparepartForm
               defaultValues={{
                 warehouse_id: transaction.warehouse_id,
                 person_id: transaction.person_id,
@@ -70,8 +69,8 @@ export default function EditPurchaseSparepartPage() {
                 billing_due_date: transaction.billing_due_date,
                 note: transaction.note,
               }}
-              onSubmit={handleSubmit} 
-              onCancel={handleCancel} 
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
             />
           ) : null}
         </div>

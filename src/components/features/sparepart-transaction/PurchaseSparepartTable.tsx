@@ -56,18 +56,18 @@ export default function PurchaseSparepartTable({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { companyId } = useCompany();
-  const { data: suppliers } = useSuppliers({ company_id: companyId });
-  const { data: spareparts } = useSpareparts({ company_id: companyId });
+  const { data: suppliers } = useSuppliers(companyId ?? null);
+  const { data: spareparts } = useSpareparts(companyId ?? undefined);
   const updatePaymentStatusMutation = useUpdateSparepartTransactionBillingPaymentStatus();
 
-  const handleMarkAsPaid = async (billingId: string) => {
+  const handleMarkAsPaid = useCallback(async (billingId: string) => {
     try {
       await updatePaymentStatusMutation.mutateAsync({ id: billingId, is_paid: true });
       toast.success("Transaksi berhasil ditandai lunas");
     } catch {
       toast.error("Gagal menandai transaksi lunas");
     }
-  };
+  }, [updatePaymentStatusMutation]);
 
   const getSupplierName = useCallback((item: SparepartTransaction) => {
     if (item.person?.name) return item.person.name;
@@ -78,8 +78,7 @@ export default function PurchaseSparepartTable({
 
   const getSparepartName = useCallback((item: SparepartTransaction) => {
     if (item.sparepart?.name) return item.sparepart.name;
-    if (item.spare_part?.name) return item.spare_part.name;
-    if (item.sparePart?.name) return item.sparePart.name;
+    if (item.sparepart?.name) return item.sparepart.name;
     if (!item.sparepart_id) return '-';
     return spareparts?.data?.find((s: any) => String(s.id) === String(item.sparepart_id))?.name || String(item.sparepart_id);
   }, [spareparts]);
@@ -242,7 +241,7 @@ export default function PurchaseSparepartTable({
                 </DropdownMenuItem>
               )}
               {canEdit && !item.billing_summary?.is_paid && item.sparepart_transaction_billing?.id && (
-                <DropdownMenuItem onClick={() => handleMarkAsPaid(String(item.sparepart_transaction_billing.id))}>
+                <DropdownMenuItem onClick={() => handleMarkAsPaid(String(item.sparepart_transaction_billing?.id))}>
                   <CheckCircle className="mr-2 h-4 w-4" /> Tandai Lunas
                 </DropdownMenuItem>
               )}
@@ -269,7 +268,7 @@ export default function PurchaseSparepartTable({
         ),
       },
     ],
-    [slug, canEdit, canDelete, onDelete, getBillingLabel, router]
+    [slug, canEdit, canDelete, onDelete, getBillingLabel, router, getSupplierName, getSparepartName, handleMarkAsPaid]
   );
 
   const headerActions = (

@@ -28,15 +28,15 @@ interface Props {
 export function PurchaseSparepartForm({ defaultValues, onSubmit, onCancel, readOnly }: Props) {
   const { companyId } = useCompany();
   const { data: warehouses } = useWarehouseOptions();
-  const { data: suppliers } = useSuppliers({ company_id: companyId, sort_order: 'asc' });
-  const { data: spareparts } = useSpareparts({ company_id: companyId });
+  const { data: suppliers } = useSuppliers({ company_id: companyId ?? undefined, sort_order: 'asc' });
+  const { data: spareparts } = useSpareparts(companyId ?? undefined);
 
   const [openWarehouse, setOpenWarehouse] = useState(false);
   const [openSupplier, setOpenSupplier] = useState(false);
   const [openSparepart, setOpenSparepart] = useState(false);
 
   const form = useForm<PurchaseSparepartFormData>({
-    resolver: zodResolver(purchaseSparepartSchema),
+    resolver: zodResolver(purchaseSparepartSchema) as any,
     defaultValues: {
       warehouse_id: defaultValues?.warehouse_id || 0,
       person_id: defaultValues?.person_id || 0,
@@ -111,6 +111,7 @@ export function PurchaseSparepartForm({ defaultValues, onSubmit, onCancel, readO
                     <button
                       type="button"
                       role="combobox"
+                      aria-controls="warehouse-popover"
                       aria-expanded={openWarehouse}
                       disabled={readOnly}
                       className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
@@ -159,6 +160,7 @@ export function PurchaseSparepartForm({ defaultValues, onSubmit, onCancel, readO
                     <button
                       type="button"
                       role="combobox"
+                      aria-controls="supplier-popover"
                       aria-expanded={openSupplier}
                       disabled={readOnly}
                       className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
@@ -208,6 +210,7 @@ export function PurchaseSparepartForm({ defaultValues, onSubmit, onCancel, readO
                     <button
                       type="button"
                       role="combobox"
+                      aria-controls="sparepart-popover"
                       aria-expanded={openSparepart}
                       disabled={readOnly}
                       className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
@@ -305,13 +308,13 @@ export function PurchaseSparepartForm({ defaultValues, onSubmit, onCancel, readO
           <FormItem>
             <FormLabel>Total Bruto</FormLabel>
             <FormControl>
-               <MoneyInput disabled value={bruto} />
+               <MoneyInput disabled value={bruto} onChangeValue={() => {}} />
             </FormControl>
           </FormItem>
           <FormItem>
             <FormLabel>Total Netto</FormLabel>
             <FormControl>
-               <MoneyInput disabled value={netto} />
+               <MoneyInput disabled value={netto} onChangeValue={() => {}} />
             </FormControl>
           </FormItem>
         </div>

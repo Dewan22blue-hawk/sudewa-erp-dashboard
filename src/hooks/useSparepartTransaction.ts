@@ -14,7 +14,7 @@ export const sparepartTransactionKeys = {
   list: (params: any) => [...sparepartTransactionKeys.lists(), params] as const,
   details: () => [...sparepartTransactionKeys.all, 'detail'] as const,
   detail: (id: string) => [...sparepartTransactionKeys.details(), id] as const,
-  
+
   billingAll: ['sparepart-transaction-billings'] as const,
   billingLists: () => [...sparepartTransactionKeys.billingAll, 'list'] as const,
   billingList: (params: any) => [...sparepartTransactionKeys.billingLists(), params] as const,
@@ -31,12 +31,15 @@ export function useSparepartTransactions(
     person_id?: number | string;
     sparepart_id?: number | string;
     billing_type?: 'cash' | 'credit';
-    company_id?: number | string;
+    company_id?: number | string | null;
   }
 ) {
   return useQuery({
     queryKey: sparepartTransactionKeys.list(params),
-    queryFn: () => sparepartTransactionService.getSparepartTransactions(params),
+    queryFn: () => sparepartTransactionService.getSparepartTransactions({
+      ...params,
+      company_id: params.company_id ?? undefined
+    }),
     placeholderData: (previousData) => previousData,
   });
 }
@@ -52,7 +55,7 @@ export function useSparepartTransaction(id: string, enabled = true) {
 export function useCreateSparepartTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateSparepartTransactionPayload) => 
+    mutationFn: (payload: CreateSparepartTransactionPayload) =>
       sparepartTransactionService.createSparepartTransaction(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sparepartTransactionKeys.lists() });

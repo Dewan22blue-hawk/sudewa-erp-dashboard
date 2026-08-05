@@ -9,7 +9,7 @@ import { LoadingState } from '@/components/ui/loading-state';
 export default function EditSalesSparepartPage() {
   const router = useRouter();
   const { slug, id } = router.query;
-  
+
   const { data: transaction, isLoading } = useSparepartTransaction(id as string, !!id);
   const updateMutation = useUpdateSparepartTransaction();
 
@@ -44,19 +44,18 @@ export default function EditSalesSparepartPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <PageHeader 
-          title="Edit Penjualan Sparepart" 
-          description={`Ubah data transaksi ${transaction?.code || ''}`}
+        <PageHeader
+          title="Edit Penjualan Sparepart"
           onBack={handleCancel}
           breadcrumbs={[
             { label: 'Penjualan Sparepart', onClick: handleCancel },
             { label: 'Edit Data' },
           ]}
         />
-        
+
         <div className="bg-white rounded-md border border-gray-200 p-6 shadow-sm">
           {!isLoading && transaction ? (
-            <SalesSparepartForm 
+            <SalesSparepartForm
               defaultValues={{
                 warehouse_id: transaction.warehouse_id,
                 person_id: transaction.person_id,
@@ -70,8 +69,8 @@ export default function EditSalesSparepartPage() {
                 billing_due_date: transaction.billing_due_date,
                 note: transaction.note,
               }}
-              onSubmit={handleSubmit} 
-              onCancel={handleCancel} 
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
             />
           ) : null}
         </div>

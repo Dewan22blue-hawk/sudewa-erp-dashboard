@@ -1,5 +1,5 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { PageHeader } from '@/components/common/PageHeader';
+import { PageHeader } from '@/components/ui/page-header';
 import { PurchaseSparepartForm } from '@/components/features/sparepart-transaction/PurchaseSparepartForm';
 import { useCreateSparepartTransaction } from '@/hooks/useSparepartTransaction';
 import { useRouter } from 'next/router';
@@ -30,20 +30,19 @@ export default function CreatePurchaseSparepartPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <PageHeader 
-          title="Tambah Pembelian Sparepart" 
-          description="Masukkan data pembelian sparepart baru ke dalam sistem"
+        <PageHeader
+          title="Tambah Pembelian Sparepart"
           onBack={handleCancel}
           breadcrumbs={[
             { label: 'Pembelian Sparepart', onClick: handleCancel },
             { label: 'Tambah Data' },
           ]}
         />
-        
+
         <div className="bg-white rounded-md border border-gray-200 p-6 shadow-sm">
-          <PurchaseSparepartForm 
-            onSubmit={handleSubmit} 
-            onCancel={handleCancel} 
+          <PurchaseSparepartForm
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
           />
         </div>
       </div>

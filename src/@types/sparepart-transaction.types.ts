@@ -54,12 +54,15 @@ export interface SparepartTransaction {
   created_at: string;
   updated_at: string;
   transaction_bruto_total: number;
+  supplier: {
+    name: string,
+  };
   transaction_netto_total: number;
   billing_summary: SparepartTransactionBillingSummary;
   sparepart_transaction_billing?: SparepartTransactionBilling;
-  warehouse?: any; 
-  person?: any; 
-  sparepart?: any; 
+  warehouse?: any;
+  person?: any;
+  sparepart?: any;
 }
 
 export interface SparepartTransactionResponse {
