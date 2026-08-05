@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Download, MoreVertical } from 'lucide-react';
+import { Download, MoreVertical, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { FinanceAsset } from '@/@types/finance-asset.types';
@@ -154,12 +154,20 @@ export function FinanceAssetTable({
 
     const headerActions = useMemo(
         () => (
-            <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
-                <Download className="h-4 w-4 mr-2" />
-                {isExporting ? 'Exporting...' : 'Export'}
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+                <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
+                    <Download className="h-4 w-4 mr-2" />
+                    {isExporting ? 'Exporting...' : 'Export'}
+                </Button>
+                {onAdd && (
+                    <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Tambah
+                    </Button>
+                )}
+            </div>
         ),
-        [onExport, isExporting]
+        [onExport, isExporting, onAdd]
     );
 
     return (
