@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ApiError } from '@/@types/api';
-import { type PPNPenjualan, UpdatePPNPenjualanSchema, type UpdatePPNPenjualanFormValues } from '@/@types/ppn-penjualan.types';
-import { useUpdatePPNPenjualan } from '@/hooks/usePPNPenjualan';
+import { type PPNPenjualan, UpdatePPNPenjualanSchema, type UpdatePPNPenjualanFormValues } from '@/@types/ppn.types';
+import { useUpdatePPNPenjualan } from '@/hooks/usePPN';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';

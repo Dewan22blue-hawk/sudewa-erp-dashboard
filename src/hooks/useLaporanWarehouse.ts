@@ -15,13 +15,17 @@ export const useGetWarehouseStock = (params: { company_id?: number; page?: numbe
 
 export const useGetWarehouseStockDetail = (params: {
   warehouse_id?: number;
+  company_id?: number | string | undefined;
   page?: number;
   per_page?: number;
+  search?: string;
   machine_number?: string;
   chassis_number?: string;
   color?: string;
   stock_state?: string;
   in_stock?: boolean | string;
+  is_forecast?: boolean | string;
+  is_sold_unit?: boolean | string;
   unit_transaction_item_id?: string;
 }) => {
   return useQuery({

@@ -1,17 +1,18 @@
 import type { ApiError } from '@/@types/api';
 import type {
-  PPNPenjualan,
-  PPNPenjualanFilterParams,
-  PPNPenjualanListResponse,
-  PPNPenjualanListResult,
-  PPNPenjualanUpdateResponse,
+  BulkUpdatePPNPayload,
+  BulkUpdatePPNResponse,
+  PPNFilterParams,
+  PPNItem,
+  PPNListResponse,
+  PPNListResult,
+  PPNUpdateResponse,
   UnitTransactionItemDetail,
   UnitType,
-  UpdatePPNPenjualanMutationPayload,
-} from '@/@types/ppn-penjualan.types';
+  UpdatePPNMutationPayload,
+} from '@/@types/ppn.types';
 import { apiClient } from '@/lib/api/client';
 import { ensureSuccess, mapLaravelPaginationMeta, type LaravelApiResponse } from '@/lib/api/response';
-import { updatePPNPembelian } from './ppn-pembelian';
 
 const BASE_PATH = '/wapi/finance/ppn';
 const DEFAULT_PAGE = 1;
@@ -42,7 +43,7 @@ const normalizeUnitDetail = (value: Partial<UnitTransactionItemDetail> | null | 
   color: value?.color ?? '-',
 });
 
-const normalizePPNPenjualan = (value: Partial<PPNPenjualan>): PPNPenjualan => ({
+const normalizePPNItem = (value: Partial<PPNItem>): PPNItem => ({
   id: toNumber(value.id),
   code: value.code ?? '-',
   buy_date: value.buy_date ?? '',
@@ -73,13 +74,13 @@ const isMethodNotAllowed = (error: unknown) => {
   return apiError.statusCode === 405;
 };
 
-export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {}): Promise<PPNPenjualanListResult> {
+export async function getPPNList(params: PPNFilterParams = {}): Promise<PPNListResult> {
   const page = params.page ?? DEFAULT_PAGE;
   const perPage = params.per_page ?? DEFAULT_PER_PAGE;
 
-  const response = await apiClient.get<PPNPenjualanListResponse>(BASE_PATH, {
+  const response = await apiClient.get<PPNListResponse>(BASE_PATH, {
     params: {
-      type: 'ppn_sales',
+      type: params.type ?? 'ppn_purchase',
       page,
       per_page: perPage,
       search: params.search || undefined,
@@ -93,13 +94,65 @@ export async function getPPNPenjualanList(params: PPNPenjualanFilterParams = {})
   const payload = ensureSuccess(toSuccessPayload(response.data));
 
   return {
-    data: (payload.data ?? []).map((item) => normalizePPNPenjualan(item)),
+    data: (payload.data ?? []).map((item) => normalizePPNItem(item)),
     meta: mapLaravelPaginationMeta(payload),
     hasNextPage: Boolean(payload.next_page_url),
     isTotalExact: true,
   };
 }
 
-export async function updatePPNPenjualan({ id, payload }: UpdatePPNPenjualanMutationPayload) {
-  return updatePPNPembelian({ id, payload: payload as any }) as any;
+export async function updatePPN({ id, payload }: UpdatePPNMutationPayload) {
+  const requestBody = {
+    fp_date: payload.fp_date || undefined,
+    nsfp_age: payload.nsfp_age || undefined,
+    amount: payload.amount ?? undefined,
+    nsfp_number: payload.nsfp_number || undefined,
+  };
+
+  try {
+    const response = await apiClient.put<PPNUpdateResponse>(`${BASE_PATH}/${id}`, requestBody);
+    return ensureSuccess(toSuccessPayload(response.data));
+  } catch (error) {
+    if (!isMethodNotAllowed(error)) throw error;
+
+    const response = await apiClient.post<PPNUpdateResponse>(`${BASE_PATH}/${id}`, {
+      ...requestBody,
+      _method: 'PUT',
+    });
+
+    return ensureSuccess(toSuccessPayload(response.data));
+  }
 }
+
+export async function bulkUpdatePPN(payload: BulkUpdatePPNPayload) {
+  const requestBody = {
+    ppn_data_ids: payload.ppn_data_ids,
+    fp_date: payload.fp_date || undefined,
+    nsfp_age: payload.nsfp_age || undefined,
+    nsfp_amount: payload.nsfp_amount ?? undefined,
+    amount: payload.amount ?? undefined,
+    nsfp_number: payload.nsfp_number || undefined,
+  };
+
+  try {
+    const response = await apiClient.put<BulkUpdatePPNResponse>(`${BASE_PATH}/bulk-update`, requestBody);
+    return ensureSuccess(toSuccessPayload(response.data));
+  } catch (error) {
+    if (!isMethodNotAllowed(error)) throw error;
+
+    const response = await apiClient.post<BulkUpdatePPNResponse>(`${BASE_PATH}/bulk-update`, {
+      ...requestBody,
+      _method: 'PUT',
+    });
+
+    return ensureSuccess(toSuccessPayload(response.data));
+  }
+}
+
+// Convenient aliases for Pembelian & Penjualan
+export const getPPNPembelianList = (params?: PPNFilterParams) => getPPNList({ ...params, type: 'ppn_purchase' });
+export const getPPNPenjualanList = (params?: PPNFilterParams) => getPPNList({ ...params, type: 'ppn_sales' });
+export const updatePPNPembelian = updatePPN;
+export const updatePPNPenjualan = updatePPN;
+export const bulkUpdatePPNPembelian = bulkUpdatePPN;
+export const bulkUpdatePPNPenjualan = bulkUpdatePPN;

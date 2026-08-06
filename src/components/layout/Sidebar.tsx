@@ -1,4 +1,4 @@
-import { ChevronDown, Check, Menu, X } from 'lucide-react';
+import { ChevronDown, Check, Menu, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCompany } from '@/contexts/CompanyContext';
@@ -68,6 +68,7 @@ export function Sidebar() {
   const { companyId, setCompanyId } = useCompany();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
   useEffect(() => {
     fetchUserCompanies().then((data) => {
@@ -94,27 +95,50 @@ export function Sidebar() {
 
 
   const sidebarContent = (
-    <aside className="flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB]">
-      <div className="flex h-16 shrink-0 items-center px-4 border-b border-gray-200">
+    <aside className={cn("flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB] transition-[width] duration-300 ease-in-out", isDesktopCollapsed ? "w-[72px]" : "w-64")}>
+      <div className={cn("flex h-16 shrink-0 items-center border-b border-gray-200", isDesktopCollapsed ? "px-0 justify-center" : "px-4")}>
         <div className="flex w-full items-center gap-2">
-          <CompanySelector
-            companies={companies}
-            companyId={companyId}
-            setCompanyId={setCompanyId}
-          />
+          {isDesktopCollapsed ? (
+            <div className="flex items-center justify-center w-full">
+              <button
+                onClick={() => setIsDesktopCollapsed(false)}
+                className="p-2 rounded-md hover:bg-gray-200 text-gray-500 transition-colors"
+                title="Expand Sidebar"
+              >
+                <PanelLeftOpen className="w-5 h-5" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <CompanySelector
+                companies={companies}
+                companyId={companyId}
+                setCompanyId={setCompanyId}
+              />
 
-          <button
-            onClick={() => setIsMobileOpen(false)}
-            className="md:hidden ml-1 shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-gray-200 transition-colors"
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
+              <button
+                onClick={() => setIsMobileOpen(false)}
+                className="md:hidden ml-1 shrink-0 rounded-md p-1.5 text-gray-500 hover:bg-gray-200 transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mb-4 text-sm font-semibold text-gray-500">Main Menu</div>
+      <div className={cn("flex-1 overflow-y-auto py-6", isDesktopCollapsed ? "px-2" : "px-4")}>
+        <div className="mb-4 flex items-center justify-between text-sm font-semibold text-gray-500">
+          {!isDesktopCollapsed && <span className="uppercase text-xs tracking-wider">Main Menu</span>}
+          <button 
+             onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
+             className={cn("p-1.5 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors", isDesktopCollapsed && "mx-auto")}
+             title="Toggle Sidebar"
+          >
+            {isDesktopCollapsed ? <PanelLeftOpen className="w-[18px] h-[18px]" /> : <PanelLeftClose className="w-[18px] h-[18px]" />}
+          </button>
+        </div>
 
         <nav className="space-y-1">
           {isMenuLoading ? (
@@ -125,7 +149,7 @@ export function Sidebar() {
             </div>
           ) : (
             menus.map((item, index) => (
-              <SidebarNavItem key={index} item={item} />
+              <SidebarNavItem key={index} item={item} isCollapsed={isDesktopCollapsed} />
             ))
           )}
         </nav>
@@ -167,7 +191,7 @@ export function Sidebar() {
   );
 }
 
-function SidebarNavItem({ item }: { item: MenuItem }) {
+function SidebarNavItem({ item, isCollapsed }: { item: MenuItem; isCollapsed?: boolean }) {
   const router = useRouter();
 
   const isActiveRoute = (href?: string, exact?: boolean) => {
@@ -194,31 +218,38 @@ function SidebarNavItem({ item }: { item: MenuItem }) {
   const [open, setOpen] = useState(isChildActive || false);
 
   useEffect(() => {
-    if (isChildActive) {
+    if (isChildActive && !isCollapsed) {
       setOpen(true);
     }
-  }, [isChildActive]);
+  }, [isChildActive, isCollapsed]);
 
   const handleToggle = () => {
-    if (isChildActive) return;
+    if (isChildActive && !isCollapsed) return;
     setOpen(!open);
   };
 
   return (
-    <div>
+    <div className={cn(isCollapsed && "flex justify-center mb-1")}>
       <button
         onClick={handleToggle}
+        title={isCollapsed ? item.label : undefined}
         className={cn(
-          'flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-          isChildActive ? 'text-[#111827]' : 'text-gray-700 hover:bg-gray-100',
+          'flex items-center justify-between rounded-md py-[9px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+          isCollapsed ? 'w-10 justify-center px-0' : 'w-full px-3',
+          isChildActive ? 'text-[#111827] bg-gray-100' : 'text-gray-600 hover:bg-gray-50',
         )}
       >
-        <span>{item.label}</span>
-        {item.children && <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', open && 'rotate-180 text-gray-900', !open && 'text-gray-500')} />}
+        <div className="flex items-center gap-3">
+          {item.icon && <item.icon className="w-[18px] h-[18px] shrink-0" />}
+          {!isCollapsed && <span>{item.label}</span>}
+        </div>
+        {!isCollapsed && item.children && (
+          <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform duration-200', open && 'rotate-180 text-gray-900', !open && 'text-gray-400')} />
+        )}
       </button>
 
-      {item.children && open && (
-        <div className="relative mt-1 ml-3 space-y-1">
+      {item.children && open && !isCollapsed && (
+        <div className="relative mt-1 ml-[22px] space-y-1">
           <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-200" />
 
           {item.children.map((child, idx) => (

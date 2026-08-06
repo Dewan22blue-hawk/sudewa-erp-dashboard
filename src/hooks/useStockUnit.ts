@@ -9,7 +9,9 @@ export const useStockUnits = (
     machine_number?: string;
     chassis_number?: string;
     color?: string;
-    in_stock?: boolean;
+    in_stock?: boolean | string;
+    is_forecast?: boolean | string;
+    is_sold_unit?: boolean | string;
     status?: string;
     specified?: string;
   },
