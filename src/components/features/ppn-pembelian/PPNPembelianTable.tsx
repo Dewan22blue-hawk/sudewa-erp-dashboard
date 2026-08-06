@@ -21,6 +21,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useBulkUpdatePPNPembelian } from '@/hooks/usePPN';
 import { toast } from 'sonner';
+import { MoneyInput } from '@/components/ui/money-input';
 
 interface Props {
   data: PPNPembelian[];
@@ -409,7 +410,7 @@ export default function PPNPembelianTable({
                 <label className="text-xs font-semibold text-slate-700">Jumlah NSFP (nsfp_amount)</label>
                 <Input
                   type="number"
-                  placeholder="Contoh: 34000"
+                  placeholder="Jumlah NSFP"
                   value={nsfpAmount}
                   onChange={(e) => setNsfpAmount(e.target.value)}
                   className="bg-white border-slate-200 h-9 text-xs rounded-lg"
@@ -418,11 +419,10 @@ export default function PPNPembelianTable({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-700">Total Nominal (amount)</label>
-                <Input
-                  type="number"
-                  placeholder="Contoh: 340000"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                <MoneyInput
+                  placeholder="Nominal Rupiah"
+                  value={Number(amount) || 0}
+                  onChangeValue={(value) => setAmount(value.toString())}
                   className="bg-white border-slate-200 h-9 text-xs rounded-lg"
                 />
               </div>
