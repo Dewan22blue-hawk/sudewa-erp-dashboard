@@ -1,8 +1,10 @@
 import { CustomerOverview, ProductOverview } from '@/@types/dashboard';
 import { Card } from '@/components/ui/card';
+import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { ReferenceLink } from '@/components/ui/reference-link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency, formatCurrencyCompact } from '@/lib/utils/currency';
 import { ArrowUpDown, Package } from 'lucide-react';
+import router from 'next/router';
 import { useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -76,6 +78,8 @@ export function CustomerOverviewCard({ data, isLoading }: CustomerOverviewCardPr
   if (isLoading) return <LoadingCard />;
   if (!data) return null;
 
+  const { slug } = router.query;
+
   const sortedCustomers = [...data.topCustomers].sort((a, b) => {
     if (sortOrder === 'asc') return a.revenue - b.revenue;
     if (sortOrder === 'desc') return b.revenue - a.revenue;
@@ -95,8 +99,8 @@ export function CustomerOverviewCard({ data, isLoading }: CustomerOverviewCardPr
         <StatItem label="Jumlah Customer" value={data.totalCustomers.toString()} />
         <StatItem
           label="Total Pendapatan"
-          value={formatCurrencyCompact(data.totalRevenue.idr, 'IDR')}
-          value2={formatCurrencyCompact(data.totalRevenue.usd, 'USD')}
+          value={currenciesFormat('idr', data.totalRevenue.idr)}
+          value2={currenciesFormat('usd', data.totalRevenue.usd)}
         />
         <StatItem label="Rata-rata pendapatan dari customer" value={data.averageRevenue.toString()} />
       </div>
@@ -120,8 +124,8 @@ export function CustomerOverviewCard({ data, isLoading }: CustomerOverviewCardPr
           <TableBody>
             {sortedCustomers.map((customer, idx) => (
               <TableRow key={`${customer.name}-${idx}`} className="border-b border-slate-50 last:border-none hover:bg-slate-50/50">
-                <TableCell className="py-[14px] text-[13px] font-medium text-slate-800">{customer.name}</TableCell>
-                <TableCell className="py-[14px] text-right text-[13px] text-slate-700">{formatCurrency(customer.revenue, 'IDR')}</TableCell>
+                <TableCell className="py-[14px] text-[13px] font-medium text-slate-800"><ReferenceLink href={`/dashboard/${slug}/customers?search=${customer.name}`}>{customer.name}</ReferenceLink></TableCell>
+                <TableCell className="py-[14px] text-right text-[13px] text-slate-700">{currenciesFormat('idr', customer.revenue)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

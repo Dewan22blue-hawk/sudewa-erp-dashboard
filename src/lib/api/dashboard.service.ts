@@ -417,4 +417,27 @@ export const dashboardService = {
       return [];
     }
   },
+
+  async getUnitTransactionTrend(params: {
+    company_id?: string | number;
+    start_date?: string | null;
+    end_date?: string | null;
+  }): Promise<{
+    summary: {
+      total_sales_transactions: number;
+      total_purchase_transactions: number;
+    };
+    trend: Array<{ label: string; sales_count: number; purchase_count: number }>;
+  }> {
+    try {
+      const response = await apiClient.get(
+        '/wapi/stats/unit-transaction-trend',
+        { params }
+      );
+      return response.data?.data || { summary: { total_sales_transactions: 0, total_purchase_transactions: 0 }, trend: [] };
+    } catch (err) {
+      console.warn('[DashboardService] Failed to fetch unit transaction trend:', err);
+      return { summary: { total_sales_transactions: 0, total_purchase_transactions: 0 }, trend: [] };
+    }
+  },
 };
