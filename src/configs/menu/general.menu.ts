@@ -1,4 +1,4 @@
-import { LayoutDashboard, Database, FileText, Warehouse, DollarSign, ScrollText, Shield, Settings } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Archive, Warehouse, Landmark, ListChecks, Shield } from 'lucide-react';
 import { MenuItem } from '@/types/menu.types';
 
 export const getGeneralMenus = (slug: string): MenuItem[] => {
@@ -20,7 +20,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Master Data',
-      icon: Database,
+      icon: ClipboardList,
       children: [
         {
           label: 'Grup Akun',
@@ -66,15 +66,11 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Blok Gudang',
           href: master('/warehouse-block'),
         },
-        // {
-        //   label: 'Perlengkapan',
-        //   href: master('/vehicle-equipment'),
-        // },
       ],
     },
     {
       label: 'Administrasi',
-      icon: FileText,
+      icon: Archive,
       children: [
         {
           label: 'Arus Transaksi',
@@ -145,7 +141,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Finance',
-      icon: DollarSign,
+      icon: Landmark,
       children: [
         {
           label: 'Transaksi Kas Harian',
@@ -191,16 +187,12 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
     },
     {
       label: 'Laporan',
-      icon: ScrollText,
+      icon: ListChecks,
       children: [
         {
           label: 'Laporan Transaksi Kas',
           href: base('/laporan/laporan-transaksi-kas'),
         },
-        // {
-        //   label: 'Laporan Akuntansi',
-        //   href: base('/laporan/laporan-akuntansi'),
-        // },
         {
           label: 'Laporan Pembelian',
           href: base('/laporan/laporan-pembelian'),
@@ -231,16 +223,6 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         },
       ],
     },
-    // {
-    //   label: 'Pengaturan',
-    //   icon: Settings,
-    //   children: [
-    //     {
-    //       label: 'Pajak',
-    //       href: settings('/tax'),
-    //     },
-    //   ],
-    // },
     {
       label: 'Manajemen Pengguna',
       icon: Shield,
