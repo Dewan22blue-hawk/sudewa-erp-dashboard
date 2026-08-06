@@ -1,12 +1,19 @@
+function normalizeUsdString(value: string): string {
+  // Strip currency symbol and spaces
+  let cleaned = value.replace(/[^0-9.,]/g, '');
+  // For USD, standard thousands separator is comma. We strip all commas.
+  return cleaned.replace(/,/g, '');
+}
+
 export function formatMoneyInput(value: string | number, currency: 'IDR' | 'USD' = 'IDR') {
   if (currency === 'USD') {
-    const strVal = String(value).replace(/,/g, '.').replace(/[^0-9.]/g, '');
-    const parts = strVal.split('.');
-    if (parts.length > 2) {
-      parts[1] = parts.slice(1).join('');
-    }
+    const normalized = normalizeUsdString(String(value));
+    if (!normalized) return '';
+    
+    const parts = normalized.split('.');
     const integerPart = parts[0] ? Number(parts[0]).toLocaleString('en-US') : '';
     const formatted = parts.length > 1 ? `${integerPart}.${parts[1]}` : integerPart;
+    
     if (!formatted && String(value).includes('.')) return '$ 0.'; 
     if (!formatted) return '';
     return `$ ${formatted}`;
@@ -20,7 +27,7 @@ export function formatMoneyInput(value: string | number, currency: 'IDR' | 'USD'
 export function parseMoneyInput(value: string | number, currency: 'IDR' | 'USD' = 'IDR'): number {
   if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
   if (currency === 'USD') {
-    const normalized = String(value).replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    const normalized = normalizeUsdString(String(value));
     if (!normalized || normalized === '.') return 0;
     const amount = Number(normalized);
     return Number.isFinite(amount) ? amount : 0;

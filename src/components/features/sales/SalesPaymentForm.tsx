@@ -131,14 +131,24 @@ export function SalesPaymentForm({
     };
 
     const handleSubmit = async (values: PaymentFormData) => {
-        const total = Number(values.bcaPayment || 0) + (values.cashPayment || 0) + (values.bcaPayment2 || 0);
-        if (total <= 0) {
+        const bcaPaymentUsd = Number(values.bcaPayment || 0);
+        const totalIdr = (values.cashPayment || 0) + (values.bcaPayment2 || 0);
+
+        if (bcaPaymentUsd <= 0 && totalIdr <= 0) {
             toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
             return;
         }
-        if (remainingPayment > 0 && total > remainingPayment) {
+
+        const remainingPaymentUsd = Number(billing?.remaining_payment_usd || 0);
+
+        if (remainingPaymentUsd > 0 && bcaPaymentUsd > remainingPaymentUsd) {
+            form.setError('bcaPayment', { type: 'manual', message: 'Nominal USD tidak boleh melebihi sisa tagihan USD' });
+            toast.error('Nominal USD tidak boleh melebihi sisa tagihan USD.');
+            return;
+        }
+
+        if (remainingPayment > 0 && totalIdr > remainingPayment) {
             form.setError('cashPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
-            form.setError('bcaPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
             form.setError('bcaPayment2', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
             toast.error('Total pembayaran tidak boleh melebihi sisa tagihan.');
             return;
@@ -342,7 +352,11 @@ export function SalesPaymentForm({
                                                     value={Number(field.value) || 0}
                                                     disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     onChangeValue={(val) => {
-                                                        field.onChange(val);
+                                                        const maxBca = billing?.remaining_payment_usd !== undefined && billing?.remaining_payment_usd !== null
+                                                            ? Math.max(0, Number(billing.remaining_payment_usd))
+                                                            : undefined;
+                                                        const capped = parseAndClampMoneyInput(val, maxBca, 'USD');
+                                                        field.onChange(capped);
                                                     }}
                                                     onBlur={field.onBlur}
                                                 />
