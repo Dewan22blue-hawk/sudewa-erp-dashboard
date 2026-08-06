@@ -222,9 +222,10 @@ export default function PaymentPage() {
         return;
       }
 
-      const inputPayment = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+      const inputIdr = Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+      const inputUsd = Number(data.bcaPayment ?? 0);
 
-      if (inputPayment <= 0) {
+      if (inputIdr <= 0 && inputUsd <= 0) {
         toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
         return;
       }
@@ -246,8 +247,8 @@ export default function PaymentPage() {
         ? 0
         : Math.max(0, Number(billing?.remaining_payment ?? (latestGrandTotal - latestPaid)));
 
-      if (inputPayment > latestRemaining && latestRemaining > 0) {
-        toast.error('Nominal pembayaran melebihi sisa tagihan saat ini.');
+      if (inputIdr > latestRemaining && latestRemaining > 0) {
+        toast.error('Nominal pembayaran IDR melebihi sisa tagihan saat ini.');
         return;
       }
 
@@ -270,9 +271,9 @@ export default function PaymentPage() {
         ? 0
         : Math.max(0, Number(billing?.remaining_payment ?? billing?.grand_total ?? 0));
 
-      if (inputPayment > actualRemaining) {
+      if (inputIdr > actualRemaining) {
         await Promise.all([refetchCurrentBilling(), refetchBillingHistory()]);
-        toast.error(`Nominal pembayaran melebihi sisa tagihan aktual (Rp ${actualRemaining.toLocaleString('id-ID')}). Halaman telah diperbarui, silakan sesuaikan nominal.`);
+        toast.error(`Nominal pembayaran IDR melebihi sisa tagihan aktual (Rp ${actualRemaining.toLocaleString('id-ID')}). Halaman telah diperbarui, silakan sesuaikan nominal.`);
         return;
       }
 
@@ -283,6 +284,7 @@ export default function PaymentPage() {
         bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
         payment_at: data.paymentDate,
         note: data.note,
+        payment_proof: data.paymentProof,
       });
 
       await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);

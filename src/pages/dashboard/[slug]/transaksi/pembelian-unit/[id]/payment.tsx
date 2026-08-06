@@ -175,9 +175,9 @@ export default function PurchasePaymentPage() {
                 ? 0
                 : Math.max(0, Number(latestBilling?.remaining_payment ?? (latestGrandTotal - latestPaid)));
 
-            const inputPayment = Number(data.bcaPayment ?? 0) + Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
-            if (inputPayment > latestRemaining) {
-                throw new Error('Nominal pembayaran melebihi total bruto/tagihan transaksi.');
+            const inputIdr = Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
+            if (inputIdr > latestRemaining) {
+                throw new Error('Nominal pembayaran IDR melebihi sisa tagihan transaksi.');
             }
 
             const validationResult = await revalidateAmount();
@@ -206,9 +206,9 @@ export default function PurchasePaymentPage() {
                 ? 0
                 : Math.max(0, Number(billing?.remaining_payment ?? billing?.grand_total ?? 0));
 
-            if (inputPayment > actualRemaining) {
+            if (inputIdr > actualRemaining) {
                 await Promise.all([refetchCurrentBilling(), refetchBillingHistory()]);
-                toast.error(`Nominal pembayaran melebihi sisa tagihan aktual (Rp ${actualRemaining.toLocaleString('id-ID')}). Halaman telah diperbarui, silakan sesuaikan nominal.`);
+                toast.error(`Nominal pembayaran IDR melebihi sisa tagihan aktual (Rp ${actualRemaining.toLocaleString('id-ID')}). Halaman telah diperbarui, silakan sesuaikan nominal.`);
                 return;
             }
 
@@ -219,6 +219,7 @@ export default function PurchasePaymentPage() {
                 bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
                 payment_at: data.paymentDate,
                 note: data.note,
+                payment_proof: data.paymentProof,
             });
 
             await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);
