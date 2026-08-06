@@ -37,20 +37,22 @@ export class AuthService {
   }
 
   static async getPermissions(): Promise<string[]> {
-    const response = await apiClient.get<{
-      status: boolean;
-      message: string;
-      errors: any;
-      data: {
-        permissions: string[];
-      };
-    }>('/wapi/auth/has-permissions');
-
-    if (!response.data.status) {
-      throw new Error(response.data.message || 'Failed to fetch permissions');
+    const response = await apiClient.get<any>('/wapi/auth/has-permissions');
+    let resData = response.data;
+    if (typeof resData === 'string') {
+      try {
+        resData = JSON.parse(resData);
+      } catch (e) {
+        console.error('[AuthService] Failed to parse has-permissions JSON string:', e);
+      }
     }
 
-    return response.data.data.permissions;
+    if (!resData || !resData.status) {
+      throw new Error(resData?.message || 'Failed to fetch permissions');
+    }
+
+    const permissions = resData.data?.permissions || resData.permissions || [];
+    return permissions;
   }
 
   static async updateProfile(id: number, data: { name?: string; username?: string; firstname?: string; lastname?: string; email?: string; avatar?: File | null }): Promise<ProfileResponse> {

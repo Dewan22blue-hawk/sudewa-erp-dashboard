@@ -42,6 +42,7 @@ export const getStoredPermissions = (): string[] => {
 export const setStoredPermissions = (permissions: string[]): void => {
   if (!isBrowser()) return;
   localStorage.setItem(USER_PERMISSIONS_KEY, JSON.stringify(permissions));
+  window.dispatchEvent(new Event('permissions-updated'));
 };
 
 export const clearStoredPermissions = (): void => {
