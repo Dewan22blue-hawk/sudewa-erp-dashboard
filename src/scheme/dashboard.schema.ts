@@ -98,6 +98,7 @@ export const productOverviewSchema = z.object({
   topProducts: z.array(
     z.object({
       name: z.string().min(1),
+      brandName: z.string().min(1),
       quantity: z.number().nonnegative(),
     }),
   ),

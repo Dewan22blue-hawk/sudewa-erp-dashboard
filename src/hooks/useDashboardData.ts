@@ -33,3 +33,22 @@ export function useDashboardData(startDate?: string | null, endDate?: string | n
 
     return query;
 }
+
+export function useUnitTypeSalesTrend(params: {
+  company_id?: string | number;
+  warehouse_id?: string | number;
+  unit_type_id?: string | number;
+  range?: string;
+  start_date?: string;
+  end_date?: string;
+}) {
+  const { companyId } = useCompany();
+  return useQuery({
+    queryKey: ['unit-type-sales-trend', companyId, params],
+    queryFn: () => dashboardService.getUnitTypeSalesTrend({ company_id: companyId || params.company_id, ...params }),
+    enabled: Boolean(companyId || params.company_id),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}

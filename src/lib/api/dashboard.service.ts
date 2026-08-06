@@ -104,12 +104,23 @@ export const dashboardService = {
     };
 
     // Mapping dari product response
+    const rawProducts = productStats.data?.data || [];
+    const totalSoldSum = rawProducts.reduce((acc: number, curr: any) => acc + (curr.total_sold ?? 0), 0);
+    const totalActualSum = rawProducts.reduce((acc: number, curr: any) => acc + (curr.total_sold_actual ?? 0), 0);
+    const totalForecastSum = rawProducts.reduce((acc: number, curr: any) => acc + (curr.total_sold_forecast ?? 0), 0);
+
     const products: ProductOverview = {
-      totalProducts: productStats.summary?.total_unit_type || 0,
-      totalSold: (productStats.data?.data || []).reduce((acc: number, curr: any) => acc + (curr.total_sold || 0), 0),
-      topProducts: (productStats.data?.data || []).map((p: any) => ({
+      totalProducts: productStats.summary?.total_unit_type || rawProducts.length || 0,
+      totalSold: totalSoldSum || productStats.summary?.total_unit_type_sold || 0,
+      totalSoldActual: totalActualSum,
+      totalSoldForecast: totalForecastSum,
+      topProducts: rawProducts.map((p: any) => ({
         name: p.unit_type_name || p.name || 'Unknown',
-        quantity: p.total_sold || 0
+        brandName: p.unit_type_brand_name || '-',
+        quantity: p.total_sold ?? 0,
+        actual: p.total_sold_actual ?? 0,
+        forecast: p.total_sold_forecast ?? 0,
+        totalProducts: p.total_products ?? 0,
       }))
     };
     const kpis: any[] = [];
@@ -380,5 +391,30 @@ export const dashboardService = {
 
   async refreshDashboard(companyId: string, startDate?: string | null, endDate?: string | null): Promise<DashboardApiResponse> {
     return dashboardService.getDashboardData(companyId, startDate, endDate);
+  },
+
+  async getUnitTypeSalesTrend(params: {
+    company_id?: string | number;
+    warehouse_id?: string | number;
+    unit_type_id?: string | number;
+    range?: string;
+    start_date?: string;
+    end_date?: string;
+  }): Promise<Array<{
+    unit_type_id: number;
+    unit_type_name: string;
+    brand_name: string;
+    trend: Array<{ label: string; total_sales: number }>;
+  }>> {
+    try {
+      const response = await apiClient.get<{ status: boolean; data: any[] }>(
+        '/wapi/stats/unit-transaction-sales-unit-type-trend',
+        { params }
+      );
+      return response.data?.data || [];
+    } catch (err) {
+      console.warn('[DashboardService] Failed to fetch unit type sales trend:', err);
+      return [];
+    }
   },
 };
