@@ -74,4 +74,5 @@ export interface CreateUnitBillingHistoryPayload {
   payment_at: string;
   note?: string;
   cash_id?: number | string;
+  payment_proof?: any;
 }

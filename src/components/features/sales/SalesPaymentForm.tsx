@@ -41,6 +41,7 @@ const paymentSchema = z.object({
     bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
     paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
     note: z.string().max(255, 'Maksimal 255 karakter'),
+    paymentProof: z.any().optional(),
     isPaid: z.boolean(),
 });
 
@@ -148,9 +149,9 @@ export function SalesPaymentForm({
         }
 
         if (remainingPayment > 0 && totalIdr > remainingPayment) {
-            form.setError('cashPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
-            form.setError('bcaPayment2', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
-            toast.error('Total pembayaran tidak boleh melebihi sisa tagihan.');
+            form.setError('cashPayment', { type: 'manual', message: 'Total pembayaran IDR tidak boleh melebihi sisa tagihan' });
+            form.setError('bcaPayment2', { type: 'manual', message: 'Total pembayaran IDR tidak boleh melebihi sisa tagihan' });
+            toast.error('Total pembayaran IDR tidak boleh melebihi sisa tagihan.');
             return;
         }
         await onSubmitPayment(values);
@@ -429,6 +430,28 @@ export function SalesPaymentForm({
                                                     {...field}
                                                     disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     value={field.value ?? ''}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="paymentProof"
+                                    render={({ field: { value, onChange, ...field } }) => (
+                                        <FormItem className="flex-1 space-y-2">
+                                            <FormLabel className="text-sm font-medium">Bukti Pembayaran (Opsional)</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="file"
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) onChange(file);
+                                                    }}
+                                                    {...field}
+                                                    value={undefined}
                                                 />
                                             </FormControl>
                                             <FormMessage />

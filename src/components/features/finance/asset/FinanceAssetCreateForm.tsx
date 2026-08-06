@@ -20,8 +20,8 @@ interface FinanceAssetCreateFormProps {
 
 export function FinanceAssetCreateForm({ onSave, onCancel, isSaving = false }: FinanceAssetCreateFormProps) {
     const { companyId } = useCompany();
-    // Use large perPage to get all assets for the select dropdown
-    const { data: assetsData, isLoading: isLoadingAssets } = useAssets(companyId, { perPage: 1000 }); 
+    // Use perPage 100 to get assets for the select dropdown
+    const { data: assetsData, isLoading: isLoadingAssets } = useAssets(companyId || 1, { perPage: 100 }); 
     const assetsList = assetsData?.data || [];
 
     const { register, handleSubmit, control, setValue, watch } = useForm<FinanceAssetPayload>({

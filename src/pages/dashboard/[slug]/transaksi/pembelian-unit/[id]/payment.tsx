@@ -233,6 +233,7 @@ export default function PurchasePaymentPage() {
                 bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
                 payment_at: data.paymentDate,
                 note: data.note,
+                payment_proof: data.paymentProof,
             });
 
             await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);

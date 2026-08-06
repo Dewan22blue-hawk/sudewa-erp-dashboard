@@ -225,6 +225,11 @@ export default function PaymentPage() {
       const inputPaymentIdr = Number(data.cashPayment ?? 0) + Number(data.bcaPayment2 ?? 0);
       const inputPaymentUsd = Number(data.bcaPayment ?? 0);
 
+      if (inputPaymentIdr <= 0 && inputPaymentUsd <= 0) {
+        toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
+        return;
+      }
+
       setValidationMessage(undefined);
 
       const validationResult = await revalidateAmount();
@@ -292,6 +297,7 @@ export default function PaymentPage() {
         bca_payment_usd_amount: Number(data.bcaPayment ?? 0),
         payment_at: data.paymentDate,
         note: data.note,
+        payment_proof: data.paymentProof,
       });
 
       await Promise.all([refetchCurrentBilling(), refetchBillingHistory(), revalidateAmount()]);
