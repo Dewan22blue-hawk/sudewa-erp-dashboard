@@ -10,7 +10,13 @@ export const HIDDEN_MENU_LABELS = [
   // 'Tipe Unit',
   // 'Kas',
   // 'User',
-  
+  'Perlengkapan',
+  'Merk Unit Tipe',
+  'Aset',
+  'Pajak',
+  'Blok Gudang',
+
+
 
 
   // Warehouse

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Upload } from 'lucide-react';
+import { Download, Upload } from 'lucide-react';
 import type { Customer } from '@/@types/customer.types';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
@@ -161,7 +161,6 @@ export function CustomerTable({
       showLimitChange
       perPage={perPage}
       onPerPageChange={onPerPageChange}
-      defaultSort={{ key: 'code', direction: 'asc' }}
       meta={{
         currentPage: page,
         perPage,
@@ -178,7 +177,7 @@ export function CustomerTable({
             </Button>
           )}
           <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
-            <Upload className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
           {canCreate && (

@@ -193,7 +193,24 @@ export const AccountGroupListPage = () => {
             <div className="text-center text-red-600">Gagal memuat data grup akun</div>
           ) : (
             <AccountGroupTable
-              data={data?.data ?? []}
+              data={
+                data?.data
+                  ? [...data.data].sort((a, b) => {
+                      if (a.is_lock && !b.is_lock) return 1;
+                      if (!a.is_lock && b.is_lock) return -1;
+                      
+                      // For unlocked items, sort by newest first so newly added items are at the very top
+                      if (!a.is_lock && !b.is_lock) {
+                        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                        if (dateA !== dateB) return dateB - dateA;
+                      }
+
+                      // Fallback sort by code
+                      return a.code.localeCompare(b.code);
+                    })
+                  : []
+              }
               meta={data?.meta}
               page={page}
               canEdit={canEdit}

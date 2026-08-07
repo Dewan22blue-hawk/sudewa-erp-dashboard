@@ -69,7 +69,20 @@ export function CustomerManagementPage() {
   });
 
   const customers = useMemo(
-    () => filterCustomersByCompany(data?.data ?? [], companyId),
+    () => {
+      const filtered = filterCustomersByCompany(data?.data ?? [], companyId);
+      return [...filtered].sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        if (dateA !== dateB) return dateB - dateA;
+        
+        const idA = typeof a.id === 'number' ? a.id : parseInt(String(a.id)) || 0;
+        const idB = typeof b.id === 'number' ? b.id : parseInt(String(b.id)) || 0;
+        if (idA !== idB) return idB - idA;
+
+        return (a.code || '').localeCompare(b.code || '');
+      });
+    },
     [companyId, data?.data],
   );
 
@@ -285,6 +298,7 @@ export function CustomerManagementPage() {
         onImport={handleImport}
         isPending={importCustomer.isPending}
         accept=".xlsx,.xls,.csv,text/csv"
+        templateUrl="https://docs.google.com/spreadsheets/d/1WdGMJEme7eGxp6GDJ-px2PmVurSdYHoKkv6za0VN8AI/edit?usp=sharing"
       />
     </>
   );

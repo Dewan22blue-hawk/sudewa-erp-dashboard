@@ -10,13 +10,32 @@ interface CopyBoxProps {
 export function CopyBox({ text, className }: CopyBoxProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for non-secure contexts (e.g. testing on local IP)
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "absolute";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+        } catch (err) {
+          console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+      }
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {
-      //
+    } catch (error) {
+      console.error('Copy failed:', error);
     }
   };
 
@@ -26,6 +45,7 @@ export function CopyBox({ text, className }: CopyBoxProps) {
         {text}
       </div>
       <button
+        type="button"
         onClick={handleCopy}
         className="inline-flex items-center gap-1 px-3 py-2 border border-gray-200 rounded-lg bg-white text-xs font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors print:hidden"
       >

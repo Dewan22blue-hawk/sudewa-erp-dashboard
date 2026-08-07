@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Upload } from 'lucide-react';
+import { Download, Upload } from 'lucide-react';
 import type { Supplier } from '@/@types/supplier.types';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
@@ -143,7 +143,6 @@ export function SupplierTable({
       showLimitChange
       perPage={perPage}
       onPerPageChange={onPerPageChange}
-      defaultSort={{ key: 'code', direction: 'asc' }}
       meta={{
         currentPage: page,
         perPage,
@@ -153,16 +152,17 @@ export function SupplierTable({
       onPageChange={onPageChange}
       headerActions={
         <div className="flex flex-wrap items-center gap-2">
-          {canCreate && (
-            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-          )}
           <Button onClick={onExport} disabled={isExporting} variant="outline" className="w-full sm:w-auto">
             <Upload className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'Export'}
           </Button>
+          {canCreate && (
+            <Button onClick={onImport} variant="outline" className="w-full sm:w-auto">
+              <Download className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+          )}
+
           {canCreate && (
             <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
               <svg className="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>

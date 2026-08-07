@@ -70,7 +70,20 @@ export function SupplierManagementPage() {
   });
 
   const suppliers = useMemo(
-    () => filterSuppliersByCompany(data?.data ?? [], companyId),
+    () => {
+      const filtered = filterSuppliersByCompany(data?.data ?? [], companyId);
+      return [...filtered].sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        if (dateA !== dateB) return dateB - dateA;
+
+        const idA = typeof a.id === 'number' ? a.id : parseInt(String(a.id)) || 0;
+        const idB = typeof b.id === 'number' ? b.id : parseInt(String(b.id)) || 0;
+        if (idA !== idB) return idB - idA;
+
+        return (a.code || '').localeCompare(b.code || '');
+      });
+    },
     [companyId, data?.data],
   );
 
@@ -293,6 +306,7 @@ export function SupplierManagementPage() {
         onImport={handleImport}
         isPending={importSupplier.isPending}
         accept=".xlsx,.xls,.csv,text/csv"
+        templateUrl="https://docs.google.com/spreadsheets/d/1WdGMJEme7eGxp6GDJ-px2PmVurSdYHoKkv6za0VN8AI/edit?usp=sharing"
       />
     </>
   );

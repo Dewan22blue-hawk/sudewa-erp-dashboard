@@ -808,7 +808,16 @@ const isLoading = isInitialLoading || isFetching;
 <TableComponent isLoading={isLoading} />
 ```
 
-### C. Client-Side Export Data Transaksi (CSV)
+### C. Pengurutan Data Baru (New Data Sorting)
+Untuk memberikan pengalaman pengguna yang baik, ketika pengguna menambahkan data baru, data tersebut **wajib** selalu muncul di posisi paling atas pada tabel, tidak tertumpuk di bawah data yang sudah ada (termasuk data default/locked).
+
+**Aturan**:
+1. Lakukan pengurutan manual *(custom sorting)* pada *frontend* sebelum array data diteruskan (di-*passing*) ke komponen tabel (`BaseTable` / table wrapper lainnya).
+2. Jika relevan, urutkan berdasarkan kolom/flag *pinned* (seperti `is_lock === false`) lebih dulu agar data yang bebas/dapat diedit menempati posisi atas.
+3. Setelah itu, urutkan berdasarkan `createdAt` (atau tanggal dibuat) secara **descending** untuk data yang tidak terkunci, memastikan item paling baru (*newly added*) benar-benar berada di urutan teratas.
+4. **Hapus properti `defaultSort`** dari pemanggilan `BaseTable` apabila terdapat pengurutan kustom dari *parent* agar `BaseTable` tidak menimpa (*overwrite*) hasil *sort* tersebut saat inisialisasi awal.
+
+### D. Client-Side Export Data Transaksi (CSV)
 Setiap halaman CRUD/Laporan yang menampilkan tabel berfitur *Export* standar ke bentuk `.csv` (Jika *backend* tidak menyediakan endpoint export khusus), dapat menggunakan fitur eksport *Blob* di browser.
 
 ```tsx

@@ -126,7 +126,6 @@ export const AccountGroupTable = ({ data, meta, isLoading = false, onEdit, onDel
       data={data}
       columns={columns}
       loading={isLoading}
-      defaultSort={{ key: 'code', direction: 'asc' }}
       meta={{
         currentPage: page,
         perPage,
