@@ -12,7 +12,7 @@ function processFile(filePath) {
   // <span className="text-sm font-medium text-slate-500">Memuat data...</span>
   // We will replace the whole wrapper if we can match it:
   const tableLoaderPattern = /<div className="flex flex-col items-center justify-center gap-3 opacity-0 animate-in fade-in duration-500">\s*<Loader2 className="h-6 w-6 animate-spin text-indigo-500" \/>\s*<span className="text-sm font-medium text-slate-500">Memuat data\.\.\.<\/span>\s*<\/div>/g;
-  
+
   // Or generic table loaders
   const genericTableLoaderPattern = /<Loader2 className="h-6 w-6 animate-spin text-indigo-500" \/>/g;
 
@@ -35,7 +35,7 @@ function processFile(filePath) {
     content = content.replace(tableLoaderPattern, '<LoadingState variant="section" text="Memuat data..." />');
     modified = true;
   }
-  
+
   if (genericTableLoaderPattern.test(content)) {
     content = content.replace(genericTableLoaderPattern, '<LoadingState variant="section" text={null} />');
     modified = true;
@@ -47,7 +47,7 @@ function processFile(filePath) {
       modified = true;
     }
   }
-  
+
   for (const pattern of pageLoaderPatterns) {
     if (pattern.test(content)) {
       content = content.replace(pattern, '<LoadingState variant="page" />');
@@ -66,7 +66,7 @@ function processFile(filePath) {
         content = "import { LoadingState } from '@/components/ui/loading-state';\n" + content;
       }
     }
-    
+
     // Attempt to remove Loader2 import
     const loader2Count = (content.match(/Loader2/g) || []).length;
     if (loader2Count === 1) { // Only the import remains
@@ -76,7 +76,6 @@ function processFile(filePath) {
     }
 
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`Updated: ${filePath}`);
   }
 }
 

@@ -106,7 +106,16 @@ export interface CustomerOverview {
 export interface ProductOverview {
   totalProducts: number;
   totalSold: number;
-  topProducts: Array<{ name: string; quantity: number }>;
+  totalSoldActual?: number;
+  totalSoldForecast?: number;
+  topProducts: Array<{
+    name: string;
+    brandName?: string;
+    quantity: number;
+    actual?: number;
+    forecast?: number;
+    totalProducts?: number;
+  }>;
 }
 
 /**

@@ -237,7 +237,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid, canEdit, c
                 <Button
                   size="sm"
                   variant="destructive"
-                  disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending && isPaid}
+                  disabled={selectedIds.size === 0 || bulkDeleteMutation.isPending && isPaid || !canDelete}
                   onClick={() => !isPaid && setBulkDeleteOpen(true)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
@@ -246,7 +246,7 @@ export default function PurchaseUnitTable({ purchaseId, slug, isPaid, canEdit, c
                 <Button
                   onClick={() => !isPaid && router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchaseId}/create-unit`)}
                   className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]"
-                  disabled={isPaid}>
+                  disabled={isPaid || !canEdit}>
                   <Plus className="h-4 w-4 mr-2" />
                   Tambah Data Unit
                 </Button>

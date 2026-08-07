@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ApiError } from '@/@types/api';
-import { type PPNPembelian, UpdatePPNPembelianSchema, type UpdatePPNPembelianFormValues } from '@/@types/ppn-pembelian.types';
-import { useUpdatePPNPembelian } from '@/hooks/usePPNPembelian';
+import { type PPNPembelian, UpdatePPNPembelianSchema, type UpdatePPNPembelianFormValues } from '@/@types/ppn.types';
+import { useUpdatePPNPembelian } from '@/hooks/usePPN';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -172,9 +172,7 @@ export default function PPNPembelianFormDialog({ open, onClose, initialData }: P
                     <FormLabel>Biaya</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Rp.</span>
                         <MoneyInput 
-                          className="pl-9" 
                           value={field.value ?? 0} 
                           onChangeValue={(value) => field.onChange(value)} 
                           placeholder="Tambahkan biaya" 

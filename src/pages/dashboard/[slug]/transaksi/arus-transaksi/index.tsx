@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,17 @@ export default function TransactionListPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
   const [localSearch, setLocalSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== debouncedSearch) {
+        setDebouncedSearch(localSearch);
+        setPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, debouncedSearch]);
 
   const { hasPermission } = usePermissionGuard();
   const canCreate = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:create');
@@ -36,7 +47,7 @@ export default function TransactionListPage() {
   const canDelete = BYPASS_TRANSACTION_PERMISSIONS || hasPermission('transaction:delete');
 
   // Query Hooks
-  const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, localSearch);
+  const { data, isLoading: isListLoading } = useTransactions(safeCompanyId, page, limit, debouncedSearch);
   const { data: summary, isLoading: isSummaryLoading } = useTransactionSummary(safeCompanyId);
 
   // Dialog State
@@ -80,7 +91,7 @@ export default function TransactionListPage() {
             </div>
             <div className="flex items-center gap-2 text-sm whitespace-nowrap">
               <span>Show</span>
-              <Select value={String(limit)} onValueChange={(v) => setLimit(Number(v))}>
+              <Select value={String(limit)} onValueChange={(v) => { setLimit(Number(v)); setPage(1); }}>
                 <SelectTrigger className="h-9 w-[70px] bg-white">
                   <SelectValue placeholder="25" />
                 </SelectTrigger>

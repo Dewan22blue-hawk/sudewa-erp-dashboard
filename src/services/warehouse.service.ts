@@ -74,6 +74,8 @@ type WarehouseActivityApiModel = {
   state?: string;
   is_refund_activity?: boolean | number | string;
   isRefundActivity?: boolean | number | string;
+  state_note?: string;
+  stateNote?: string;
   unit_transaction_details?: WarehouseActivityUnitDetailApiModel[];
   details?: WarehouseActivityUnitDetailApiModel[];
   data?: WarehouseActivityApiModel;
@@ -122,6 +124,7 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
   const keterangan = item.description ?? '';
   const state = item?.state ?? '-';
   const isRefundActivity = toBoolValue(item.is_refund_activity) || toBoolValue(item.isRefundActivity);
+  const state_note = item.state_note ?? item.stateNote;
 
   return {
     id,
@@ -147,6 +150,7 @@ const mapActivity = (item: WarehouseActivityApiModel): WarehouseActivity => {
     supplier,
     keterangan,
     isRefundActivity,
+    state_note,
   };
 };
 
@@ -448,11 +452,12 @@ export const deleteWarehouseActivity = async (id: string): Promise<void> => {
 
 export const updateWarehouseActivityState = async (
   activityId: string | number,
-  state: 'draft' | 'process' | 'done'
+  state: 'draft' | 'process' | 'done',
+  state_note?: string
 ): Promise<any> => {
   const response = await apiClient.put<LaravelApiResponse<any>>(
     `${basePath}/${activityId}/update-state`,
-    { state }
+    { state, state_note }
   );
   return ensureSuccess(response.data);
 };

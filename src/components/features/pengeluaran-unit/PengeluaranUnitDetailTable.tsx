@@ -26,7 +26,7 @@ interface Props {
   isLoading?: boolean;
 }
 
-export default function PengeluaranUnitDetailTable({ data, activityState, isRefundActivity, isLoading = false }: Props) {
+export default function PengeluaranUnitDetailTable({ data, isRefundActivity, activityState, isLoading = false }: Props) {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const [search, setSearch] = useState('');
@@ -121,7 +121,6 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isRefu
         unit_transaction_item_details_ids: selected,
         stock_state: stockState,
         transaction_type: 'sales',
-        refund_activity: isRefundActivity,
         warehouse_sub_block_id: warehouseSubBlockId ? Number(warehouseSubBlockId) : null,
       });
       toast.success('Berhasil memproses status dan sub-blok unit');
@@ -135,17 +134,19 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isRefu
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'KODE JUAL',
+        header: 'Kode Jual',
         accessorKey: 'salesCode',
         sortable: true,
+        alignment: 'left',
         cell: (item) => (
           <CopyBox text={item.salesCode || ""} />
         )
       },
       {
-        header: 'TIPE UNIT',
+        header: 'Tipe Unit',
         accessorKey: 'unitTypeName',
         sortable: true,
+        alignment: 'left',
         cell: (item) => (
           <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item.unitTypeName}`}>
             {item.unitTypeName}
@@ -153,109 +154,112 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isRefu
         ),
       },
       {
-        header: 'WARNA',
+        header: 'Warna',
         accessorKey: 'color',
         sortable: true,
+        alignment: 'left',
       },
       {
-        header: 'NO MESIN',
+        header: 'Nomor Mesin',
         accessorKey: 'machineNumber',
         sortable: true,
+        alignment: 'left',
         cell: (item) => (
           <CopyBox text={item?.machineNumber || ""} />
         )
       },
       {
-        header: 'NO RANGKA',
+        header: 'Nomor Rangka',
         accessorKey: 'chassisNumber',
         sortable: true,
+        alignment: 'left',
         cell: (item) => (
           <CopyBox text={item?.chassisNumber || ""} />
         )
       },
       {
-        header: 'SUB BLOK',
+        header: 'Sub Blok',
         accessorKey: 'warehouseSubBlock',
         sortable: true,
+        alignment: 'center',
+        tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
         cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
       },
       {
-        header: 'STATUS UNIT',
+        header: 'Status Stok',
+        accessorKey: 'in_stock',
+        sortable: true,
+        alignment: 'center',
+        tooltip: 'Status ketersediaan unit fisik di gudang',
+        cell: (item) => item?.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia {item?.isSoldUnit && isRefundActivity ? '/ Dikembalikan' : '/ Terjual'}</Badge>
+      },
+      {
+        header: 'Kondisi Stok',
         accessorKey: 'status',
         sortable: true,
+        alignment: 'center',
+        tooltip: 'Kondisi fisik unit saat ini',
         cell: (item) => {
           let text = '-';
           let background = 'border-slate-200 bg-slate-50 text-slate-700';
           switch (item?.status) {
             case 'returned':
-              text = 'Return';
-              background = 'border-rose-200 bg-rose-50 text-rose-700';
+              text = 'Returned';
+              background = 'border-purple-200 bg-purple-50 text-purple-700 font-semibold';
               break;
             case 'refunded':
-              text = 'Refund';
-              background = 'border-rose-200 bg-rose-50 text-rose-700';
+              text = 'Refunded';
+              background = 'border-orange-200 bg-orange-50 text-orange-700 font-semibold';
               break;
             case 'normal':
               text = 'Normal';
-              background = 'border-emerald-200 bg-emerald-50 text-emerald-700';
+              background = 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold';
               break;
             default:
               text = 'Belum Dikeluarkan';
-              background = 'border-amber-200 bg-amber-50 text-amber-700';
+              background = 'border-amber-200 bg-amber-50 text-amber-700 font-semibold';
               break;
           }
 
           return (
-            <Badge variant='outline' className={`font-semibold ${background}`}>
+            <Badge variant='outline' className={cn('capitalize font-semibold', background)}>
               {text}
             </Badge>
           );
         },
       },
       {
-        header: 'STATUS STOK',
-        accessorKey: 'in_stock',
-        sortable: true,
-        cell: (item) => {
-          if (item.in_stock === true) {
-            return <Badge className="border-amber-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
-          }
-          if (item.in_stock === false) {
-            return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia</Badge>;
-          }
-          return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
-        }
-      },
-      {
-        header: 'STATUS PENGELUARAN',
+        header: 'Posisi Stok',
         accessorKey: 'state',
         sortable: true,
+        alignment: 'center',
+        tooltip: 'Posisi logistik atau status alur stok unit',
         cell: (item) => {
           const config: Record<string, { label: string; name: string; className: string }> = {
-            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
-            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700' },
-            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700' },
-            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700' },
-            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
-            receipt: { label: 'Receipt', name: 'Dikirim', className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
+            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-semibold' },
+            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold' },
+            receipt: { label: 'Receipt', name: 'Terkirim', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
           };
 
           const stateVal = item?.state ?? 'draft';
           const match = config[stateVal] ?? {
             label: stateVal.replace(/_/g, ' '),
             name: stateVal.replace(/_/g, ' '),
-            className: 'border-slate-200 bg-slate-50 text-slate-700',
+            className: 'border-slate-200 bg-slate-50 text-slate-700 font-semibold',
           };
 
           return (
             <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
-              {match.name}
+              {item?.isSoldUnit ? (isRefundActivity ? 'Dikembalikan' : 'Diterima') : match.name}
             </Badge>
           );
         }
       }
     ],
-    [slug]
+    [slug, isRefundActivity]
   );
 
   return (
@@ -273,7 +277,7 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isRefu
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}
-        isCheckboxDisabled={() => activityState?.toLowerCase() === 'done'}
+        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done'}
         meta={{
           currentPage: safePage,
           perPage: itemsPerPage,
@@ -383,15 +387,17 @@ export default function PengeluaranUnitDetailTable({ data, activityState, isRefu
                     <SelectValue placeholder={subBlocksLoading ? "Memuat sub blok..." : "Pilih sub blok gudang"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {subBlocksResponse?.data?.data?.map((sb: any) => (
-                      <SelectItem key={sb.id} value={String(sb.id)}>
-                        {sb.name}
-                      </SelectItem>
-                    )) || (
-                        <SelectItem value="none" disabled>
-                          Tidak ada sub blok aktif
+                    {subBlocksResponse?.data?.data && subBlocksResponse.data.data.length > 0 ? (
+                      subBlocksResponse.data.data.map((sb: any) => (
+                        <SelectItem key={sb.id} value={String(sb.id)}>
+                          {sb.name}
                         </SelectItem>
-                      )}
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>
+                        Sub blok gudang tidak ditemukan.
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

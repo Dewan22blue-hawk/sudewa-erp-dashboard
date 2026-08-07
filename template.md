@@ -1196,7 +1196,209 @@ export const getMasterDataList = async (params: PaginationParams & { company_id?
       total: filteredData.length,
       last_page: Math.max(1, Math.ceil(filteredData.length / perPage)),
     },
-    mapModel
   );
 };
+```
+
+---
+
+## 25. Standarisasi Input Nominal (Currency Input: IDR & USD)
+
+**Aturan**: Seluruh field input yang berkaitan dengan nominal uang, harga, biaya, atau transaksi (kas) **wajib** menggunakan komponen `MoneyInput` (dari `@/components/ui/money-input.tsx`). 
+Format tampilan mata uang sudah diatur secara dinamis dengan prefix `"Rp. "` untuk Rupiah dan `"$ "` untuk mata uang asing, ditambah penanganan *decimal point* (titik desimal) secara otomatis pada USD.
+
+**Dilarang Keras**:
+1. Menambahkan tulisan teks statis (teks absolut/span) "Rp" atau "$" yang difloating di atas atau di sebelah field input. 
+2. Menambahkan *padding left* (`pl-7`, `pl-9`) secara manual pada input untuk memberikan ruang buat tulisan "Rp" / "$". 
+3. Membuat fungsionalitas parsing / stripping karakter non-angka secara manual berulang-ulang dengan Regex di setiap `onChange` (kecuali di dalam berkas helper utility).
+
+**Standar Komponen `MoneyInput`**:
+- Untuk input bertipe **Rupiah (IDR)**, cukup panggil `<MoneyInput />` secara rutin (secara logis defaultnya `'IDR'`).
+- Untuk input bertipe **Dolar (USD)**, sertakan properti `currency="USD"`.
+
+**Contoh Implementasi**:
+
+```tsx
+import { MoneyInput } from '@/components/ui/money-input';
+
+// 1. Untuk Transaksi Rupiah (Otomatis mendapatkan prefix "Rp. ")
+<FormField
+  control={form.control}
+  name="paymentIdr"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Pembayaran IDR</FormLabel>
+      <FormControl>
+        <MoneyInput 
+          value={field.value ?? 0} 
+          onChangeValue={field.onChange} 
+          placeholder="0" 
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
+// 2. Untuk Transaksi USD (Otomatis mendapatkan prefix "$ " dan properti desimal)
+<FormField
+  control={form.control}
+  name="paymentUsd"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Pembayaran USD</FormLabel>
+      <FormControl>
+        <MoneyInput 
+          currency="USD" 
+          value={field.value ?? 0} 
+          onChangeValue={field.onChange} 
+          placeholder="0.00" 
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+```
+
+## 26. Penanganan Konflik HTTP Status Code & Penjagaan Toleransi Akses Menu (CORS / Redirect Loop)
+
+### Latar Belakang & Gejala Bug
+Pengguna dengan izin terbatas (misal, staf gudang yang hanya memiliki akses menu `Warehouse`) mengalami kegagalan saat masuk ke Dashboard, ditandai dengan pesan error:
+`Failed to fetch permissions test: Error: Failed to fetch permissions`
+Dan konsol peramban menampilkan error parse string kosong (`SyntaxError: JSON.parse: unexpected end of data`) serta respon status `0`.
+
+Hal ini disebabkan oleh dua faktor utama:
+1. **Inversi Status Kode HTTP di Backend**:
+   - Backend (Laravel Exception Handler) mengembalikan status **`401 Unauthorized`** ketika pengguna ditolak hak aksesnya oleh Spatie (`UnauthorizedException`), dan mengembalikan status **`403 Forbidden`** ketika pengguna unauthenticated (token hilang/invalid). Hal ini terbalik secara standar RESTful API.
+2. **Auto-Logout / Redirect Interceptor di Frontend**:
+   - Axios response interceptor di frontend mendeteksi status `401` lalu menghapus token JWT dan mengalihkan halaman ke `/login`.
+   - Karena pengguna warehouse ditolak memuat beberapa statistik halaman dashboard (seperti `/stats/billing-stats` yang memerlukan izin finansial), request tersebut menghasilkan error `401` (yang aslinya adalah penolakan izin `403`), memicu penghapusan token secara sepihak dan pembatalan (*abort*) seluruh request aktif (status `0`), termasuk pengambilan izin menu `/wapi/auth/has-permissions`.
+
+---
+
+### Solusi Standar & Pencegahan
+
+#### 1. Perbaikan Kode Status di Laravel Handler (`app/Exceptions/Handler.php`)
+Pastikan *Exceptions* terpetakan dengan kode status RESTful yang benar:
+- **`401 Unauthorized` (Unauthenticated)**: Digunakan saat token tidak sah, kedaluwarsa, atau tidak terkirim.
+  ```php
+  if ($exception instanceof \Illuminate\Auth\AuthenticationException || 
+      $exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException || 
+      $exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException || 
+      $exception instanceof \Tymon\JWTAuth\Exceptions\JWTException ||
+      $exception instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException) {
+      return $this->responseError(null, 'Unauthenticated. Your session has expired or is invalid.', 401);
+  }
+  ```
+- **`403 Forbidden` (Unauthorized / No Permission)**: Digunakan saat pengguna terverifikasi namun tidak memiliki hak akses/izin (*role/permission*) Spatie.
+  ```php
+  if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException || 
+      $exception instanceof \Illuminate\Auth\AccessDeniedException || 
+      $exception instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException) {
+      return $this->responseError(null, 'You do not have the required permissions to access this resource.', 403);
+  }
+  ```
+
+#### 2. Toleransi Pemuatan Data Dashboard / Multi-API (`dashboard.service.ts`)
+Agar halaman utama/dashboard aman diakses oleh semua level pengguna:
+- **Jangan gunakan Promise.all mentah** yang langsung terputus (*fail-fast*) jika salah satu request API melempar error status `403`.
+- Bungkus panggilan API individual dengan penanganan *catch* lokal (`safeGet`) untuk mereturn objek *fallback* kosong secara elegan sehingga UI tidak kolaps.
+  ```typescript
+  const safeGet = async <T>(url: string, config: any, fallback: T): Promise<T> => {
+    try {
+      const response = await apiClient.get<{ status: boolean; data: T }>(url, config);
+      return response.data.data;
+    } catch (err) {
+      console.warn(`[DashboardService] Failed to fetch from ${url}, using fallback:`, err);
+      return fallback;
+    }
+  };
+  ```
+#### 3. Pencegahan Reload/Refresh pada Halaman Login (`client.ts`)
+Agar info error login salah atau status tidak aktif tidak menghilang akibat halaman ter-refresh secara otomatis oleh interceptor:
+- **Kondisi Interceptor**: Jangan lakukan pembersihan token dan pemaksaan pengalihan `window.location.href = '/login'` apabila request berasal dari endpoint login (`/auth/login`) atau peramban memang sudah berada di halaman `/login`.
+  ```typescript
+  apiClient.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError<ApiError>) => {
+      if (error.response?.status === 401) {
+        const isLoginRequest = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('login');
+        const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/login';
+
+        if (!isLoginRequest && !isLoginPage) {
+          if (typeof window !== 'undefined') {
+            removeAccessToken();
+            clearStoredCompanyId();
+            clearStoredPermissions();
+            window.location.href = '/login';
+          }
+        }
+      }
+      // ...
+    }
+  );
+  ```
+
+---
+
+## Standarisasi Searchable Select (Combobox) untuk Form
+
+**Aturan**: Untuk field/dropdown opsi yang memiliki banyak item (Gudang, Supplier, Sparepart), letakkan komponen navigasi menggunakan **Popover + Command** dari Shadcn UI. Elemen untuk trigger drop-down *wajib* disisipkan dengan *native* `<button type="button">` dan dilekatkan di dalam blok `<FormControl>`. Penggunaan `<Button>` atau `<FormControl>` tanpa membungkus `PopoverTrigger` tidak direkomendasikan karena dapat merusak *ref forwarding* dan malah mengirimkan status *form submit*.
+
+**Hierarki yang Tepat:**
+```tsx
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { ChevronsUpDown, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+<FormField control={form.control} name="item_id" render={({ field }) => (
+  <FormItem>
+    <FormLabel>Pilih Item</FormLabel>
+    <Popover open={open} onOpenChange={setOpen}>
+      {/* ⚠️ PENTING: letakkan target asChild popover secara hierarki di dalam FormControl, dan gunakan tag HTML <button type="button"> */}
+      <FormControl>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            role="combobox"
+            aria-expanded={open}
+            className={cn("flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}
+          >
+            <span className="truncate">
+              {field.value ? options?.find((w) => String(w.id) === String(field.value))?.name : "Pilih..."}
+            </span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </button>
+        </PopoverTrigger>
+      </FormControl>
+      
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Cari opsi..." />
+          <CommandList>
+            <CommandEmpty>Tidak ditemukan.</CommandEmpty>
+            <CommandGroup>
+              {options?.map((opt) => (
+                <CommandItem
+                  key={opt.id}
+                  value={`${opt.name} ${opt.id}`} // value gabungan memudahkan pencarian berdasarkan kode & nama
+                  onSelect={() => {
+                    form.setValue("item_id", opt.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check className={cn("mr-2 h-4 w-4", String(field.value) === String(opt.id) ? "opacity-100" : "opacity-0")} />
+                  {opt.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+    <FormMessage />
+  </FormItem>
+)} />
 ```

@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { getWarehouseBlockDetail } from '@/services/warehouseBlock.service';
-import { createWarehouseSubBlock, updateWarehouseSubBlock, deleteWarehouseSubBlock, makeDefaultWarehouseSubBlock } from '@/services/warehouseSubBlock.service';
+import { createWarehouseSubBlock, updateWarehouseSubBlock, deleteWarehouseSubBlock, makeDefaultWarehouseSubBlock, importWarehouseSubBlock, exportWarehouseSubBlock } from '@/services/warehouseSubBlock.service';
 import { WarehouseSubBlockTable } from '@/components/features/master/warehouse-sub-block/WarehouseSubBlockTable';
 import { WarehouseSubBlockForm, type WarehouseSubBlockFormValues } from '@/components/features/master/warehouse-sub-block/WarehouseSubBlockForm';
+import { DataImportModal } from '@/components/features/master-data/DataImportModal';
 import { toast } from 'sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
@@ -14,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import type { WarehouseSubBlock } from '@/services/warehouseBlock.service';
+import { usePermissionGuard } from '@/hooks/usePermissionGuard';
 
 export default function WarehouseBlockDetailPage() {
   const router = useRouter();
@@ -26,6 +28,11 @@ export default function WarehouseBlockDetailPage() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  const { hasPermission } = usePermissionGuard();
+  const canCreate = hasPermission('master-data:create');
+  const canEdit = hasPermission('master-data:edit');
+  const canDelete = hasPermission('master-data:delete');
+
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       setDebouncedSearch(searchInput.trim());
@@ -36,6 +43,8 @@ export default function WarehouseBlockDetailPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedSubBlock, setSelectedSubBlock] = useState<WarehouseSubBlock | undefined>();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: blockData, isLoading: isBlockLoading } = useQuery({
     queryKey: ['warehouse-block', blockId],
@@ -65,13 +74,9 @@ export default function WarehouseBlockDetailPage() {
   const createMutation = useMutation({
     mutationFn: createWarehouseSubBlock,
     onSuccess: (response, variables) => {
-      if (variables.is_default && response.data?.id) {
-        makeDefaultMutation.mutate({ id: response.data.id, data: variables });
-      } else {
-        toast.success('Berhasil menambahkan sub blok gudang baru');
-        setIsFormOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
-      }
+      toast.success('Berhasil menambahkan sub blok gudang baru');
+      setIsFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Gagal menambahkan sub blok gudang');
@@ -81,13 +86,9 @@ export default function WarehouseBlockDetailPage() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => updateWarehouseSubBlock(id, data),
     onSuccess: (response, variables) => {
-      if (variables.data.is_default && !selectedSubBlock?.is_default) {
-        makeDefaultMutation.mutate({ id: variables.id, data: variables.data });
-      } else {
-        toast.success('Berhasil mengubah data sub blok gudang');
-        setIsFormOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
-      }
+      toast.success('Berhasil mengubah data sub blok gudang');
+      setIsFormOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Gagal mengubah sub blok gudang');
@@ -105,6 +106,36 @@ export default function WarehouseBlockDetailPage() {
       toast.error(error?.response?.data?.message || 'Gagal menghapus sub blok gudang');
     },
   });
+
+  const importMutation = useMutation({
+    mutationFn: importWarehouseSubBlock,
+    onSuccess: () => {
+      toast.success('Berhasil mengimpor detail sub blok');
+      setIsImportModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['warehouse-block', blockId] });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || 'Gagal mengimpor detail sub blok');
+    }
+  });
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const data = await exportWarehouseSubBlock();
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `sub_blok_gudang.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Gagal mengekspor data');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleAdd = () => {
     setSelectedSubBlock(undefined);
@@ -139,11 +170,11 @@ export default function WarehouseBlockDetailPage() {
 
   // Client-side filtering and pagination for Sub Blocks
   const allSubBlocks = block?.warehouse_sub_blocks || [];
-  const filteredSubBlocks = allSubBlocks.filter((sb) => 
-    sb.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+  const filteredSubBlocks = allSubBlocks.filter((sb) =>
+    sb.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     (sb.description || '').toLowerCase().includes(debouncedSearch.toLowerCase())
   );
-  
+
   const startIdx = (page - 1) * perPage;
   const paginatedSubBlocks = filteredSubBlocks.slice(startIdx, startIdx + perPage);
   const totalPages = Math.ceil(filteredSubBlocks.length / perPage) || 1;
@@ -199,7 +230,7 @@ export default function WarehouseBlockDetailPage() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Daftar Sub Blok Gudang</h2>
               <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                Kelola sub blok untuk 
+                Kelola sub blok untuk
                 {block?.name ? (
                   <Badge variant="outline" className="bg-slate-50 text-slate-700">
                     Blok {block.name}
@@ -230,6 +261,12 @@ export default function WarehouseBlockDetailPage() {
               onDelete={handleDelete}
               onMakeDefault={handleMakeDefault}
               onToggleActive={handleToggleActive}
+              onImport={() => setIsImportModalOpen(true)}
+              onExport={handleExport}
+              isExporting={isExporting}
+              canCreate={canCreate}
+              canEdit={canEdit}
+              canDelete={canDelete}
             />
           </div>
         </div>
@@ -241,6 +278,16 @@ export default function WarehouseBlockDetailPage() {
           baseWarehouseBlockId={blockId}
           onSubmit={handleSubmit}
           isSubmitting={createMutation.isPending || updateMutation.isPending || makeDefaultMutation.isPending}
+        />
+
+        <DataImportModal
+          open={isImportModalOpen}
+          onOpenChange={setIsImportModalOpen}
+          title="Import Sub Blok Gudang"
+          description="Download template untuk memastikan format data sesuai sebelum melakukan import"
+          templateUrl="https://docs.google.com/spreadsheets/d/1dix-TR6FpAstJUggUpCG_-AVAoZYPMunGqS3DNF-U8s/edit?usp=sharing"
+          onImport={async (file) => { await importMutation.mutateAsync(file); }}
+          isPending={importMutation.isPending}
         />
 
         <AlertDialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>

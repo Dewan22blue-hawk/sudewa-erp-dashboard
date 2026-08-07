@@ -150,9 +150,10 @@ export const deactivateUser = async (id: number | string): Promise<void> => {
   }
 };
 
-export const getUserPassword = async (id: number | string): Promise<string | null> => {
-  const response = await apiClient.get<LaravelApiResponse<string | null>>(`${basePath}/${id}/get-user-password`);
-  return ensureSuccess(response.data);
+export const getUserPassword = async (id: number | string): Promise<string> => {
+  const response = await apiClient.get<LaravelApiResponse<{ secure_password: string }>>(`${basePath}/${id}/get-user-password`);
+  const data = ensureSuccess(response.data);
+  return data.secure_password;
 };
 
 export const getUserStatus = async (status?: boolean): Promise<UserStatusResponse> => {

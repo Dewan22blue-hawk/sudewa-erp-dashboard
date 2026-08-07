@@ -101,7 +101,6 @@ export default function TypeUnitPage() {
       toast.success('Data berhasil dihapus');
       refetch();
     } catch (error) {
-      console.error('Failed to delete type unit:', error);
       toast.error('Gagal menghapus data tipe unit');
     }
   };

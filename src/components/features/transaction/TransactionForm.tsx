@@ -80,8 +80,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormLabel>Debet USD</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
-                      <MoneyInput className="pl-7" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
+                      <MoneyInput currency="USD" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -96,8 +95,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormLabel>Kredit USD</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">$</span>
-                      <MoneyInput className="pl-7" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
+                      <MoneyInput currency="USD" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -114,8 +112,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormLabel>Debet IDR</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
+                      <MoneyInput value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -130,8 +127,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormLabel>Kredit IDR</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
+                      <MoneyInput value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -153,8 +149,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormLabel>Debet IDR</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
+                      <MoneyInput value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -169,8 +164,7 @@ export default function TransactionForm({ defaultValues, onSubmit, onCancel, isB
                   <FormLabel>Kredit IDR</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
-                      <MoneyInput className="pl-9" value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
+                      <MoneyInput value={field.value ?? 0} onChangeValue={(val) => field.onChange(val)} disabled={isBusy} placeholder="0" />
                     </div>
                   </FormControl>
                   <FormMessage />

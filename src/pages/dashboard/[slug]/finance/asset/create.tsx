@@ -44,7 +44,7 @@ export default function FinanceAssetCreatePage() {
                     onBack={handleCancel}
                 />
 
-                <div className="max-w-4xl">
+                <div>
                     <FinanceAssetCreateForm
                         onSave={handleSave}
                         onCancel={handleCancel}

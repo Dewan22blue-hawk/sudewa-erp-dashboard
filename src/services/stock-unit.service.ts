@@ -23,6 +23,7 @@ interface StockUnitApiModel {
   stock_available: boolean;
   type_unit_name?: string;
   is_sold_unit?: boolean | number | string;
+  is_forecast?: boolean | number | string;
   warehouse_sub_block?: {
     id: number;
     name: string;
@@ -39,6 +40,7 @@ const mapStockUnit = (payload: StockUnitApiModel): StockUnit => ({
   inStock: (payload.stock_available),
   stockStatus: (payload.stock_state) as StockStatus,
   warehouseSubBlock: payload.warehouse_sub_block,
+  isForecast: payload?.is_forecast === true || payload?.is_forecast === 1 || payload?.is_forecast === '1',
   isSoldUnit: payload?.is_sold_unit === true || payload?.is_sold_unit === 1 || payload?.is_sold_unit === '1',
 });
 
@@ -58,7 +60,9 @@ export const getStockUnits = async (
     chassis_number?: string;
     color?: string;
     search?: string; // Added search param for consistency
-    in_stock?: boolean;
+    in_stock?: boolean | string;
+    is_forecast?: boolean | string;
+    is_sold_unit?: boolean | string;
     specified?: string;
   },
 ) => {
@@ -76,6 +80,12 @@ export const getStockUnits = async (
 
   if (params.in_stock !== undefined) {
     queryParams.in_stock = params.in_stock;
+  }
+  if (params.is_forecast !== undefined) {
+    queryParams.is_forecast = params.is_forecast;
+  }
+  if (params.is_sold_unit !== undefined) {
+    queryParams.is_sold_unit = params.is_sold_unit;
   }
 
   const response = await apiClient.get<PaginatedStockUnitResponse>(

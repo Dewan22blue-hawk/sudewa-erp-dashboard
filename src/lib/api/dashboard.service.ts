@@ -12,27 +12,51 @@ export const dashboardService = {
     if (startDate) defaultParams.start_date = startDate;
     if (endDate) defaultParams.end_date = endDate;
 
-    // Fetch real data dari API secara paralel
-    const [statsResponse, customerResponse, productResponse, transactionResponse] = await Promise.all([
-      apiClient.get<{ status: boolean; data: BillingStatsRaw }>('/wapi/stats/billing-stats', { params: defaultParams }),
-      apiClient.get<{ status: boolean; data: CustomerStatsRaw }>('/wapi/stats/customer-stats', { params: defaultParams }),
-      apiClient.get<{ status: boolean; data: ProductStatsRaw }>('/wapi/stats/unit-type-stats', { params: defaultParams }),
-      apiClient.get<{ status: boolean; data: TransactionStatsRaw }>('/wapi/transaction/unit-transaction/unit-transaction', {
+    const safeGet = async <T>(url: string, config: any, fallback: T): Promise<T> => {
+      try {
+        const response = await apiClient.get<{ status: boolean; data: T }>(url, config);
+        return response.data.data;
+      } catch (err) {
+        console.warn(`[DashboardService] Failed to fetch from ${url}, using fallback:`, err);
+        return fallback;
+      }
+    };
+
+    // Fetch real data dari API secara paralel dengan penanganan error masing-masing
+    const [stats, customerStats, productStats, transactionStats] = await Promise.all([
+      safeGet<BillingStatsRaw>('/wapi/stats/billing-stats', { params: defaultParams }, {
+        opening_balance: {
+          debet: { bca_idr: 0, bca_usd: 0 },
+          kredit: { bca_idr: 0, bca_usd: 0 }
+        },
+        mutation: {
+          debet: { bca_idr: 0, bca_usd: 0 },
+          kredit: { bca_idr: 0, bca_usd: 0 }
+        },
+        percentage: []
+      }),
+      safeGet<CustomerStatsRaw>('/wapi/stats/customer-stats', { params: defaultParams }, {
+        summary: { total_customer: 0, total_revenue: 0, average_revenue_per_customer: 0 },
+        customers: { current_page: 1, data: [], total: 0 }
+      }),
+      safeGet<ProductStatsRaw>('/wapi/stats/unit-type-stats', { params: defaultParams }, {
+        summary: { total_unit_type: 0, total_unit_type_sold: 0 },
+        data: { current_page: 1, data: [], total: 0 }
+      }),
+      safeGet<TransactionStatsRaw>('/wapi/transaction/unit-transaction/unit-transaction', {
         params: {
           sort_order: 'desc',
           per_page: 5,
-          // type: 'purchase', // Removed to get all transactions for history
           page: 1,
           is_paid: true,
           ...defaultParams,
         },
+      }, {
+        current_page: 1,
+        data: [],
+        total: 0
       })
     ]);
-
-    const stats = statsResponse.data.data;
-    const customerStats = customerResponse.data.data;
-    const productStats = productResponse.data.data;
-    const transactionStats = transactionResponse.data.data;
 
     // Transform ke AccountOverview
     const accounts = dashboardService.transformToAccounts(stats);
@@ -80,12 +104,23 @@ export const dashboardService = {
     };
 
     // Mapping dari product response
+    const rawProducts = productStats.data?.data || [];
+    const totalSoldSum = rawProducts.reduce((acc: number, curr: any) => acc + (curr.total_sold ?? 0), 0);
+    const totalActualSum = rawProducts.reduce((acc: number, curr: any) => acc + (curr.total_sold_actual ?? 0), 0);
+    const totalForecastSum = rawProducts.reduce((acc: number, curr: any) => acc + (curr.total_sold_forecast ?? 0), 0);
+
     const products: ProductOverview = {
-      totalProducts: productStats.summary?.total_unit_type || 0,
-      totalSold: (productStats.data?.data || []).reduce((acc: number, curr: any) => acc + (curr.total_sold || 0), 0),
-      topProducts: (productStats.data?.data || []).map((p: any) => ({
+      totalProducts: productStats.summary?.total_unit_type || rawProducts.length || 0,
+      totalSold: totalSoldSum || productStats.summary?.total_unit_type_sold || 0,
+      totalSoldActual: totalActualSum,
+      totalSoldForecast: totalForecastSum,
+      topProducts: rawProducts.map((p: any) => ({
         name: p.unit_type_name || p.name || 'Unknown',
-        quantity: p.total_sold || 0
+        brandName: p.unit_type_brand_name || '-',
+        quantity: p.total_sold ?? 0,
+        actual: p.total_sold_actual ?? 0,
+        forecast: p.total_sold_forecast ?? 0,
+        totalProducts: p.total_products ?? 0,
       }))
     };
     const kpis: any[] = [];
@@ -356,5 +391,53 @@ export const dashboardService = {
 
   async refreshDashboard(companyId: string, startDate?: string | null, endDate?: string | null): Promise<DashboardApiResponse> {
     return dashboardService.getDashboardData(companyId, startDate, endDate);
+  },
+
+  async getUnitTypeSalesTrend(params: {
+    company_id?: string | number;
+    warehouse_id?: string | number;
+    unit_type_id?: string | number;
+    range?: string;
+    start_date?: string;
+    end_date?: string;
+  }): Promise<Array<{
+    unit_type_id: number;
+    unit_type_name: string;
+    brand_name: string;
+    trend: Array<{ label: string; total_sales: number }>;
+  }>> {
+    try {
+      const response = await apiClient.get<{ status: boolean; data: any[] }>(
+        '/wapi/stats/unit-transaction-sales-unit-type-trend',
+        { params }
+      );
+      return response.data?.data || [];
+    } catch (err) {
+      console.warn('[DashboardService] Failed to fetch unit type sales trend:', err);
+      return [];
+    }
+  },
+
+  async getUnitTransactionTrend(params: {
+    company_id?: string | number;
+    start_date?: string | null;
+    end_date?: string | null;
+  }): Promise<{
+    summary: {
+      total_sales_transactions: number;
+      total_purchase_transactions: number;
+    };
+    trend: Array<{ label: string; sales_count: number; purchase_count: number }>;
+  }> {
+    try {
+      const response = await apiClient.get(
+        '/wapi/stats/unit-transaction-trend',
+        { params }
+      );
+      return response.data?.data || { summary: { total_sales_transactions: 0, total_purchase_transactions: 0 }, trend: [] };
+    } catch (err) {
+      console.warn('[DashboardService] Failed to fetch unit transaction trend:', err);
+      return { summary: { total_sales_transactions: 0, total_purchase_transactions: 0 }, trend: [] };
+    }
   },
 };

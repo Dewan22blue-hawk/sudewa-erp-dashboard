@@ -10,6 +10,8 @@ import { Eye, FileDown, FileCheck, FileText, FileSpreadsheet, FileX, FileUp, Fil
 import { FinanceOverview } from '@/components/features/dashboard/FinanceOverview';
 import { FinanceChart } from '@/components/features/dashboard/FinanceChart';
 import { CustomerOverviewCard, ProductOverviewCard } from '@/components/features/dashboard/CustomerProductOverview';
+import { UnitTypeSalesTrendChart } from '@/components/features/dashboard/charts/UnitTypeSalesTrendChart';
+import { UnitTransactionTrendChart } from '@/components/features/dashboard/charts/UnitTransactionTrendChart';
 
 import { TransactionTable } from '@/components/features/dashboard/TransactionTable';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -302,10 +304,14 @@ export default function DashboardPage() {
 
         {/* company_id = [1,2,5] */}
         {companyId && ['1', '2', '5'].includes(companyId) && (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <CustomerOverviewCard data={data?.customers} isLoading={isLoadingDisplay} />
-            <ProductOverviewCard data={data?.products} isLoading={isLoadingDisplay} />
+          <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <CustomerOverviewCard data={data?.customers} isLoading={isLoadingDisplay} />
+              <ProductOverviewCard data={data?.products} isLoading={isLoadingDisplay} />
+            </div>
+            <UnitTransactionTrendChart startDate={activeDateRange.start} endDate={activeDateRange.end} />
             <TransactionTable data={data?.transactions || []} isLoading={isLoadingDisplay} />
+            <UnitTypeSalesTrendChart companyId={companyId} />
           </div>
         )}
 

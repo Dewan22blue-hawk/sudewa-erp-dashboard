@@ -20,6 +20,7 @@ const baseUserShape = {
   firstname: z.string().min(1, 'Nama depan wajib diisi'),
   lastname: z.string().optional(),
   roles: z.string().optional(),
+  is_active: z.union([z.string(), z.boolean()]).optional(),
 };
 
 // Create: password wajib

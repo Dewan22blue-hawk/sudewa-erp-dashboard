@@ -10,10 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { User } from '@/@types/user.types';
-import { useAssignRole, useCreateUser, useUpdateUser } from '@/hooks/useUser';
+import { useAssignRole, useCreateUser, useUpdateUser, useActivateUser, useDeactivateUser } from '@/hooks/useUser';
 import { useRoles } from '@/hooks/useRole';
 import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Info } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import RequiredMark from '@/components/ui/required-mark';
 
 interface Props {
@@ -25,10 +26,13 @@ interface Props {
 export function UserFormDialog({ open, onOpenChange, user }: Props) {
   const isEdit = Boolean(user);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const assignRoleMutation = useAssignRole();
+  const activateMutation = useActivateUser();
+  const deactivateMutation = useDeactivateUser();
   const { data: roleOptions = [], isLoading: isRolesLoading } = useRoles();
 
   // Using a union type for potential values
@@ -43,6 +47,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
       roles: 'employee',
       password: '',
       password_confirmation: '',
+      is_active: true,
     },
   });
 
@@ -60,6 +65,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
           roles: user.roles?.[0]?.name || roleOptions[0]?.name || '',
           password: '', // Password always empty on edit start
           password_confirmation: '',
+          is_active: Boolean(user.isActive),
         });
       } else {
         // Create Mode: Reset all
@@ -72,13 +78,14 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
           roles: roleOptions[0]?.name || 'employee',
           password: '',
           password_confirmation: '',
+          is_active: true,
         });
       }
     }
   }, [open, user, form, roleOptions]);
 
   const onSubmit = async (values: any) => {
-    if (createMutation.isPending || updateMutation.isPending || assignRoleMutation.isPending) return;
+    if (createMutation.isPending || updateMutation.isPending || assignRoleMutation.isPending || activateMutation.isPending || deactivateMutation.isPending) return;
 
     // Hilangkan password kosong agar lolos validasi backend saat edit
     const payload = { ...values } as any;
@@ -87,6 +94,9 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
 
     // Gabungkan firstname dan lastname untuk kolom name yang wajib di backend
     payload.name = [payload.firstname, payload.lastname].filter(Boolean).join(' ');
+
+    // Hapus is_active dari payload store/update biasa karena backend tidak menyimpannya via store/update
+    delete payload.is_active;
 
     try {
       if (isEdit && user) {
@@ -101,11 +111,30 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
         if (newRole && newRole !== currentRole) {
           await assignRoleMutation.mutateAsync({ id: user.id, role: newRole });
         }
+
+        // Handle activate/deactivate
+        const isCurrentlyActive = Boolean(user.isActive);
+        const shouldBeActive = Boolean(values.is_active);
+        if (shouldBeActive !== isCurrentlyActive) {
+          if (shouldBeActive) {
+            await activateMutation.mutateAsync(user.id);
+          } else {
+            await deactivateMutation.mutateAsync(user.id);
+          }
+        }
+
         toast.success('Data berhasil diperbarui');
       } else {
-        await createMutation.mutateAsync({
+        const createdUser = await createMutation.mutateAsync({
           ...payload,
         });
+
+        // Jika dicentang aktif (is_active === true), jalankan aktivasi setelah user dibuat
+        const shouldBeActive = Boolean(values.is_active);
+        if (shouldBeActive) {
+          await activateMutation.mutateAsync(createdUser.id);
+        }
+
         toast.success('Data berhasil ditambahkan');
       }
       onOpenChange(false);
@@ -114,13 +143,13 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
     }
   };
 
-  const isBusy = createMutation.isPending || updateMutation.isPending || assignRoleMutation.isPending || form.formState.isSubmitting;
+  const isBusy = createMutation.isPending || updateMutation.isPending || assignRoleMutation.isPending || activateMutation.isPending || deactivateMutation.isPending || form.formState.isSubmitting;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Ubah Data User' : 'Tambah Data User'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Ubah Data Pengguna' : 'Tambah Data Pengguna'}</DialogTitle>
           <DialogDescription className="hidden">Form untuk {isEdit ? 'mengubah' : 'menambah'} data user</DialogDescription>
         </DialogHeader>
 
@@ -213,7 +242,13 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                 <FormItem>
                   <FormLabel>Konfirmasi Password{!isEdit && <RequiredMark />}</FormLabel>
                   <FormControl>
-                    <Input type={showPassword ? 'text' : 'password'} placeholder="Ulangi password" {...field} disabled={isBusy} />
+                    <div className="relative">
+                      <Input type={showConfirmPassword ? 'text' : 'password'} placeholder="Ulangi password" {...field} disabled={isBusy} />
+                      <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent" onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={isBusy}>
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                        <span className="sr-only">Toggle password visibility</span>
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -225,7 +260,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
               name="roles"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role<RequiredMark /></FormLabel>
+                  <FormLabel>Hak Akses<RequiredMark /></FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={isBusy || isRolesLoading}>
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -244,6 +279,36 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="is_active"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel>Jadikan Aktif<RequiredMark /></FormLabel>
+                  <FormControl>
+                    <div className="flex items-center space-x-3 h-9">
+                      <Switch
+                        checked={Boolean(field.value)}
+                        onCheckedChange={field.onChange}
+                        disabled={isBusy}
+                      />
+                      <span className={`text-sm font-medium ${Boolean(field.value) ? 'text-green-600' : 'text-slate-400'}`}>
+                        {Boolean(field.value) ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="rounded-lg border border-blue-100 bg-blue-50/55 p-3 text-[12px] text-blue-800 flex items-start gap-2 leading-relaxed">
+              <Info className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+              <span>
+                Pengaturan ini digunakan untuk memberi atau mencabut akses aktif pengguna agar dapat masuk (login) ke dalam sistem dashboard.
+              </span>
+            </div>
 
             <div className="space-y-2 pt-4">
               <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isBusy}>

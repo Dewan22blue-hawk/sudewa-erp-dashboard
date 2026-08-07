@@ -23,12 +23,12 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
       icon: ClipboardList,
       children: [
         {
-          label: 'Akun',
-          href: master('/account'),
-        },
-        {
           label: 'Grup Akun',
           href: master('/account-group'),
+        },
+        {
+          label: 'Akun',
+          href: master('/account'),
         },
         {
           label: 'Supplier',
@@ -85,12 +85,30 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           href: base('/transaksi/arus-transaksi'),
         },
         {
-          label: 'Pembelian Unit',
-          href: base('/transaksi/pembelian-unit'),
+          label: 'Transaksi Unit Tipe',
+          children: [
+            {
+              label: 'Pembelian Unit',
+              href: base('/transaksi/pembelian-unit'),
+            },
+            {
+              label: 'Penjualan Unit',
+              href: base('/transaksi/penjualan-unit'),
+            },
+          ]
         },
         {
-          label: 'Penjualan Unit',
-          href: base('/transaksi/penjualan-unit'),
+          label: 'Transaksi Sparepart',
+          children: [
+            {
+              label: 'Pembelian Sparepart',
+              href: base('/transaksi/pembelian-sparepart'),
+            },
+            {
+              label: 'Penjualan Sparepart',
+              href: base('/transaksi/penjualan-sparepart'),
+            },
+          ]
         },
         {
           label: 'Bukti Potong',
@@ -190,10 +208,6 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Laporan Transaksi Kas',
           href: base('/laporan/laporan-transaksi-kas'),
         },
-        // {
-        //   label: 'Laporan Akuntansi',
-        //   href: base('/laporan/laporan-akuntansi'),
-        // },
         {
           label: 'Laporan Pembelian',
           href: base('/laporan/laporan-pembelian'),
@@ -224,16 +238,6 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
         },
       ],
     },
-    // {
-    //   label: 'Pengaturan',
-    //   icon: Settings,
-    //   children: [
-    //     {
-    //       label: 'Pajak',
-    //       href: settings('/tax'),
-    //     },
-    //   ],
-    // },
     {
       label: 'Manajemen Pengguna',
       icon: Shield,

@@ -162,7 +162,17 @@ function SidebarNavItem({ item, isCollapsed }: { item: MenuItem; isCollapsed?: b
     return currentPath === href || currentPath.startsWith(`${href}/`);
   };
 
-  const isChildActive = item.children?.some((child) => isActiveRoute(child.href, child.exact)) || false;
+  const hasActiveChild = (menuItem: MenuItem): boolean => {
+    if (menuItem.href && isActiveRoute(menuItem.href, menuItem.exact)) {
+      return true;
+    }
+    if (menuItem.children) {
+      return menuItem.children.some(hasActiveChild);
+    }
+    return false;
+  };
+
+  const isChildActive = item.children?.some(hasActiveChild) || false;
 
   const [open, setOpen] = useState(isChildActive || false);
 
@@ -192,28 +202,94 @@ function SidebarNavItem({ item, isCollapsed }: { item: MenuItem; isCollapsed?: b
           {item.icon && <item.icon className="w-[18px] h-[18px] shrink-0" />}
           {!isCollapsed && <span>{item.label}</span>}
         </div>
-        {!isCollapsed && item.children && <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform duration-200', open && 'rotate-180 text-gray-900', !open && 'text-gray-400')} />}
+        {!isCollapsed && item.children && (
+          <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform duration-200', open && 'rotate-180 text-gray-900', !open && 'text-gray-400')} />
+        )}
       </button>
 
       {item.children && open && !isCollapsed && (
         <div className="relative mt-1 ml-[22px] space-y-1">
           <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-200" />
 
-          {item.children.map((child, idx) => {
-            const active = isActiveRoute(child.href, child.exact);
+          {item.children.map((child, idx) => (
+            <SidebarSubNavItem
+              key={idx}
+              item={child}
+              isActiveRoute={isActiveRoute}
+              hasActiveChild={hasActiveChild}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
+function SidebarSubNavItem({
+  item,
+  isActiveRoute,
+  hasActiveChild,
+}: {
+  item: MenuItem;
+  isActiveRoute: (href?: string, exact?: boolean) => boolean;
+  hasActiveChild: (menuItem: MenuItem) => boolean;
+}) {
+  const isSubChildActive = item.children?.some(hasActiveChild) || false;
+  const [open, setOpen] = useState(isSubChildActive);
+
+  useEffect(() => {
+    if (isSubChildActive) {
+      setOpen(true);
+    }
+  }, [isSubChildActive]);
+
+  if (!item.children) {
+    const active = isActiveRoute(item.href, item.exact);
+    return (
+      <Link
+        href={item.href || '#'}
+        className={cn(
+          'group relative ml-1 block rounded-md pl-3 pr-2 py-2 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+          active ? 'bg-[#E5E7EB] text-[#111827] font-[500]' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+        )}
+        aria-current={active ? 'page' : undefined}
+      >
+        {active && <div className="absolute left-0 top-0 h-full w-[3px] rounded-r-md bg-primary transition-transform duration-300 animate-in slide-in-from-left-1" />}
+        {item.label}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="ml-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn(
+          'flex w-full items-center justify-between rounded-md pl-3 pr-2 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+          isSubChildActive ? 'text-[#111827]' : 'text-gray-600 hover:bg-gray-100',
+        )}
+      >
+        <span>{item.label}</span>
+        <ChevronDown className={cn('h-3.5 w-3.5 transition-transform duration-200', open && 'rotate-180 text-gray-900', !open && 'text-gray-500')} />
+      </button>
+
+      {open && (
+        <div className="relative mt-1 ml-3 space-y-1">
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-200" />
+          {item.children.map((subChild, idx) => {
+            const active = isActiveRoute(subChild.href, subChild.exact);
             return (
               <Link
                 key={idx}
-                href={child.href || '#'}
+                href={subChild.href || '#'}
                 className={cn(
-                  'group relative ml-1 block rounded-md pl-3 pr-2 py-2 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                  'group relative ml-2 block rounded-md pl-3 pr-2 py-2 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                   active ? 'bg-[#E5E7EB] text-[#111827] font-[500]' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
                 )}
                 aria-current={active ? 'page' : undefined}
               >
                 {active && <div className="absolute left-0 top-0 h-full w-[3px] rounded-r-md bg-primary transition-transform duration-300 animate-in slide-in-from-left-1" />}
-                {child.label}
+                {subChild.label}
               </Link>
             );
           })}

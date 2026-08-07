@@ -41,6 +41,7 @@ const paymentSchema = z.object({
     bcaPayment2: z.number().min(0, 'Tidak boleh negatif'),
     paymentDate: z.string().min(1, 'Tanggal wajib diisi'),
     note: z.string().max(255, 'Maksimal 255 karakter'),
+    paymentProof: z.any().optional(),
     isPaid: z.boolean(),
 });
 
@@ -131,16 +132,26 @@ export function SalesPaymentForm({
     };
 
     const handleSubmit = async (values: PaymentFormData) => {
-        const total = Number(values.bcaPayment || 0) + (values.cashPayment || 0) + (values.bcaPayment2 || 0);
-        if (total <= 0) {
+        const bcaPaymentUsd = Number(values.bcaPayment || 0);
+        const totalIdr = (values.cashPayment || 0) + (values.bcaPayment2 || 0);
+
+        if (bcaPaymentUsd <= 0 && totalIdr <= 0) {
             toast.error('Minimal salah satu nominal pembayaran harus lebih dari 0.');
             return;
         }
-        if (remainingPayment > 0 && total > remainingPayment) {
-            form.setError('cashPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
-            form.setError('bcaPayment', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
-            form.setError('bcaPayment2', { type: 'manual', message: 'Total pembayaran tidak boleh melebihi sisa tagihan' });
-            toast.error('Total pembayaran tidak boleh melebihi sisa tagihan.');
+
+        const remainingPaymentUsd = Number(billing?.remaining_payment_usd || 0);
+
+        if (remainingPaymentUsd > 0 && bcaPaymentUsd > remainingPaymentUsd) {
+            form.setError('bcaPayment', { type: 'manual', message: 'Nominal USD tidak boleh melebihi sisa tagihan USD' });
+            toast.error('Nominal USD tidak boleh melebihi sisa tagihan USD.');
+            return;
+        }
+
+        if (remainingPayment > 0 && totalIdr > remainingPayment) {
+            form.setError('cashPayment', { type: 'manual', message: 'Total pembayaran IDR tidak boleh melebihi sisa tagihan' });
+            form.setError('bcaPayment2', { type: 'manual', message: 'Total pembayaran IDR tidak boleh melebihi sisa tagihan' });
+            toast.error('Total pembayaran IDR tidak boleh melebihi sisa tagihan.');
             return;
         }
         await onSubmitPayment(values);
@@ -336,18 +347,17 @@ export function SalesPaymentForm({
                                         <FormItem className="space-y-2">
                                             <FormLabel className="text-sm font-medium">BCA USD</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="text"
-                                                    inputMode="decimal"
-                                                    value={field.value}
+                                                <MoneyInput
+                                                    name={field.name}
+                                                    currency="USD"
+                                                    value={Number(field.value) || 0}
                                                     disabled={billing && billingRemaining === 0 || isPaidAndValid}
-                                                    onChange={(e) => {
-                                                        let val = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
-                                                        const parts = val.split('.');
-                                                        if (parts.length > 2) {
-                                                            val = parts[0] + '.' + parts.slice(1).join('');
-                                                        }
-                                                        field.onChange(val);
+                                                    onChangeValue={(val) => {
+                                                        const maxBca = billing?.remaining_payment_usd !== undefined && billing?.remaining_payment_usd !== null
+                                                            ? Math.max(0, Number(billing.remaining_payment_usd))
+                                                            : undefined;
+                                                        const capped = parseAndClampMoneyInput(val, maxBca, 'USD');
+                                                        field.onChange(capped);
                                                     }}
                                                     onBlur={field.onBlur}
                                                 />
@@ -420,6 +430,28 @@ export function SalesPaymentForm({
                                                     {...field}
                                                     disabled={billing && billingRemaining === 0 || isPaidAndValid}
                                                     value={field.value ?? ''}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="paymentProof"
+                                    render={({ field: { value, onChange, ...field } }) => (
+                                        <FormItem className="flex-1 space-y-2">
+                                            <FormLabel className="text-sm font-medium">Bukti Pembayaran (Opsional)</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="file"
+                                                    disabled={billing && billingRemaining === 0 || isPaidAndValid}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) onChange(file);
+                                                    }}
+                                                    {...field}
+                                                    value={undefined}
                                                 />
                                             </FormControl>
                                             <FormMessage />

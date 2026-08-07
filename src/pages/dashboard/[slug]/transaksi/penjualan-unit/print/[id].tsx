@@ -84,7 +84,6 @@ export default function SalesPrintPage() {
               price_usd: row.price_usd ? Number(row.price_usd) : undefined,
             }));
           } catch (err) {
-            console.error('Failed to fetch details for item', itemId, err);
             return [];
           }
         })

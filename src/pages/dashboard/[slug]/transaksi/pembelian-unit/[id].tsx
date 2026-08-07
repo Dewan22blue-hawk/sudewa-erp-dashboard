@@ -84,7 +84,7 @@ export default function PurchaseDetailPage() {
   const isPaid = billingSummary?.is_paid ?? (hasPaidBilling || (totalPaid >= totalTagihan && totalTagihan > 0));
   const currentStockState = String(purchase?.stock_state ?? '').toLowerCase();
   const isRefunded = purchase?.has_refund_transaction;
-  const canReceive = isPaid && (purchase?.warehouse_activity ? purchase?.warehouse_activity?.state === 'draft' : true);
+  const canReceive = isPaid && purchase?.isUnitTypeDetailValid === true && (purchase?.warehouse_activity ? purchase?.warehouse_activity?.state === 'draft' : true);
 
   const receiveButtonText = useMemo(() => {
     if (updateState.isPending) return 'Memproses...';
@@ -180,6 +180,9 @@ export default function PurchaseDetailPage() {
       toast.error(readApiError(error));
     }
   };
+
+  console.log(purchase)
+
 
   const handleReceipt = async () => {
     if (!purchase?.id) return;
@@ -339,14 +342,14 @@ export default function PurchaseDetailPage() {
           }
           actions={
             <>
-              <Button disabled={isRefunded} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
+              <Button disabled={isRefunded || !canEdit} className="bg-emerald-500 hover:bg-emerald-600 text-white disabled:cursor-not-allowed disabled:opacity-50" onClick={() => router.push(`/dashboard/${slug}/transaksi/pembelian-unit/${purchase.id}/payment`)}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 {isPaid ? 'Sudah Dibayar' : 'Bayar'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                disabled={isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
+                disabled={!canEdit || isPaid || isRefunded || updateBillingIsPaid.isPending || purchase?.unit_transaction_billing == null}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => setIsMarkAsPaidDialogOpen(true)}
               >
@@ -356,7 +359,7 @@ export default function PurchaseDetailPage() {
               <Button
                 variant="outline"
                 className="bg-white hover:bg-gray-50 border-gray-200"
-                disabled={!canReceive}
+                disabled={!canReceive || !canEdit}
                 onClick={() => setIsReceiveDialogOpen(true)}
               >
                 {receiveButtonText}
@@ -377,13 +380,10 @@ export default function PurchaseDetailPage() {
           </div>
         ) : null}
 
-        {/* 3-COLUMN CARDS */}
         <PurchaseDetailCards data={purchase} billingHistories={resolvedBillingHistories} />
 
-        {/* UNIT TABLE */}
         <PurchaseUnitTable purchaseId={purchase.id} slug={slug as string} isPaid={isPaid} canEdit={canEdit} canDelete={canDelete} />
 
-        {/* PAYMENT HISTORY TABLE */}
         <div className="space-y-3">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">History Pembayaran</h2>

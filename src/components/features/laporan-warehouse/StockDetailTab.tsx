@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { TableRow, TableCell } from '@/components/ui/table';
 import { toast } from 'sonner';
+import { useCompany } from '@/contexts/CompanyContext';
 import { useGetWarehouseStockDetail } from '@/hooks/useLaporanWarehouse';
 import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,45 @@ import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
 import { CopyBox } from '@/components/ui/copy-box';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import type { StockStatus, StockUnit } from '@/@types/stock-unit.types';
+import StockUnitFilterDropdown from '@/components/features/stock-unit/StockUnitFilterTabs';
+
+const statusConfig: Record<string, { label: string; className: string }> = {
+  normal: { label: 'Normal', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  minor_damage: { label: 'Minor Damage', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+  major_damage: { label: 'Major Damage', className: 'border-red-200 bg-red-50 text-red-700 font-semibold' },
+  returned: { label: 'Returned', className: 'border-purple-200 bg-purple-50 text-purple-700 font-semibold' },
+  refunded: { label: 'Refunded', className: 'border-orange-200 bg-orange-50 text-orange-700 font-semibold' },
+  lost: { label: 'Lost', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+  in_repair: { label: 'In Repair', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+  draft: { label: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-medium' },
+  cancel: { label: 'Cancel', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  rejected: { label: 'Rejected', className: 'border-red-200 bg-red-50 text-red-700 font-medium' },
+  prepare: { label: 'Prepare', className: 'border-amber-200 bg-amber-50 text-amber-700 font-medium' },
+  inbound_purchase_order: { label: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_incoming_goods: { label: 'In Transit', className: 'border-blue-200 bg-blue-50 text-blue-700 font-medium' },
+  inbound_receipt: { label: 'Available', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+  inbound_return: { label: 'Refund', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_reserved: { label: 'Reserved', className: 'border-orange-200 bg-orange-50 text-orange-700 font-medium' },
+  outbound_in_transit: { label: 'In Transit', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-medium' },
+  outbound_delivered: { label: 'Delivered', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-medium' },
+  outbound_return: { label: 'Return', className: 'border-rose-200 bg-rose-50 text-rose-700 font-medium' },
+};
+
+const renderStatus = (status: string) => {
+  const config = statusConfig[status] ?? {
+    label: status ? status.replace(/_/g, ' ') : '-',
+    className: 'border-slate-200 bg-slate-50 text-slate-700 font-medium',
+  };
+
+  return (
+    <Badge variant="outline" className={cn('capitalize', config.className)}>
+      {config.label}
+    </Badge>
+  );
+};
 
 type StockDetailTabProps = {
   perPage: number;
@@ -35,72 +73,50 @@ const toCsvLine = (cells: Array<string | number>): string =>
     .join(',');
 
 export default function StockDetailTab({ perPage, machineNumber: initialMachineNumber, onActionsChange }: StockDetailTabProps) {
+  const { companyId } = useCompany();
   const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(perPage || 25);
+  const [search, setSearch] = useState('');
   const [machineNumber, setMachineNumber] = useState(initialMachineNumber || '');
   const [chassisNumber, setChassisNumber] = useState('');
   const [color, setColor] = useState('');
-  const [stockState, setStockState] = useState('');
-  const [inStock, setInStock] = useState('true');
+  const [stockState, setStockState] = useState<StockStatus | undefined>(undefined);
+  const [inStock, setInStock] = useState<boolean | undefined>(undefined);
 
+  const debouncedSearch = useDebouncedValue(search, 500);
   const debouncedMachineNumber = useDebouncedValue(machineNumber, 500);
   const debouncedChassisNumber = useDebouncedValue(chassisNumber, 500);
   const debouncedColor = useDebouncedValue(color, 500);
 
-  const {
-    data: response,
-    isLoading,
-    isError,
-  } = useGetWarehouseStockDetail({
-    warehouse_id: 1,
+  useEffect(() => {
+    setItemsPerPage(perPage);
+    setPage(1);
+  }, [perPage]);
+
+  const params = useMemo(() => ({
+    company_id: companyId || undefined,
     page,
-    per_page: perPage,
-  });
+    per_page: itemsPerPage,
+    search: debouncedSearch || undefined,
+    machine_number: debouncedMachineNumber || undefined,
+    chassis_number: debouncedChassisNumber || undefined,
+    color: debouncedColor || undefined,
+    stock_state: stockState,
+    in_stock: inStock,
+  }), [companyId, page, itemsPerPage, debouncedSearch, debouncedMachineNumber, debouncedChassisNumber, debouncedColor, stockState, inStock]);
 
-  const rawRows = useMemo(() => response?.data || [], [response?.data]);
+  const { data: response, isLoading, isError } = useGetWarehouseStockDetail(params);
 
-  const rows = useMemo(() => {
-    let result = [...rawRows];
+  console.log(response?.data)
 
-    if (debouncedMachineNumber) {
-      const q = debouncedMachineNumber.toLowerCase();
-      result = result.filter(r => r.machine_number?.toLowerCase().includes(q));
-    }
-    if (debouncedChassisNumber) {
-      const q = debouncedChassisNumber.toLowerCase();
-      result = result.filter(r => r.chassis_number?.toLowerCase().includes(q));
-    }
-    if (debouncedColor) {
-      const q = debouncedColor.toLowerCase();
-      result = result.filter(r => r.color?.toLowerCase().includes(q));
-    }
-    if (stockState && stockState !== 'all') {
-      result = result.filter(r => r.stock_status === stockState || r.status === stockState);
-    }
-    if (inStock && inStock !== 'all') {
-      const isInStockStr = String(inStock).toLowerCase();
-      if (isInStockStr === 'true') {
-        result = result.filter(r => r.stock_available > 0);
-      } else if (isInStockStr === 'false') {
-        result = result.filter(r => r.stock_available <= 0);
-      }
-    }
+  const rows = useMemo(() => (response?.data as unknown as StockUnit[]) || [], [response?.data]);
 
-    return result;
-  }, [rawRows, debouncedMachineNumber, debouncedChassisNumber, debouncedColor, stockState, inStock]);
-  const pagination = response || {
-    current_page: 1,
-    data: [],
-    last_page: 1,
-    per_page: perPage,
-    total: 0,
-    from: 0,
-    to: 0,
-  };
-
-  const grandTotalPurchase = useMemo(
-    () => rows.reduce((total, item) => total + item.purchase_price, 0),
-    [rows],
-  );
+  const meta = useMemo(() => ({
+    currentPage: response?.meta?.currentPage || response?.current_page || page,
+    perPage: response?.meta?.perPage || response?.per_page || itemsPerPage,
+    lastPage: response?.meta?.lastPage || response?.last_page || 1,
+    total: response?.meta?.total || response?.total || rows.length,
+  }), [response, page, itemsPerPage, rows.length]);
 
   const handlePrint = useCallback(() => {
     window.print();
@@ -112,28 +128,34 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
       return;
     }
 
-    const header = ['NO', 'KODE UNIT', 'TIPE UNIT', 'WARNA', 'NO MESIN', 'NO RANGKA', 'HARGA BELI', 'TERSEDIA', 'STOCK STATUS', 'STATUS'];
+    const header = [
+      'NO',
+      'NAMA UNIT',
+      'WARNA',
+      'NOMOR MESIN',
+      'NOMOR RANGKA',
+      'SUB BLOK',
+      'STATUS STOK',
+      'KONDISI STOK',
+      'POSISI STOK',
+    ];
     const lines = [toCsvLine(header)];
 
     rows.forEach((item, index) => {
       lines.push(
         toCsvLine([
-          (pagination.from > 0 ? pagination.from - 1 : 0) + index + 1,
-          item.unit_type?.code || '-',
-          item.person || '-',
-          item.unit_type?.name || '-',
-          item.color || '-',
-          item.machine_number || '-',
-          item.chassis_number || '-',
-          item.purchase_price,
-          item.stock_available || 0,
-          item.stock_status || '-',
+          index + 1,
+          item.namaUnit || '-',
+          item.warna || '-',
+          item.noMesin || '-',
+          item.noRangka || '-',
+          item.warehouseSubBlock?.name || 'Belum Ditambahkan',
+          item.inStock ? 'Tersedia' : 'Tidak Tersedia',
           item.status || '-',
+          item.stockStatus || '-',
         ]),
       );
     });
-
-    lines.push(toCsvLine(['', '', '', '', '', '', '', 'GRAND TOTAL', grandTotalPurchase, '', '', '']));
 
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -146,7 +168,7 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
     URL.revokeObjectURL(url);
 
     toast.success('Data stock detail berhasil diunduh');
-  }, [grandTotalPurchase, page, pagination.from, rows]);
+  }, [page, rows]);
 
   useEffect(() => {
     onActionsChange?.({ print: handlePrint, download: handleDownload });
@@ -156,88 +178,98 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
   const { slug } = router.query;
   const slugStr = typeof slug === 'string' ? slug : '';
 
-  const columns = useMemo<ColumnDef<any>[]>(
+  const columns = useMemo<ColumnDef<StockUnit>[]>(
     () => [
       {
-        header: 'KODE UNIT',
-        accessorKey: 'unit_type.code',
+        header: 'Nama Unit',
+        accessorKey: 'namaUnit',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <CopyBox text={item.unit_type?.code || '-'} />
+        cell: (item) => (
+          <ReferenceLink href={`/dashboard/${slugStr}/master/type-unit?search=${item.namaUnit}`}>
+            {item.namaUnit}
+          </ReferenceLink>
+        ),
       },
       {
-        header: 'TIPE UNIT',
-        accessorKey: 'unit_type.name',
+        header: 'Warna',
+        accessorKey: 'warna',
         sortable: true,
         alignment: 'left',
-        cell: (item) => item.unit_type?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/unit-type?search=${item.unit_type?.name}`}>
-          {item.unit_type?.name}
-        </ReferenceLink> : '-',
+        cell: (item) => item.warna || '-',
       },
       {
-        header: 'WARNA',
-        accessorKey: 'color',
+        header: 'Nomor Mesin',
+        accessorKey: 'noMesin',
         sortable: true,
         alignment: 'left',
-        cell: (item) => item.color || '-',
+        cell: (item) => <CopyBox text={item.noMesin || '-'} />,
       },
       {
-        header: 'NO MESIN',
-        accessorKey: 'machine_number',
+        header: 'Nomor Rangka',
+        accessorKey: 'noRangka',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <CopyBox text={item.machine_number || '-'} />
+        cell: (item) => <CopyBox text={item.noRangka || '-'} />,
       },
       {
-        header: 'NO RANGKA',
-        accessorKey: 'chassis_number',
+        header: 'Sub Blok',
+        accessorKey: 'warehouseSubBlock',
+        alignment: 'center',
         sortable: true,
-        alignment: 'left',
-        cell: (item) => <CopyBox text={item.chassis_number || '-'} />
+        tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
+        cell: (item) => item.warehouseSubBlock?.name ? <CopyBox text={item.warehouseSubBlock.name} /> : <Badge variant='outline' className="font-semibold bg-white">Belum Ditambahkan</Badge>,
       },
       {
-        header: 'HARGA BELI',
-        accessorKey: 'purchase_price',
-        sortable: true,
-        alignment: 'right',
-        cell: (item) => currenciesFormat('idr', item.purchase_price),
-      },
-      {
-        header: 'TERSEDIA',
-        accessorKey: 'stock_available',
+        header: 'Status Stok',
+        accessorKey: 'inStock',
         sortable: true,
         alignment: 'center',
-        cell: (item) => (item.stock_available || 0).toLocaleString('id-ID'),
+        tooltip: 'Status ketersediaan unit fisik di gudang',
+        cell: (item) => item?.inStock ? (
+          <Badge variant="outline" className="capitalize border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold">Tersedia</Badge>
+        ) : (
+          <Badge variant="outline" className="capitalize border-rose-200 bg-rose-50 text-rose-700 font-semibold">Tidak Tersedia {item?.isSoldUnit && '/ Terjual'}</Badge>
+        ),
       },
       {
-        header: 'STOCK STATUS',
-        accessorKey: 'stock_status',
-        sortable: true,
-        alignment: 'center',
-        cell: (item) => item.stock_status || '-',
-      },
-      {
-        header: 'STATUS',
+        header: 'Kondisi Stok',
         accessorKey: 'status',
         sortable: true,
         alignment: 'center',
-        cell: (item) => item.status || '-',
+        tooltip: 'Kondisi fisik unit saat ini',
+        cell: (item) => renderStatus(item.status),
+      },
+      {
+        header: 'Posisi Stok',
+        accessorKey: 'stockStatus',
+        sortable: true,
+        alignment: 'center',
+        tooltip: 'Posisi logistik atau status alur stok unit',
+        cell: (item) => {
+          const config: Record<string, { label: string; name: string; className: string }> = {
+            draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600 font-semibold' },
+            cancel: { label: 'Cancel', name: 'Batal', className: 'border-rose-200 bg-rose-50 text-rose-700 font-semibold' },
+            prepare: { label: 'Prepare', name: 'Disiapkan', className: 'border-amber-200 bg-amber-50 text-amber-700 font-semibold' },
+            purchase_order: { label: 'Purchase Order', name: 'Purchase Order', className: 'border-blue-200 bg-blue-50 text-blue-700 font-semibold' },
+            in_transit: { label: 'In Transit', name: 'Dalam Perjalanan', className: 'border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold' },
+            receipt: { label: 'Receipt', name: 'Diterima', className: 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold' },
+          };
+          const stateVal = item?.stockStatus ?? 'draft';
+          const match = config[stateVal] ?? {
+            label: stateVal.replace(/_/g, ' '),
+            className: 'border-slate-200 bg-slate-50 text-slate-700 font-semibold',
+          };
+
+          return (
+            <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
+              {item?.isSoldUnit ? 'Terkirim' : match.name}
+            </Badge>
+          );
+        },
       },
     ],
     [slugStr]
-  );
-
-  const footerRow = useMemo(
-    () => (
-      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold print:text-[10px]">
-        <TableCell colSpan={7} className="px-4 py-4 pr-10 text-right text-slate-900">
-          GRAND TOTAL
-        </TableCell>
-        <TableCell className="px-4 py-4 text-right text-slate-900">{currenciesFormat('idr', grandTotalPurchase)}</TableCell>
-        <TableCell colSpan={3}></TableCell>
-      </TableRow>
-    ),
-    [grandTotalPurchase]
   );
 
   return (
@@ -270,26 +302,29 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
           }}
           className="w-32 bg-white"
         />
-        <Select value={stockState || 'all'} onValueChange={(val) => { setStockState(val); setPage(1); }}>
-          <SelectTrigger className="w-40 bg-white">
-            <SelectValue placeholder="Stock State" />
+        <Select
+          value={inStock === undefined ? 'all' : inStock ? 'true' : 'false'}
+          onValueChange={(val) => {
+            setInStock(val === 'all' ? undefined : val === 'true');
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-36 bg-white">
+            <SelectValue placeholder="Ketersediaan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua State</SelectItem>
-            <SelectItem value="good">Good</SelectItem>
-            <SelectItem value="bad">Bad</SelectItem>
+            <SelectItem value="all">Semua Stok</SelectItem>
+            <SelectItem value="true">Tersedia</SelectItem>
+            <SelectItem value="false">Tidak Tersedia</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={inStock || 'all'} onValueChange={(val) => { setInStock(val); setPage(1); }}>
-          <SelectTrigger className="w-32 bg-white">
-            <SelectValue placeholder="In Stock" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Semua</SelectItem>
-            <SelectItem value="true">In Stock</SelectItem>
-            <SelectItem value="false">Out of Stock</SelectItem>
-          </SelectContent>
-        </Select>
+        <StockUnitFilterDropdown
+          active={stockState ?? 'all'}
+          onChange={(val) => {
+            setStockState(val === 'all' ? undefined : val);
+            setPage(1);
+          }}
+        />
       </div>
 
       {isError ? (
@@ -302,13 +337,19 @@ export default function StockDetailTab({ perPage, machineNumber: initialMachineN
           data={rows}
           columns={columns}
           loading={isLoading}
-          footer={footerRow}
-          meta={{
-            currentPage: pagination.current_page,
-            perPage: pagination.per_page,
-            lastPage: pagination.last_page,
-            total: rows.length > 0 ? rows.length : pagination.total,
+          searchPlaceholder="Search here..."
+          search={search}
+          onSearchChange={(val) => {
+            setSearch(val);
+            setPage(1);
           }}
+          showLimitChange
+          perPage={itemsPerPage}
+          onPerPageChange={(pp) => {
+            setItemsPerPage(pp);
+            setPage(1);
+          }}
+          meta={meta}
           onPageChange={setPage}
         />
       )}
