@@ -16,7 +16,7 @@ export default function KasPage() {
   const { data, isLoading, isError } = useKas(safeCompanyId);
   const { hasPermission } = usePermissionGuard();
   const canCreate = hasPermission('master-data:create');
-  
+
   const sortedData = useMemo(() => {
     const rawData = data?.data ?? [];
     return [...rawData].sort((a: any, b: any) => {
@@ -81,12 +81,12 @@ export default function KasPage() {
             <h1 className="text-2xl font-semibold">Kas</h1>
             <p className="text-sm text-muted-foreground">Kelola Kas Keuangan</p>
           </div>
-          {canCreate && (
+          {/* {canCreate && (
             <Button onClick={() => setIsFormOpen(true)} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
               <Plus className="mr-2 h-4 w-4" />
               Tambah
             </Button>
-          )}
+          )} */}
         </div>
 
         {/* TABLE CARD */}
