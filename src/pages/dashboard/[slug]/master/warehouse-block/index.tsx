@@ -98,6 +98,21 @@ export default function WarehouseBlockPage() {
     }
   };
 
+  const sortedData = React.useMemo(() => {
+    const rawData = data?.data?.data || [];
+    return [...rawData].sort((a: any, b: any) => {
+      const dateA = a.created_at || a.createdAt ? new Date(a.created_at || a.createdAt).getTime() : 0;
+      const dateB = b.created_at || b.createdAt ? new Date(b.created_at || b.createdAt).getTime() : 0;
+      if (dateA !== dateB) return dateB - dateA;
+
+      const idA = typeof a.id === 'number' ? a.id : parseInt(String(a.id)) || 0;
+      const idB = typeof b.id === 'number' ? b.id : parseInt(String(b.id)) || 0;
+      if (idA !== idB) return idB - idA;
+
+      return (a.code || a.name || '').localeCompare(b.code || b.name || '');
+    });
+  }, [data?.data?.data]);
+
   return (
     <>
       <Head>
@@ -111,7 +126,7 @@ export default function WarehouseBlockPage() {
           />
 
           <WarehouseBlockTable
-            data={data?.data?.data || []}
+            data={sortedData}
             meta={data?.data ? {
               currentPage: data.data.current_page,
               lastPage: data.data.last_page,

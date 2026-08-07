@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { useKas } from '@/hooks/useKas';
@@ -17,6 +17,21 @@ export default function KasPage() {
   const { hasPermission } = usePermissionGuard();
   const canCreate = hasPermission('master-data:create');
   
+  const sortedData = useMemo(() => {
+    const rawData = data?.data ?? [];
+    return [...rawData].sort((a: any, b: any) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateA !== dateB) return dateB - dateA;
+
+      const idA = typeof a.id === 'number' ? a.id : parseInt(String(a.id)) || 0;
+      const idB = typeof b.id === 'number' ? b.id : parseInt(String(b.id)) || 0;
+      if (idA !== idB) return idB - idA;
+
+      return (a.code || '').localeCompare(b.code || '');
+    });
+  }, [data?.data]);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   // --- RENDER STATES ---
@@ -76,7 +91,7 @@ export default function KasPage() {
 
         {/* TABLE CARD */}
         <div className="">
-          <KasTable data={data?.data ?? []} />
+          <KasTable data={sortedData} />
         </div>
       </div>
       <KasFormDialog

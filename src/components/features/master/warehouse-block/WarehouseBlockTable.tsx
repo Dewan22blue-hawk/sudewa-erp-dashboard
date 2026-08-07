@@ -110,7 +110,6 @@ export const WarehouseBlockTable = ({
       showLimitChange
       perPage={perPage}
       onPerPageChange={onPerPageChange}
-      defaultSort={{ key: 'id', direction: 'desc' }}
       meta={{
         currentPage: page,
         perPage,

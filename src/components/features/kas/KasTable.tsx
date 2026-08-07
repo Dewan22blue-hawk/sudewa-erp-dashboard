@@ -25,7 +25,7 @@ export function KasTable({ data }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [search, setSearch] = useState('');
-  const [sortState, setSortState] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'code', direction: 'asc' });
+  const [sortState, setSortState] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: '', direction: 'asc' });
 
   const enrichedData = useMemo(() => {
     return data.map((item) => ({

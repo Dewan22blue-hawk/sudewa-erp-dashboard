@@ -70,6 +70,10 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Perlengkapan',
           href: master('/vehicle-equipment'),
         },
+        {
+          label: 'User',
+          href: master('/user'),
+        }
       ],
     },
     {
@@ -202,7 +206,7 @@ export const getGeneralMenus = (slug: string): MenuItem[] => {
           label: 'Laporan Penerimaan',
           href: base('/laporan/laporan-penerimaan'),
         },
-                {
+        {
           label: 'Laporan Pengiriman',
           href: base('/laporan/laporan-pengiriman'),
         },

@@ -29,7 +29,19 @@ export default function TypeUnitPage() {
     const term = search.toLowerCase();
     const result = data?.data || [];
 
-    return result.filter((item) => [item.code, item.name, item.unitType, item.unitModel, item.brand?.name].filter(Boolean).some((value) => value!.toString().toLowerCase().includes(term)));
+    const filtered = result.filter((item) => [item.code, item.name, item.unitType, item.unitModel, item.brand?.name].filter(Boolean).some((value) => value!.toString().toLowerCase().includes(term)));
+    
+    return [...filtered].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateA !== dateB) return dateB - dateA;
+
+      const idA = typeof a.id === 'number' ? a.id : parseInt(String(a.id)) || 0;
+      const idB = typeof b.id === 'number' ? b.id : parseInt(String(b.id)) || 0;
+      if (idA !== idB) return idB - idA;
+
+      return (a.code || '').localeCompare(b.code || '');
+    });
   }, [data?.data, search]);
 
   const paginatedData = useMemo(() => {

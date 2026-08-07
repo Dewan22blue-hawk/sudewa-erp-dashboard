@@ -107,8 +107,22 @@ export default function AssetPage() {
     }
   };
 
-  const assetsList = assetsData?.data || [];
   const totalAssets = assetsData?.meta?.total || 0;
+
+  const assetsList = React.useMemo(() => {
+    const rawData = assetsData?.data || [];
+    return [...rawData].sort((a: any, b: any) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (dateA !== dateB) return dateB - dateA;
+
+      const idA = typeof a.id === 'number' ? a.id : parseInt(String(a.id)) || 0;
+      const idB = typeof b.id === 'number' ? b.id : parseInt(String(b.id)) || 0;
+      if (idA !== idB) return idB - idA;
+
+      return (a.code || '').localeCompare(b.code || '');
+    });
+  }, [assetsData?.data]);
 
   return (
     <DashboardLayout>
