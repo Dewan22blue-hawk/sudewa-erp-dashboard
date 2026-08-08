@@ -5,7 +5,7 @@ import { companyMenuMap } from '@/configs/menu/company-menu.map';
 import { MenuItem } from '@/types/menu.types';
 import { Company, fetchCompanyDetail } from '@/services/company.service';
 import { HIDDEN_MENU_LABELS } from '@/configs/skripsi-filter';
-
+import { useQuery } from '@tanstack/react-query';
 const MODULE_MAP: Record<string, string[]> = {
     'master-data': ['Master Data'],
     'transaction': ['Administrasi'],
@@ -22,39 +22,39 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
     const slug = Array.isArray(slugQuery) ? slugQuery[0] : slugQuery || '';
 
     const { companyId } = useCompany();
-    const [allowedLabels, setAllowedLabels] = useState<string[]>(ALWAYS_ALLOWED);
-    const [isLoading, setIsLoading] = useState(false);
 
     // Find the exact company based on ID from Context, to get its safe slug or name
     const currentCompany = companies.find((c) => String(c.id) === String(companyId));
 
-    useEffect(() => {
-        if (!currentCompany?.slug) return;
-        setIsLoading(true);
-        fetchCompanyDetail(currentCompany.slug)
-            .then((data) => {
-                const companySlug = (data.slug || data.name || '').toLowerCase();
-                const labels = [...ALWAYS_ALLOWED];
-                if (data.modules) {
-                    data.modules.forEach(m => {
-                        const mapped = MODULE_MAP[m.slug || ''];
-                        if (mapped) {
-                            labels.push(...mapped);
-                        }
-                    });
+    // Gunakan useQuery agar response menu company tersimpan di cache dan tidak berulang kali fetching di setiap perpindahan halaman
+    const { data: companyDetail, isLoading } = useQuery({
+        queryKey: ['companyDetail', currentCompany?.slug],
+        queryFn: () => fetchCompanyDetail(currentCompany!.slug),
+        enabled: !!currentCompany?.slug,
+        staleTime: 1000 * 60 * 15, // Cache selama 15 menit
+    });
+
+    const allowedLabels = useMemo(() => {
+        const labels = [...ALWAYS_ALLOWED];
+        if (!companyDetail) return labels;
+
+        const companySlug = (companyDetail.slug || companyDetail.name || '').toLowerCase();
+        
+        if (companyDetail.modules) {
+            companyDetail.modules.forEach(m => {
+                const mapped = MODULE_MAP[m.slug || ''];
+                if (mapped) {
+                    labels.push(...mapped);
                 }
-                if (companySlug.includes('yanotama')) {
-                    labels.push('Warehouse');
-                }
-                setAllowedLabels(labels);
-            })
-            .catch((err) => {
-                console.error('Failed to fetch company modules:', err);
-            })
-            .finally(() => {
-                setIsLoading(false);
             });
-    }, [currentCompany?.slug]);
+        }
+        
+        if (companySlug.includes('yanotama')) {
+            labels.push('Warehouse');
+        }
+        
+        return labels;
+    }, [companyDetail]);
 
     const mappedMenus = useMemo(() => {
         if (!currentCompany) return [];

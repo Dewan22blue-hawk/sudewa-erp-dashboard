@@ -16,6 +16,10 @@ export const HIDDEN_MENU_LABELS = [
   'Pajak',
   'Blok Gudang',
 
+  // Administrasi
+  'Transaksi Sparepart',
+  'Bukti Potong',
+
 
 
 

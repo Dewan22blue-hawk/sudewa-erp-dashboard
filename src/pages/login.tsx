@@ -98,12 +98,12 @@ export default function LoginPage() {
             {/* User ID Field */}
             <div className="flex flex-col gap-[6px] w-full">
               <label htmlFor="userId" className="text-[14px] font-medium leading-5 text-[#0A0A0A]">
-                User ID
+                User ID / Email
               </label>
               <Input
                 id="userId"
                 type="text"
-                placeholder="Enter your user ID"
+                placeholder="Enter your user ID or Email"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 className="w-full h-[36px] px-3 py-[7.5px] border border-[#E5E5E5] rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)] text-[14px]"
@@ -111,69 +111,44 @@ export default function LoginPage() {
               />
             </div>
 
-            <form onSubmit={handleLogin} className="flex flex-col gap-4 w-full">
-              {/* Error Message Display */}
-              {error && (
-                <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* User ID Field */}
-              <div className="flex flex-col gap-[6px] w-full">
-                <label htmlFor="userId" className="text-[14px] font-medium leading-5 text-[#0A0A0A]">
-                  User ID / Email
+            {/* Password Field */}
+            <div className="flex flex-col gap-[6px] w-full">
+              <div className="flex items-center justify-between w-full">
+                <label htmlFor="password" className="text-[14px] font-medium leading-5 text-[#0A0A0A]">
+                  Password
                 </label>
+                <Link href="/forgot-password" className="text-[14px] font-normal leading-5 text-[#0A0A0A] text-right">
+                  Forgot Password?
+                </Link>
+              </div>
+              <div className="relative">
                 <Input
-                  id="userId"
-                  type="text"
-                  placeholder="Masukkan User ID / Email"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  className="w-full h-[36px] px-3 py-[7.5px] border border-[#E5E5E5] rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)] text-[14px]"
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-[36px] px-3 py-[7.5px] pr-10 border border-[#E5E5E5] rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)] text-[14px]"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-[#737373] hover:text-[#0A0A0A]"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
+            </div>
 
-              {/* Password Field */}
-              <div className="flex flex-col gap-[6px] w-full">
-                <div className="flex items-center justify-between w-full">
-                  <label htmlFor="password" className="text-[14px] font-medium leading-5 text-[#0A0A0A]">
-                    Kata Sandi
-                  </label>
-                  <Link href="/forgot-password" className="text-[14px] font-normal leading-5 text-[#0A0A0A] text-right">
-                    Lupa Kata Sandi
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-[36px] px-3 py-[7.5px] pr-10 border border-[#E5E5E5] rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)] text-[14px]"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-0 flex items-center px-3 text-[#737373] hover:text-[#0A0A0A]"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Login Button */}
-              <div className="flex flex-col gap-3 w-full mt-2">
-                <Button type="submit" disabled={isLoading} className="w-full h-[36px] bg-[#B0160D] hover:bg-[#991B1B] text-[#FAFAFA] text-[14px] font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                  {isLoading ? 'Memuat...' : 'Masuk'}
-                </Button>
-              </div>
-            </form>
+            {/* Login Button */}
+            <div className="flex flex-col gap-3 w-full mt-2">
+              <Button type="submit" disabled={isLoading} className="w-full h-[36px] bg-[#B0160D] hover:bg-[#991B1B] text-[#FAFAFA] text-[14px] font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                {isLoading ? 'Memuat...' : 'Login'}
+              </Button>
+            </div>
+          </form>
           </div>
         </div>
 
