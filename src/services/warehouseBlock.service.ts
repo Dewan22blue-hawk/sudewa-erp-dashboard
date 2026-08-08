@@ -29,7 +29,6 @@ export interface WarehouseBlock {
   updated_at: string;
   warehouse?: Warehouse;
   warehouse_sub_blocks?: WarehouseSubBlock[];
-  warehouse_sub_block_count?: number | string;
 }
 
 export const getWarehouseBlocks = async (page: number = 1, perPage: number = 25, search: string = '') => {

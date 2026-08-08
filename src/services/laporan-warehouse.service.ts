@@ -1,5 +1,4 @@
 import { apiClient } from '@/lib/api/client';
-import { getStockUnits } from '@/services/stock-unit.service';
 
 export interface StockItem {
   id: number;
@@ -230,46 +229,51 @@ export const getStockData = async (params: {
 
 export const getStockDetailData = async (params: {
   warehouse_id?: number;
-  company_id?: number | string;
   page?: number;
   per_page?: number;
-  search?: string;
   machine_number?: string;
   chassis_number?: string;
   color?: string;
   stock_state?: string;
   in_stock?: boolean | string;
-  is_forecast?: boolean | string;
-  is_sold_unit?: boolean | string;
   unit_transaction_item_id?: string;
-}) => {
-  const companyId = params.company_id ?? params.warehouse_id ?? 1;
-  const inStockBool = params.in_stock === undefined || params.in_stock === '' ? undefined : (params.in_stock === true || params.in_stock === 'true');
-  const isForecastBool = params.is_forecast === undefined || params.is_forecast === '' ? undefined : (params.is_forecast === true || params.is_forecast === 'true');
-  const isSoldUnitBool = params.is_sold_unit === undefined || params.is_sold_unit === '' ? undefined : (params.is_sold_unit === true || params.is_sold_unit === 'true');
-  const res = await getStockUnits(companyId, {
-    page: params.page,
-    perPage: params.per_page,
-    search: params.search,
-    machine_number: params.machine_number,
-    chassis_number: params.chassis_number,
-    color: params.color,
-    stock_state: params.stock_state,
-    in_stock: inStockBool,
-    is_forecast: isForecastBool,
-    is_sold_unit: isSoldUnitBool,
-  });
+}): Promise<PaginatedResponse<StockItem>> => {
+  const warehouseId = params.warehouse_id ?? 1;
 
-  return {
-    current_page: res.meta.currentPage,
-    data: res.data,
-    last_page: res.meta.lastPage,
-    per_page: res.meta.perPage,
-    total: res.meta.total,
-    from: (res.meta.currentPage - 1) * res.meta.perPage + 1,
-    to: Math.min(res.meta.currentPage * res.meta.perPage, res.meta.total),
-    meta: res.meta,
-  };
+  const [detailResponse, brandResponse] = await Promise.all([
+    apiClient.get(
+      `/wapi/warehouse/warehouse-get-unit-transaction-item-details/${warehouseId}`,
+      {
+        params: {
+          page: params.page ?? 1,
+          per_page: params.per_page ?? 50,
+          ...(params.machine_number ? { machine_number: params.machine_number } : {}),
+          ...(params.chassis_number ? { chassis_number: params.chassis_number } : {}),
+          ...(params.color ? { color: params.color } : {}),
+          ...(params.stock_state ? { stock_state: params.stock_state } : {}),
+          ...(params.in_stock !== undefined ? { in_stock: params.in_stock } : {}),
+          ...(params.unit_transaction_item_id ? { unit_transaction_item_id: params.unit_transaction_item_id } : {}),
+        },
+      },
+    ),
+    apiClient.get('/wapi/master-data/brand', {
+      params: { per_page: 1000 },
+    }).catch(() => null),
+  ]);
+
+  const brandsList = brandResponse?.data?.data?.data || [];
+  const brandMap = new Map<number, string>();
+  if (Array.isArray(brandsList)) {
+    brandsList.forEach((brand: any) => {
+      if (brand && typeof brand.id === 'number') {
+        brandMap.set(brand.id, brand.name || '');
+      }
+    });
+  }
+
+  const responseData = detailResponse.data?.data ?? detailResponse.data;
+
+  return buildPaginatedResponse(responseData, params.per_page ?? 50, (item) => mapStockItem(item, brandMap));
 };
 
 export const getOrderOutstanding = async (params: {

@@ -134,19 +134,17 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'No Pembelian',
+        header: 'NO PEMBELIAN',
         accessorKey: 'purchaseCode',
         sortable: true,
-        alignment: 'left',
         cell: (item) => (
           <CopyBox text={item.purchaseCode || ""} />
         )
       },
       {
-        header: 'Tipe Unit',
+        header: 'TIPE UNIT',
         accessorKey: 'unitTypeName',
         sortable: true,
-        alignment: 'left',
         cell: (item) => (
           <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item.unitTypeName}`}>
             {item.unitTypeName}
@@ -154,86 +152,83 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
         ),
       },
       {
-        header: 'Warna',
+        header: 'WARNA',
         accessorKey: 'color',
         sortable: true,
-        alignment: 'left',
       },
       {
-        header: 'Nomor Mesin',
+        header: 'NO MESIN',
         accessorKey: 'machineNumber',
         sortable: true,
-        alignment: 'left',
         cell: (item) => (
           <CopyBox text={item?.machineNumber || ""} />
         )
       },
       {
-        header: 'Nomor Rangka',
+        header: 'NO RANGKA',
         accessorKey: 'chassisNumber',
         sortable: true,
-        alignment: 'left',
         cell: (item) => (
           <CopyBox text={item?.chassisNumber || ""} />
         )
       },
       {
-        header: 'Sub Blok',
+        header: 'SUB BLOK',
         accessorKey: 'warehouseSubBlock',
         sortable: true,
-        alignment: 'center',
-        tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
         cell: (item) => item.warehouseSubBlock ? <CopyBox text={item.warehouseSubBlock} /> : <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
       },
       {
-        header: 'Status Stok',
-        accessorKey: 'in_stock',
-        sortable: true,
-        alignment: 'center',
-        tooltip: 'Status ketersediaan unit fisik di gudang',
-        cell: (item) => item?.in_stock ? <Badge variant="outline" className={cn('capitalize', 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold')}>Tersedia</Badge> : <Badge variant="outline" className={cn('capitalize', 'border-rose-200 bg-rose-50 text-rose-700 font-semibold')}>Tidak Tersedia {item?.isSoldUnit && '/ Terjual'}</Badge>
-      },
-      {
-        header: 'Kondisi Stok',
+        header: 'STATUS UNIT',
         accessorKey: 'status',
         sortable: true,
-        alignment: 'center',
-        tooltip: 'Kondisi fisik unit saat ini',
         cell: (item) => {
           let text = '-';
           let background = 'border-slate-200 bg-slate-50 text-slate-700';
           switch (item?.status) {
             case 'returned':
-              text = 'Returned';
-              background = 'border-purple-200 bg-purple-50 text-purple-700 font-semibold';
+              text = 'Return';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
               break;
             case 'refunded':
-              text = 'Refunded';
-              background = 'border-orange-200 bg-orange-50 text-orange-700 font-semibold';
+              text = 'Refund';
+              background = 'border-rose-200 bg-rose-50 text-rose-700';
               break;
             case 'normal':
               text = 'Normal';
-              background = 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold';
+              background = 'border-emerald-200 bg-emerald-50 text-emerald-700';
               break;
             default:
               text = 'Belum Diterima';
-              background = 'border-amber-200 bg-amber-50 text-amber-700 font-semibold';
+              background = 'border-amber-200 bg-amber-50 text-amber-700';
               break;
           }
 
           return (
-            <Badge variant='outline' className={cn('capitalize font-semibold', background)}>
+            <Badge variant='outline' className={`font-semibold ${background}`}>
               {text}
             </Badge>
           );
         },
       },
       {
-        header: 'Posisi Stok',
+        header: 'STATUS STOK',
+        accessorKey: 'in_stock',
+        sortable: true,
+        cell: (item) => {
+          if (item.in_stock === true) {
+            return <Badge className="border-amber-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Tersedia</Badge>;
+          }
+          if (item.in_stock === false) {
+            return <Badge variant="outline" className="border-amber-200 text-amber-700">Tidak Tersedia {item?.isSoldUnit && '/ Terjual'}</Badge>;
+          }
+          return <Badge variant="outline" className="border-gray-200 text-gray-700">-</Badge>;
+        }
+      },
+      {
+        header: 'STATUS PENERIMAAN',
         accessorKey: 'state',
         sortable: true,
-        alignment: 'center',
-        tooltip: 'Posisi logistik atau status alur stok unit',
         cell: (item) => {
           const config: Record<string, { label: string; name: string; className: string }> = {
             draft: { label: 'Draft', name: 'Draft', className: 'border-slate-200 bg-slate-50 text-slate-600' },
@@ -253,7 +248,7 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
 
           return (
             <Badge variant="outline" className={cn('capitalize font-semibold', match.className)}>
-              {item?.isSoldUnit ? 'Terkirim' : match.name}
+              {match.name}
             </Badge>
           );
         }
@@ -277,7 +272,7 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
         selectedIds={stringSelectedIds}
         onSelectedIdsChange={handleSelectedIdsChange}
         getRowId={(item) => String(item.id)}
-        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done'}
+        isCheckboxDisabled={(item) => activityState?.toLowerCase() === 'done' || item?.isSoldUnit === true}
         meta={{
           currentPage: safePage,
           perPage: itemsPerPage,
@@ -387,17 +382,15 @@ export default function PenerimaanUnitDetailTable({ data, activityState, isLoadi
                     <SelectValue placeholder={subBlocksLoading ? "Memuat sub blok..." : "Pilih sub blok gudang"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {subBlocksResponse?.data?.data && subBlocksResponse.data.data.length > 0 ? (
-                      subBlocksResponse.data.data.map((sb: any) => (
-                        <SelectItem key={sb.id} value={String(sb.id)}>
-                          {sb.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="none" disabled>
-                        Sub blok gudang tidak ditemukan.
+                    {subBlocksResponse?.data?.data?.map((sb: any) => (
+                      <SelectItem key={sb.id} value={String(sb.id)}>
+                        {sb.name}
                       </SelectItem>
-                    )}
+                    )) || (
+                        <SelectItem value="none" disabled>
+                          Tidak ada sub blok aktif
+                        </SelectItem>
+                      )}
                   </SelectContent>
                 </Select>
               </div>

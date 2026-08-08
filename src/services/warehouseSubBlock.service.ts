@@ -82,17 +82,3 @@ export const getWarehouseSubBlocks = async (params: { is_active?: boolean; per_p
   });
   return response.data;
 };
-
-export const exportWarehouseSubBlock = async () => {
-  const response = await apiClient.get(`/wapi/master-data/warehouse-sub-block/export`, {
-    responseType: 'blob',
-  });
-  return response.data;
-};
-
-export const importWarehouseSubBlock = async (file: File) => {
-  const form = new FormData();
-  form.append('file', file);
-  const response = await apiClient.post<ApiResponse<any>>(`/wapi/master-data/warehouse-sub-block/import`, form);
-  return response.data;
-};

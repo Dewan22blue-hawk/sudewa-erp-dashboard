@@ -24,7 +24,6 @@ export interface StockUnit {
   inStock: boolean;
   stockStatus: StockStatus;
   isSoldUnit: boolean;
-  isForecast: boolean;
   warehouseSubBlock?: {
     id: number;
     name: string;

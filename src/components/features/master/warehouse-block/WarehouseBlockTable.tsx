@@ -21,9 +21,6 @@ interface WarehouseBlockTableProps {
   onViewDetail: (block: WarehouseBlock) => void;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
-  canCreate: boolean
-  canEdit: boolean
-  canDelete: boolean
 }
 
 export const WarehouseBlockTable = ({
@@ -40,9 +37,6 @@ export const WarehouseBlockTable = ({
   onViewDetail,
   onPageChange,
   onPerPageChange,
-  canCreate,
-  canEdit,
-  canDelete,
 }: WarehouseBlockTableProps) => {
   const columns = useMemo<ColumnDef<WarehouseBlock>[]>(
     () => [
@@ -65,12 +59,6 @@ export const WarehouseBlockTable = ({
         cell: (item) => <span className="text-sm text-slate-600">{item.description || '-'}</span>,
       },
       {
-        header: 'JUMLAH SUB BLOK',
-        accessorKey: 'warehouse_sub_block_count',
-        sortable: false,
-        cell: (item) => <span className="text-sm text-slate-600">{item.warehouse_sub_block_count || '-'}</span>,
-      },
-      {
         header: 'ACTION',
         alignment: 'center',
         sticky: 'right',
@@ -91,7 +79,6 @@ export const WarehouseBlockTable = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onEdit(item)}
-                disabled={!canEdit}
                 className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
               >
                 <Pencil className="mr-2 h-4 w-4" />
@@ -99,7 +86,6 @@ export const WarehouseBlockTable = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDelete(item)}
-                disabled={!canDelete}
                 className="rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
               >
                 <Trash className="mr-2 h-4 w-4" />
@@ -110,7 +96,7 @@ export const WarehouseBlockTable = ({
         ),
       },
     ],
-    [onEdit, onDelete, onViewDetail, canEdit, canDelete],
+    [onEdit, onDelete, onViewDetail],
   );
 
   return (
@@ -124,6 +110,7 @@ export const WarehouseBlockTable = ({
       showLimitChange
       perPage={perPage}
       onPerPageChange={onPerPageChange}
+      defaultSort={{ key: 'id', direction: 'desc' }}
       meta={{
         currentPage: page,
         perPage,
@@ -132,7 +119,7 @@ export const WarehouseBlockTable = ({
       }}
       onPageChange={onPageChange}
       headerActions={
-        <Button onClick={canCreate ? onAdd : undefined} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]" disabled={!canCreate}>
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah Data
         </Button>

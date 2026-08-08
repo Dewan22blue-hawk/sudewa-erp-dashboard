@@ -6,8 +6,6 @@ import { PenerimaanItem } from '@/services/laporan-penerimaan.service';
 import { CopyBox } from '@/components/ui/copy-box';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { useRouter } from 'next/router';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 
 interface Props {
   data: PenerimaanItem[];
@@ -32,65 +30,40 @@ export default function LaporanPenerimaanTable({
 
   const columns: ColumnDef<PenerimaanItem>[] = useMemo(() => [
     {
-      header: 'No Penerimaan',
+      header: 'NO PENERIMAAN',
       accessorKey: 'transaction_code',
-      sortable: true,
-      alignment: 'left',
       cell: (item) => <CopyBox text={item.transaction_code} />,
     },
     {
-      header: 'Tgl Terima',
+      header: 'TGL TERIMA',
       id: 'tgl_terima',
-      sortable: true,
       alignment: 'center',
       cell: (item) => <span className="text-gray-600">{formatDate(item.receipt_date)}</span>,
     },
     {
-      header: 'Nama Supplier',
+      header: 'NAMA SUPPLIER',
       accessorKey: 'person',
-      sortable: true,
-      alignment: 'left',
       cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/supplier?search=${item?.person}`}>{item?.person}</ReferenceLink>,
     },
     {
-      header: 'Tipe Unit',
+      header: 'TIPE UNIT',
       id: 'tipe_unit',
-      sortable: true,
-      alignment: 'left',
-      cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/type-unit?search=${item?.unit_type?.name}`}>{item?.unit_type?.name}</ReferenceLink>,
+      cell: (item) => <ReferenceLink href={`/dashboard/${slug}/master/unit-type?search=${item?.unit_type.name}`}>{item?.unit_type?.name}</ReferenceLink>,
     },
     {
-      header: 'Warna',
+      header: 'WARNA',
       accessorKey: 'color',
-      sortable: true,
-      alignment: 'left',
       cell: (item) => <span className="text-gray-600">{item.color}</span>,
     },
     {
-      header: 'Nomor Mesin',
+      header: 'NO MESIN',
       accessorKey: 'machine_number',
-      sortable: true,
-      alignment: 'left',
       cell: (item) => <CopyBox text={item.machine_number} />,
     },
     {
-      header: 'Nomor Rangka',
+      header: 'NO RANGKA',
       accessorKey: 'chassis_number',
-      sortable: true,
-      alignment: 'left',
       cell: (item) => <CopyBox text={item.chassis_number} />,
-    },
-    {
-      header: 'Sub Blok',
-      accessorKey: 'warehouse_sub_block',
-      sortable: true,
-      alignment: 'center',
-      tooltip: 'Lokasi sub-blok penyimpanan unit di dalam gudang',
-      cell: (item) => item.warehouse_sub_block?.name ? (
-        <CopyBox text={item.warehouse_sub_block?.name} />
-      ) : (
-        <Badge variant='outline' className={`font-semibold bg-white`}>Belum Ditambahkan</Badge>
-      ),
     },
   ], [slug]);
 

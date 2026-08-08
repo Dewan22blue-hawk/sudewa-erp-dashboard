@@ -22,7 +22,6 @@ export interface PenerimaanItem {
   chassis_number: string;
   color: string;
   warehouse_movement?: { serial_number: string };
-  warehouse_sub_block?: { id: number; name: string } | null;
 }
 
 export interface PenerimaanResponse {
@@ -48,7 +47,6 @@ const normalizePenerimaanItem = (item: any): PenerimaanItem => ({
   chassis_number: item.chassis_number || '-',
   color: item.color || '-',
   warehouse_movement: item.warehouse_movement,
-  warehouse_sub_block: item.warehouse_sub_block,
 });
 
 export const getLaporanPenerimaan = async (

@@ -18,8 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Plus, Search, Eye, Pencil, Trash2, RotateCcw, Printer, AlertTriangle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { MoreVertical, Plus, Search, Eye, Pencil, Trash2, RotateCcw, Printer } from 'lucide-react';
 import SearchVehicleModal from '@/components/features/vehicle/SearchVehicleModal';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,7 +35,6 @@ export interface SalesTableProps {
   search?: string;
   canEdit?: boolean;
   canDelete?: boolean;
-  canCreate?: boolean;
   onSearchChange?: (value: string) => void;
   loading?: boolean;
 }
@@ -53,7 +51,6 @@ export function SalesTable({
   search,
   canEdit,
   canDelete,
-  canCreate,
   onSearchChange,
 }: SalesTableProps) {
   const router = useRouter();
@@ -178,46 +175,14 @@ export function SalesTable({
         accessorKey: 'code',
         sortable: true,
         alignment: 'left',
-        cell: (item) => {
-          const showUnBilled = item.billing_summary?.is_paid === false || item.isPaid === false;
-          const showUnVerified = item.isUnitTypeDetailValid === false;
-
-          let tooltipText = '';
-          if (showUnBilled && showUnVerified) {
-            tooltipText = 'Tagihan belum lunas dan detail tipe unit belum lengkap/belum valid';
-          } else if (showUnBilled) {
-            tooltipText = 'Tagihan belum lunas';
-          } else if (showUnVerified) {
-            tooltipText = 'Detail tipe unit belum lengkap/belum valid';
-          }
-
-          return (
-            <div className="flex items-center gap-2">
-              {(showUnBilled || showUnVerified) && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button type="button" className="cursor-help text-amber-500 hover:text-amber-600 transition-colors flex items-center shrink-0">
-                        <AlertTriangle className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" align="center" className="max-w-xs bg-slate-900 text-white rounded-lg p-2 text-xs shadow-md">
-                      {tooltipText}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              <CopyBox text={item.code} />
-            </div>
-          );
-        },
+        cell: (item) => <CopyBox text={item.code} />,
       },
       {
         header: 'Tanggal',
         accessorKey: 'created_at',
         sortable: true,
         alignment: 'center',
-        cell: (item) => item?.created_at || '-',
+        cell: (item) => formatDate(item?.created_at) || '-',
       },
       {
         header: 'Customer',
@@ -339,7 +304,6 @@ export function SalesTable({
               {canEdit && (
                 <>
                   <DropdownMenuItem
-                    disabled={!canEdit}
                     className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                     onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/edit/${item.id}` : `/transaksi/penjualan-unit/edit/${item.id}`)}
                   >
@@ -348,7 +312,7 @@ export function SalesTable({
                   <DropdownMenuItem
                     className="rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-slate-50 cursor-pointer"
                     onClick={() => router.push(slug ? `/dashboard/${slug}/transaksi/penjualan-unit/${item.id}/refund` : `/transaksi/penjualan-unit/${item.id}/refund`)}
-                    disabled={isRefunded(item) || !canEdit}
+                    disabled={isRefunded(item)}
                   >
                     <RotateCcw className="mr-2 h-4 w-4" /> Refund Jual
                   </DropdownMenuItem>
@@ -369,7 +333,7 @@ export function SalesTable({
                     }
                     onDelete(item.id);
                   }}
-                  disabled={item.isPaid || !canDelete}
+                  disabled={item.isPaid}
                   className={cn(
                     "rounded-lg px-3 py-2 text-sm text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer",
                     item.isPaid && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-red-600 focus:bg-transparent"
@@ -427,7 +391,7 @@ export function SalesTable({
       </div>
 
       {onAdd && (
-        <Button onClick={onAdd} disabled={!canCreate} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
+        <Button onClick={onAdd} className="w-full sm:w-auto bg-[#1e3a5f] hover:bg-[#152e4d]">
           <Plus className="mr-2 h-4 w-4" />
           Tambah Data
         </Button>

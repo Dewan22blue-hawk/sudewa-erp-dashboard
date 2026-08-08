@@ -103,7 +103,6 @@ export type SalesApiModel = {
     description?: string;
     created_at?: string;
   }>;
-  is_unit_type_detail_valid?: boolean | string | number;
 };
 
 export type SalesListUI = {
@@ -259,17 +258,6 @@ export const mapSalesToTableItem = (item: SalesApiModel): UnitTransaction => {
     remainingPayment: kurangBayar,
     created_at: formatDate(mapped.date),
     isRefunded: mapped.isRefunded,
-    isUnitTypeDetailValid: item.is_unit_type_detail_valid === true || item.is_unit_type_detail_valid === 1 || String(item.is_unit_type_detail_valid) === 'true',
-    billing_summary: item.billing_summary
-      ? {
-        grand_total: toNumber(item.billing_summary.grand_total),
-        total_cash_payment: toNumber(item.billing_summary.total_cash_payment),
-        total_bca_payment: toNumber(item.billing_summary.total_bca_payment),
-        total_paid: toNumber(item.billing_summary.total_paid),
-        remaining_payment: toNumber(item.billing_summary.remaining_payment),
-        is_paid: toBool(item.billing_summary?.is_paid),
-      }
-      : null,
   };
 };
 

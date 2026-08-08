@@ -1,17 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { useCompany } from '@/contexts/CompanyContext';
 import { useGetWarehouseStock } from '@/hooks/useLaporanWarehouse';
-import { StockItem } from '@/services/laporan-warehouse.service';
 import { AlertCircle } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import BaseTable, { ColumnDef } from '@/components/ui/base-table';
 import { ReferenceLink } from '@/components/ui/reference-link';
 import { CopyBox } from '@/components/ui/copy-box';
 import { useRouter } from 'next/router';
-import { currenciesFormat } from '@/components/ui/currenciesFormat';
 
 const toCsvLine = (cells: Array<string | number>): string =>
   cells
@@ -27,26 +32,39 @@ type StockTabProps = {
 };
 
 export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
-  const { companyId } = useCompany();
   const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(perPage || 25);
-
-  useEffect(() => {
-    setItemsPerPage(perPage);
-    setPage(1);
-  }, [perPage]);
+  const [status, setStatus] = useState<string>('unprocessed');
 
   const {
     data: response,
     isLoading,
     isError,
   } = useGetWarehouseStock({
-    company_id: companyId ? Number(companyId) : 1,
+    company_id: 1,
     page,
-    per_page: itemsPerPage,
+    per_page: perPage,
   });
 
-  const rows = useMemo(() => response?.data || [], [response?.data]);
+  const rawRows = useMemo(() => response?.data || [], [response?.data]);
+  
+  const rows = useMemo(() => {
+    let result = [...rawRows];
+
+    if (status && status !== 'all') {
+      result = result.filter(r => r.status === status || r.stock_status === status);
+    }
+    
+    return result;
+  }, [rawRows, status]);
+  const pagination = response || {
+    current_page: 1,
+    data: [],
+    last_page: 1,
+    per_page: perPage,
+    total: 0,
+    from: 0,
+    to: 0,
+  };
 
   const totals = useMemo(() => {
     return rows.reduce(
@@ -72,21 +90,17 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
     const header = ['NO', 'KODE UNIT', 'MERK', 'TIPE UNIT', 'KATEGORI', 'HARGA BELI', 'TERSEDIA', 'FORECAST'];
     const lines = [toCsvLine(header)];
 
-    const fromIndex = response?.from ?? 1;
-
     rows.forEach((item, index) => {
-      lines.push(
-        toCsvLine([
-          fromIndex + index,
-          item.unit_type?.code || '-',
-          item.unit_type?.brand?.name || '-',
-          item.unit_type?.name || '-',
-          item.unit_type?.unit_type || '-',
-          item.unit_type?.buy_price || 0,
-          item.stock_available || 0,
-          item.stock_forecast || 0,
-        ])
-      );
+      lines.push(toCsvLine([
+        (pagination.from > 0 ? pagination.from - 1 : 0) + index + 1,
+        item.unit_type?.code || '-',
+        item.unit_type?.brand?.name || '-',
+        item.unit_type?.name || '-',
+        item.unit_type?.unit_type || '-',
+        item.unit_type?.buy_price || 0,
+        item.stock_available || 0,
+        item.stock_forecast || 0,
+      ]));
     });
 
     lines.push(toCsvLine(['', '', '', '', '', 'GRAND TOTAL', totals.available, totals.forecast]));
@@ -102,7 +116,7 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
     URL.revokeObjectURL(url);
 
     toast.success('Data stock berhasil diunduh');
-  }, [rows, response?.from, totals.available, totals.forecast, page]);
+  }, [rows, page, pagination.from, totals]);
 
   useEffect(() => {
     onActionsChange?.({ print: handlePrint, download: handleDownload });
@@ -112,66 +126,52 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
   const { slug } = router.query;
   const slugStr = typeof slug === 'string' ? slug : '';
 
-  const columns = useMemo<ColumnDef<StockItem>[]>(
+  const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        header: 'Kode Unit',
+        header: 'KODE UNIT',
         accessorKey: 'unit_type.code',
         sortable: true,
         alignment: 'left',
-        cell: (item) => <CopyBox text={item.unit_type?.code || '-'} />,
+        cell: (item) => <CopyBox text={item.unit_type?.code || '-'} />
       },
       {
-        header: 'Merk',
+        header: 'MERK',
         accessorKey: 'unit_type.brand.name',
         sortable: true,
-        alignment: 'left',
-        cell: (item) =>
-          item.unit_type?.brand?.name ? (
-            <ReferenceLink href={`/dashboard/${slugStr}/master/brand?search=${item.unit_type.brand.name}`}>
-              {item.unit_type.brand.name}
-            </ReferenceLink>
-          ) : (
-            '-'
-          ),
+        alignment: 'center',
+        cell: (item) => item.unit_type?.brand?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/brand?search=${item.unit_type.brand.name}`}>{item.unit_type.brand.name}</ReferenceLink> : '-'
       },
       {
-        header: 'Tipe Unit',
+        header: 'TIPE UNIT',
         accessorKey: 'unit_type.name',
         sortable: true,
-        alignment: 'left',
-        cell: (item) =>
-          item.unit_type?.name ? (
-            <ReferenceLink href={`/dashboard/${slugStr}/master/type-unit?search=${item.unit_type.name}`}>
-              {item.unit_type.name}
-            </ReferenceLink>
-          ) : (
-            '-'
-          ),
+        alignment: 'center',
+        cell: (item) => item.unit_type?.name ? <ReferenceLink href={`/dashboard/${slugStr}/master/type-unit?search=${item.unit_type.name}`}>{item.unit_type.name}</ReferenceLink> : '-'
       },
       {
-        header: 'Kategori',
+        header: 'KATEGORI',
         accessorKey: 'unit_type.unit_type',
         sortable: true,
-        alignment: 'left',
+        alignment: 'center',
         cell: (item) => item.unit_type?.unit_type || '-',
       },
       {
-        header: 'Harga Beli',
+        header: 'HARGA BELI',
         accessorKey: 'unit_type.buy_price',
         sortable: true,
         alignment: 'right',
-        cell: (item) => currenciesFormat('idr', item.unit_type?.buy_price),
+        cell: (item) => (item.unit_type?.buy_price || 0).toLocaleString('id-ID'),
       },
       {
-        header: 'Unit Tersedia',
+        header: 'TERSEDIA',
         accessorKey: 'stock_available',
         sortable: true,
         alignment: 'center',
         cell: (item) => (item.stock_available || 0).toLocaleString('id-ID'),
       },
       {
-        header: 'Perkiraan Unit',
+        header: 'FORECAST',
         accessorKey: 'stock_forecast',
         sortable: true,
         alignment: 'center',
@@ -183,8 +183,8 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
 
   const footerRow = useMemo(
     () => (
-      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold print:text-[10px]">
-        <TableCell colSpan={5} className="px-4 py-4 pr-10 text-right text-slate-900">
+      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-t border-slate-200 font-semibold">
+        <TableCell colSpan={5} className="px-4 py-4 text-center text-slate-900">
           GRAND TOTAL
         </TableCell>
         <TableCell className="px-4 py-4 text-center text-slate-900">{totals.available.toLocaleString('id-ID')}</TableCell>
@@ -192,6 +192,30 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
       </TableRow>
     ),
     [totals]
+  );
+
+  const selectFilter = useMemo(
+    () => (
+      <div className="flex justify-end no-print">
+        <Select
+          value={status}
+          onValueChange={(val) => {
+            setStatus(val);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Pilih Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unprocessed">Unprocessed</SelectItem>
+            <SelectItem value="processed">Processed</SelectItem>
+            <SelectItem value="all">Semua</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    ),
+    [status]
   );
 
   return (
@@ -207,17 +231,12 @@ export default function StockTab({ perPage, onActionsChange }: StockTabProps) {
           columns={columns}
           loading={isLoading}
           footer={footerRow}
-          showLimitChange
-          perPage={itemsPerPage}
-          onPerPageChange={(pp) => {
-            setItemsPerPage(pp);
-            setPage(1);
-          }}
+          headerActions={selectFilter}
           meta={{
-            currentPage: response?.current_page || page,
-            perPage: response?.per_page || itemsPerPage,
-            lastPage: response?.last_page || 1,
-            total: response?.total || rows.length,
+            currentPage: pagination.current_page,
+            perPage: pagination.per_page,
+            lastPage: pagination.last_page,
+            total: rows.length > 0 ? rows.length : pagination.total,
           }}
           onPageChange={setPage}
         />

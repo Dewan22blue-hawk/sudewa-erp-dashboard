@@ -26,7 +26,6 @@ export interface PengirimanItem {
   is_forecast?: boolean;
   status?: string;
   warehouse_movement?: any;
-  warehouse_sub_block?: { id: number; name: string } | null;
 }
 
 export interface PengirimanResponse {
@@ -52,7 +51,6 @@ const normalizePengirimanItem = (item: any): PengirimanItem => ({
   chassis_number: item.chassis_number || '-',
   color: item.color || '-',
   warehouse_movement: item.warehouse_movement,
-  warehouse_sub_block: item.warehouse_sub_block,
   type: item.type,
   stock_state: item.stock_state,
   in_stock: item.in_stock,

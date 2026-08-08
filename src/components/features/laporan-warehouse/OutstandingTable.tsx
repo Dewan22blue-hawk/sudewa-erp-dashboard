@@ -45,8 +45,6 @@ export default function OutstandingTable({ type, perPage, onActionsChange }: Out
 
   const { data: response, isLoading, isError } = useStockUnits(companyId, params);
 
-  console.log(response?.data);
-
   // Pagination display states
   const [tablePage, setTablePage] = useState(1);
   const [tablePerPage, setTablePerPage] = useState(perPage || 25);

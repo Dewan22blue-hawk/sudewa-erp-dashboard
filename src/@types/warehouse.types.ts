@@ -38,7 +38,6 @@ export interface WarehouseActivity {
   state: string;
   keterangan: string;
   isRefundActivity?: boolean;
-  state_note?: string;
 }
 
 export interface WarehouseActivityListResponse {
