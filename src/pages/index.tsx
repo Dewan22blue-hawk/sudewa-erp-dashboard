@@ -1,29 +1,41 @@
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
-import { getToken } from "@/lib/auth";
-import { LoadingState } from "@/components/ui/loading-state";
+import Navbar from "@/components/landing/Navbar";
+import HeroSection from "@/components/landing/HeroSection";
+import TrustedByMarquee from "@/components/landing/TrustedByMarquee";
+import BentoFeatures from "@/components/landing/BentoFeatures";
+import HowItWorks from "@/components/landing/HowItWorks";
+import Testimonials from "@/components/landing/Testimonials";
+import FAQ from "@/components/landing/FAQ"; 
+import FinalCTA from "@/components/landing/FinalCTA"; 
+import Footer from "@/components/landing/Footer";
 
 export default function Home() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = getToken();
-    if (token) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
-  }, [router]);
-
   return (
     <>
       <Head>
+        {/* Hati-hati: Jangan lupa hapus noindex ini saat rilis ke production */}
         <meta name="robots" content="noindex, nofollow" />
-        <title>Redirecting...</title>
+        <title>Deraly.id Dashboard</title>
       </Head>
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <LoadingState variant="page" text="Mengalihkan..." />
+      
+      {/* Wrapper utama */}
+      <div className="font-sans antialiased selection:bg-indigo-300 selection:text-indigo-900 bg-[#f8fafc] min-h-screen flex flex-col">
+        
+        {/* Sisipkan Navbar di sini. Set class sticky top-0 z-50 di dalam komponen Navbar */}
+        <Navbar />
+        
+        {/* Gunakan tag main untuk semantik HTML5 yang baik */}
+        <main className="flex-grow">
+          <HeroSection />
+          <TrustedByMarquee />
+          <BentoFeatures />
+          <HowItWorks />
+          <Testimonials />
+          <FAQ />
+          <FinalCTA />
+        </main>
+        
+        <Footer />
       </div>
     </>
   );
