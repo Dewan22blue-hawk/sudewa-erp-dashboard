@@ -1,5 +1,0 @@
-﻿a4069ca4 feat(ci): automate deployment for finance dashboard with multi-stage build support
-43ed07b0 update: docker-compose file '
-1b940c0d update-docker-network
-fc2879d1 update-nex-config
-bf68a83b remove: remove husky

@@ -26,7 +26,7 @@ export default function UJDriverPage() {
   const [perPage, setPerPage] = useState(25);
   const [orderBy, setOrderBy] = useState('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
-  
+
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UJDriverItem | null>(null);
 
@@ -74,7 +74,7 @@ export default function UJDriverPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Linimasa Driver - PT Wajira Transindo</title>
+        <title>Linimasa Driver - PT Deraly ERP Transindo</title>
       </Head>
 
       <div className="space-y-6">

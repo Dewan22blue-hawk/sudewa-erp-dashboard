@@ -103,7 +103,7 @@ export default function TaxPage() {
   return (
     <>
       <Head>
-        <title>Data Pajak | Wajira</title>
+        <title>Data Pajak | Deraly ERP</title>
       </Head>
       <DashboardLayout>
         <div className="space-y-6">

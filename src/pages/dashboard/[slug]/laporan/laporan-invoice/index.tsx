@@ -160,7 +160,7 @@ export default function LaporanInvoicePage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Laporan Invoice - Wajira Dashboard</title>
+        <title>Laporan Invoice - Deraly ERP Dashboard</title>
       </Head>
       <div className="space-y-6">
         {/* Header Section */}
@@ -220,7 +220,7 @@ export default function LaporanInvoicePage() {
                   Laporan Invoice
                 </h2>
                 <p className="text-[15px] font-bold text-gray-900 tracking-wide">
-                  PT WAJIRA TRANSINDO
+                  PT DERALY
                 </p>
                 <p className="text-[12px] text-gray-600">
                   Tanggal Cetak: {formatDate(new Date())}

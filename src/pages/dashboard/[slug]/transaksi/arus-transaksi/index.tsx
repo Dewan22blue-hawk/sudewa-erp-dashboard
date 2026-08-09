@@ -22,7 +22,7 @@ export default function TransactionListPage() {
   const router = useRouter();
   const { slug } = router.query;
   const { companyId } = useCompany();
-  const safeCompanyId = companyId || '1'; // Fallback to "1" for PT Wajira Morindo
+  const safeCompanyId = companyId || '1'; // Fallback to "1" for PT Deraly ERP Morindo
   const basePath = slug ? `/dashboard/${slug}/transaksi/arus-transaksi` : '/transaksi/arus-transaksi';
 
   // Local State

@@ -139,11 +139,11 @@ export default function WarehouseBlockDetailPage() {
 
   // Client-side filtering and pagination for Sub Blocks
   const allSubBlocks = block?.warehouse_sub_blocks || [];
-  const filteredSubBlocks = allSubBlocks.filter((sb) => 
-    sb.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+  const filteredSubBlocks = allSubBlocks.filter((sb) =>
+    sb.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     (sb.description || '').toLowerCase().includes(debouncedSearch.toLowerCase())
   );
-  
+
   const startIdx = (page - 1) * perPage;
   const paginatedSubBlocks = filteredSubBlocks.slice(startIdx, startIdx + perPage);
   const totalPages = Math.ceil(filteredSubBlocks.length / perPage) || 1;
@@ -151,7 +151,7 @@ export default function WarehouseBlockDetailPage() {
   return (
     <>
       <Head>
-        <title>Detail Blok Gudang | Wajira</title>
+        <title>Detail Blok Gudang | Deraly ERP</title>
       </Head>
       <DashboardLayout>
         <div className="space-y-6">
@@ -199,7 +199,7 @@ export default function WarehouseBlockDetailPage() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Daftar Sub Blok Gudang</h2>
               <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                Kelola sub blok untuk 
+                Kelola sub blok untuk
                 {block?.name ? (
                   <Badge variant="outline" className="bg-slate-50 text-slate-700">
                     Blok {block.name}

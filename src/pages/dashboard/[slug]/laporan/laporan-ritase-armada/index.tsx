@@ -53,10 +53,10 @@ export default function LaporanRitaseArmadaPage() {
   const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
 
   const getCompanyName = (coId: number) => {
-    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
-    if (coId === 3) return 'PT WAJIRA YANOTAMA';
-    if (coId === 4) return 'PT WAJIRA TRANSINDO';
-    return 'PT WAJIRA';
+    if (coId === 1) return 'PT DERALY  ';
+    if (coId === 3) return 'PT DERALY ';
+    if (coId === 4) return 'PT DERALY ';
+    return 'PT DERALY';
   };
 
   // States
@@ -270,7 +270,7 @@ export default function LaporanRitaseArmadaPage() {
   const ritaseHeaderGroups = (
     <TableRow className="hover:bg-transparent border-b border-slate-200">
       <TableHead colSpan={5} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
-        LAPORAN TARGET INCOME EKSPEDISI PT WAJIRA JAGRATARA MORINDO
+        LAPORAN TARGET INCOME EKSPEDISI PT DERALY
       </TableHead>
       <TableHead colSpan={3} className="text-center text-xs font-bold uppercase text-slate-700 whitespace-nowrap border-r border-slate-200 bg-slate-100">
         BIAYA DAN PENGELUARAN

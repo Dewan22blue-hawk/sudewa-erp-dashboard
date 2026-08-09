@@ -17,7 +17,7 @@ export default function PurchasePrintPage() {
   const { companyId } = useCompany();
   const id = router.isReady && typeof router.query.id === 'string' ? router.query.id : '';
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
+  const [companyName, setCompanyName] = React.useState('DERALY  ');
 
   const detailQuery = usePurchaseById(id);
   const detailsQuery = useUnitItemDetailsByTransactionId(id);

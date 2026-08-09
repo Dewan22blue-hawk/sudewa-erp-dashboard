@@ -7,11 +7,11 @@ export default function LaporanNeracaView() {
       <div className="bg-white border rounded-md p-12 shadow-sm relative">
         {/* Header Section */}
         <div className="flex flex-col items-center justify-center mb-8 relative">
-          <Image src="/wajira-logo.png" alt="Wajira Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
+          <Image src="/assets/login_banner.png" alt="Deraly ERP Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
 
           <div className="text-center space-y-1">
             <h2 className="font-bold text-lg">Laporan Keuangan</h2>
-            <h3 className="font-bold text-base uppercase">PT WAJIRA JAGATRARA MORINDO</h3>
+            <h3 className="font-bold text-base uppercase">PT DERALY  </h3>
             <p className="text-sm text-gray-500">Periode: Bulan Januari 2026</p>
           </div>
         </div>
@@ -109,11 +109,11 @@ export default function LaporanNeracaView() {
       <div className="bg-white border rounded-md p-12 shadow-sm relative">
         {/* Header Section */}
         <div className="flex flex-col items-center justify-center mb-8 relative">
-          <Image src="/wajira-logo.png" alt="Wajira Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
+          <Image src="/assets/login_banner.png" alt="Deraly ERP Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
 
           <div className="text-center space-y-1">
             <h2 className="font-bold text-lg">Laporan Keuangan</h2>
-            <h3 className="font-bold text-base uppercase">PT WAJIRA JAGATRARA MORINDO</h3>
+            <h3 className="font-bold text-base uppercase">PT DERALY  </h3>
             <p className="text-sm text-gray-500">Periode: Bulan Januari 2026</p>
           </div>
         </div>

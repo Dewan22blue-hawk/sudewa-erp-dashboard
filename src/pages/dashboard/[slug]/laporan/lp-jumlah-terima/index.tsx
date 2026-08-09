@@ -206,7 +206,7 @@ export default function LPJumlahTerimaPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Laporan Jumlah Terima - Wajira Dashboard</title>
+        <title>Laporan Jumlah Terima - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">
@@ -300,7 +300,7 @@ export default function LPJumlahTerimaPage() {
                     {activeTab === 'tnkb' && 'LP Jumlah Terima TNKB'}
                   </h2>
                   <p className="text-[15px] font-bold text-gray-900 tracking-wide">
-                    PT WAJIRA YANOTAMA
+                    PT DERALY
                   </p>
                   <p className="text-[12px] text-gray-600">
                     Tanggal Cetak: {formatDate(new Date())}

@@ -43,7 +43,7 @@ export function BBNBillPrintDocument({ data, paymentItems }: Props) {
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '24px', borderBottom: '2px solid #000', paddingBottom: '12px' }}>
         <h1 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', letterSpacing: '1px' }}>
-          PT. YANOTAMA
+          PT.
         </h1>
         <p style={{ fontSize: '11px', margin: '0 0 2px 0' }}>Jl. Contoh Alamat No. 123, Jakarta</p>
         <p style={{ fontSize: '11px', margin: '0' }}>Telp: (021) 000-0000</p>

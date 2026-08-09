@@ -36,7 +36,7 @@ export default function BulkCreateInvoicePrintPage() {
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
   const ids = React.useMemo(() => (router.isReady ? parseIds(router.query.ids) : []), [router.isReady, router.query.ids]);
 
-  const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
+  const [companyName, setCompanyName] = React.useState('DERALY  ');
 
   React.useEffect(() => {
     fetchUserCompanies()

@@ -58,6 +58,8 @@ export function Sidebar() {
     setIsMobileOpen(false);
   }, [router.asPath]);
 
+  console.log(menus);
+
 
   const sidebarContent = (
     <aside className={cn("flex h-full w-full flex-col border-r border-gray-200 bg-[#F9FAFB] transition-[width] duration-300 ease-in-out", isDesktopCollapsed ? "w-[72px]" : "w-64")}>
@@ -90,10 +92,10 @@ export function Sidebar() {
       <div className={cn("flex-1 overflow-y-auto py-6", isDesktopCollapsed ? "px-2" : "px-4")}>
         <div className="mb-4 flex items-center justify-between text-sm font-semibold text-gray-500">
           {!isDesktopCollapsed && <span className="uppercase text-xs tracking-wider">Main Menu</span>}
-          <button 
-             onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
-             className={cn("p-1.5 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors", isDesktopCollapsed && "mx-auto")}
-             title="Toggle Sidebar"
+          <button
+            onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
+            className={cn("p-1.5 rounded-md hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors", isDesktopCollapsed && "mx-auto")}
+            title="Toggle Sidebar"
           >
             {isDesktopCollapsed ? <PanelLeftOpen className="w-[18px] h-[18px]" /> : <PanelLeftClose className="w-[18px] h-[18px]" />}
           </button>
@@ -102,7 +104,7 @@ export function Sidebar() {
         <nav className="space-y-1">
           {isMenuLoading ? (
             <div className="space-y-2 animate-pulse px-2">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1].map((i) => (
                 <div key={i} className="h-8 bg-gray-200 rounded-md w-full"></div>
               ))}
             </div>

@@ -1,7 +1,7 @@
 # 🏢 Sudewa Dashboard
 
 > **Dashboard ERP Modern untuk Manajemen Multi-Perusahaan**  
-> *Sistem terintegrasi kanggo ngatur data penjualan, inventory, lan finansial perusahaan grup Wajira*
+> *Sistem terintegrasi kanggo ngatur data penjualan, inventory, lan finansial perusahaan grup Deraly ERP*
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.1-blue?style=flat-square&logo=react)](https://react.dev/)
@@ -27,7 +27,7 @@
 
 ## Tentang Project
 
-**Wajira Dashboard** adalah aplikasi web-based ERP (Enterprise Resource Planning) yang dirancang khusus untuk mengelola operasional multi-perusahaan di grup Wajira. Dashboard ini menyediakan antarmuka yang modern, responsif, dan user-friendly untuk memantau data penjualan, inventory, keuangan, dan laporan bisnis secara real-time.
+**Deraly ERP Dashboard** adalah aplikasi web-based ERP (Enterprise Resource Planning) yang dirancang khusus untuk mengelola operasional multi-perusahaan di grup Deraly ERP. Dashboard ini menyediakan antarmuka yang modern, responsif, dan user-friendly untuk memantau data penjualan, inventory, keuangan, dan laporan bisnis secara real-time.
 
 ### Kenapa Dashboard Ini Dibuat?
 
@@ -605,11 +605,11 @@ Untuk pertanyaan atau issue:
 
 ## 📄 License
 
-Copyright © 2026 Wajira Group. All rights reserved.
+Copyright © 2026 Deraly ERP Group. All rights reserved.
 
 ---
 
-**Built with ❤️ by Wajira Development Team**  
+**Built with ❤️ by Deraly ERP Development Team**  
 *Dashboard apik kanggo perusahaan sing apik* 🚀
 
 ---

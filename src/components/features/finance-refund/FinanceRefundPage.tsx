@@ -38,7 +38,7 @@ export function FinanceRefundPage({ title, description, transactionType }: Finan
   return (
     <DashboardLayout>
       <Head>
-        <title>{title} - Wajira Dashboard</title>
+        <title>{title} - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">

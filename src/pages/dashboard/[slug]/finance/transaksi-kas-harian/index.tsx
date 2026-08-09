@@ -168,7 +168,7 @@ export default function KasHarianPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Transaksi Kas Harian - Wajira Dashboard</title>
+        <title>Transaksi Kas Harian - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">

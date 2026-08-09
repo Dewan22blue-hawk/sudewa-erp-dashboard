@@ -27,8 +27,7 @@ export default function SelectCompanyPage() {
   useEffect(() => {
     fetchUserCompanies()
       .then((data) => {
-        const filteredData = data.filter((c) => c.name.toLowerCase().includes('morindo'));
-        setCompanies(filteredData);
+        setCompanies(data);
       })
       .catch((err) => {
         setError(err?.message || 'Gagal memuat perusahaan');
@@ -101,7 +100,7 @@ export default function SelectCompanyPage() {
           {/* LOGO */}
           <div className="flex justify-center mb-8">
             <div className="relative w-[100px] h-[100px]">
-              <Image src="/wajira-logo.png" alt="Wajira Logo" fill className="object-contain drop-shadow-sm" priority />
+              <Image src="/assets/login_banner.png" alt="Deraly ERP Logo" fill className="object-contain drop-shadow-sm" priority />
             </div>
           </div>
 
@@ -147,7 +146,7 @@ export default function SelectCompanyPage() {
 
           {/* FOOTER */}
           <div className="mt-8 text-center">
-            <p className="text-[#9CA3AF] text-xs">&copy; {new Date().getFullYear()} Wajira Dashboard. All rights reserved.</p>
+            <p className="text-[#9CA3AF] text-xs">&copy; {new Date().getFullYear()} Deraly ERP Dashboard. All rights reserved.</p>
           </div>
         </Card>
       </div>

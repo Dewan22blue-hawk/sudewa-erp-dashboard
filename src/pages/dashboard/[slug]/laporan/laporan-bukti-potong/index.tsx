@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { LaporanBuktiPotongTable } from '@/components/features/laporan-bukti-potong/LaporanBuktiPotongTable';
-import {  Search, Printer, Download } from 'lucide-react';
+import { Search, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -67,7 +67,7 @@ export default function LaporanBuktiPotongPage() {
   const isLoading = isInitialLoading || isFetching;
 
   const rawData = React.useMemo(() => queryResult?.data || [], [queryResult?.data]);
-  
+
   // Safe Client-Side Array Filter
   const filteredData = React.useMemo(() => {
     let result = [...rawData];
@@ -103,7 +103,7 @@ export default function LaporanBuktiPotongPage() {
     perPage: 25,
     total: 0,
   };
-  
+
   const pagination = {
     ...backendPagination,
     total: (searchQuery.trim() || dateRange?.from) ? filteredData.length : backendPagination.total,
@@ -113,10 +113,10 @@ export default function LaporanBuktiPotongPage() {
   const toCount = Math.min(pagination.currentPage * pagination.perPage, pagination.total);
 
   const getCompanyName = (coId: number) => {
-    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
-    if (coId === 3) return 'PT WAJIRA YANOTAMA';
-    if (coId === 4) return 'PT WAJIRA TRANSINDO';
-    return 'PT WAJIRA JAGRATARA';
+    if (coId === 1) return 'PT DERALY  ';
+    if (coId === 3) return 'PT DERALY ';
+    if (coId === 4) return 'PT DERALY ';
+    return 'PT DERALY ';
   };
 
   const handlePrint = () => {
@@ -174,7 +174,7 @@ export default function LaporanBuktiPotongPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Laporan Bukti Potong - Wajira Dashboard</title>
+        <title>Laporan Bukti Potong - Deraly ERP Dashboard</title>
       </Head>
       <div className="space-y-6">
         {/* Header */}
@@ -234,7 +234,7 @@ export default function LaporanBuktiPotongPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 w-full sm:w-auto mt-4 sm:mt-0">
             <Button onClick={handleDownload} variant="outline" className="w-full sm:w-auto">
               <Download className="h-4 w-4 mr-2" />

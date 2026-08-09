@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { LaporanKasTable } from '@/components/features/laporan-kas/LaporanKasTable';
-import {  Search, Printer } from 'lucide-react';
+import { Search, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -42,10 +42,10 @@ export default function LaporanTransaksiKasPage() {
   const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
 
   const getCompanyName = (coId: number) => {
-    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
-    if (coId === 3) return 'PT WAJIRA YANOTAMA';
-    if (coId === 4) return 'PT WAJIRA TRANSINDO';
-    return 'PT WAJIRA JAGRATARA';
+    if (coId === 1) return 'PT DERALY  ';
+    if (coId === 3) return 'PT DERALY ';
+    if (coId === 4) return 'PT DERALY ';
+    return 'PT DERALY ';
   };
 
   const handlePrint = () => {

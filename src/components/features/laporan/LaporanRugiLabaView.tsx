@@ -6,12 +6,12 @@ export default function LaporanRugiLabaView() {
       {/* Header Section */}
       <div className="flex flex-col items-center justify-center mb-10 relative">
         {/* Logo */}
-        <Image src="/wajira-logo.png" alt="Wajira Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
+        <Image src="/assets/login_banner.png" alt="Deraly ERP Logo" width={80} height={80} className="absolute left-8 top-0 object-contain" />
 
         <div className="text-center space-y-1">
           <p className="text-xs uppercase tracking-wider text-gray-600">Koreksi Negatif</p>
           <h2 className="font-bold text-lg">LAPORAN RUGI LABA</h2>
-          <p className="font-bold text-sm">PT WAJIRA JAGATRARA MORINDO</p>
+          <p className="font-bold text-sm">PT DERALY  </p>
           <p className="text-xs text-gray-500">Periode: Bulan Januari 2026</p>
         </div>
       </div>

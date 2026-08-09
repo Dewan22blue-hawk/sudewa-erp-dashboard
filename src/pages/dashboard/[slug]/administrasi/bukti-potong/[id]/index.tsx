@@ -32,7 +32,7 @@ export default function BuktiPotongDetailPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Detail Bukti Potong - Wajira Dashboard</title>
+        <title>Detail Bukti Potong - Deraly ERP Dashboard</title>
       </Head>
 
       {/* BREADCRUMB HEADER */}

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useCompany } from '@/contexts/CompanyContext';
 import { fetchUserCompanies } from '@/services/company.service';
 import { LoadingState } from '@/components/ui/loading-state';
+import { ACTIVE_COMPANY_KEYWORD } from '@/configs/skripsi-filter';
 
 export default function DashboardIndex() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function DashboardIndex() {
         if (companyId) {
           try {
             const companies = await fetchUserCompanies();
-            const filteredCompanies = companies.filter((c) => c.name.toLowerCase().includes('morindo'));
+            const filteredCompanies = companies.filter((c) => c.name.toLowerCase().includes(ACTIVE_COMPANY_KEYWORD.toLowerCase()));
             const company = filteredCompanies.find((c) => String(c.id) === String(companyId));
 
             if (company && company.slug) {

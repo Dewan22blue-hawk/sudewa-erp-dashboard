@@ -147,7 +147,7 @@ export default function LaporanPengirimanPage() {
                     REKAP PENGIRIMAN {activeTab.replace('-', ' ')}
                   </h2>
                   <p className="text-[13px] font-bold text-gray-900 tracking-wide">
-                    PT WAJIRA JAGRATARA MORINDO
+                    PT DERALY
                   </p>
                   <p className="text-[13px] font-semibold text-gray-800 opacity-90">
                     {startDate && endDate

@@ -43,7 +43,7 @@ const getErrorMessage = (error: any): string => {
 export default function PerlengkapanMasukListPage() {
   const router = useRouter();
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  // PT Wajira Transindo company_id is 4
+  // PT Deraly ERP Transindo company_id is 4
   const activeCompanyId = 4;
 
   const { page, perPage, search, setPage, setPerPage, updateQuery } = useQueryParamsTable({ defaultPerPage: 25 });

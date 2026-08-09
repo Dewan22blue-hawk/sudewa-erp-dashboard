@@ -145,7 +145,7 @@ export default function StockPerlengkapanPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Stock Material - Wajira Dashboard</title>
+        <title>Stock Material - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">

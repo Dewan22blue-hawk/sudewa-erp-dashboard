@@ -6,8 +6,8 @@ import { ACCOUNTING_REPORT_TABS } from './laporan-akuntansi.constants';
 
 const COMPANY_NAME_MATCHERS = [
   {
-    matches: ['morindo'],
-    value: 'PT. WAJIRA JAGRATARA MORINDO',
+    matches: ['morindo', 'deraly'],
+    value: 'PT. DERALY  ',
   },
   {
     matches: ['adhiyas', 'agradasta'],
@@ -15,7 +15,7 @@ const COMPANY_NAME_MATCHERS = [
   },
   {
     matches: ['international'],
-    value: 'PT. WAJIRA INTERNATIONAL',
+    value: 'PT. DERALY INTERNATIONAL',
   },
 ];
 
@@ -35,7 +35,7 @@ export function getAccountingCompanyName(slug?: string | null) {
   }
 
   if (!normalizedSlug) {
-    return 'PT. WAJIRA JAGRATARA MORINDO';
+    return 'PT. DERALY  ';
   }
 
   const readableSlug = normalizedSlug

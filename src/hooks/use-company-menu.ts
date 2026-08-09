@@ -25,7 +25,6 @@ export function useCompanyMenu(companies: Company[]): { menus: MenuItem[], isLoa
     const [allowedLabels, setAllowedLabels] = useState<string[]>(ALWAYS_ALLOWED);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Find the exact company based on ID from Context, to get its safe slug or name
     const currentCompany = companies.find((c) => String(c.id) === String(companyId));
 
     useEffect(() => {

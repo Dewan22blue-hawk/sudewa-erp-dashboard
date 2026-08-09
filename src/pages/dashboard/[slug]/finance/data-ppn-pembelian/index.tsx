@@ -86,7 +86,7 @@ export default function DataPPNPembelianPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Data PPN Pembelian - Wajira Dashboard</title>
+        <title>Data PPN Pembelian - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">

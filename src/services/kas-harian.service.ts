@@ -11,7 +11,7 @@ let kasHarianDB: KasHarian[] = [
         note: "Terima tagihan John Doe",
         debet: 0,
         credit: 99000000,
-        company: { id: 1, name: "PT Wajira" },
+        company: { id: 1, name: "PT Deraly ERP" },
         cash: { id: 1, code: 'cash_usd', description: 'BCA USD', type: 'bank' }
     },
 ]
@@ -34,7 +34,7 @@ export const kasHarianService = {
             credit: data.type === "kredit" ? data.nominal : 0,
             date: data.tanggal,
             note: data.keterangan,
-            company: { id: 1, name: "PT Wajira" },
+            company: { id: 1, name: "PT Deraly ERP" },
             cash: { id: 1, code: 'cash_idr', description: data.akun || 'Kas IDR', type: 'cash' }
         }
 

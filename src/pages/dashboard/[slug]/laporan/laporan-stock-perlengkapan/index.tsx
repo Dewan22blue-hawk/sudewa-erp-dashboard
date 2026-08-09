@@ -29,7 +29,7 @@ export default function LaporanStockPerlengkapanPage() {
   const { companyId } = useCompany();
   const slugParam = router.query.slug;
 
-  // Resolve companyId. Defaults to Wajira Transindo (4) for this sub-menu
+  // Resolve companyId. Defaults to Deraly ERP Transindo (4) for this sub-menu
   const resolvedCompanyId = resolveCompanyId(slugParam, companyId) || 4;
   const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
 
@@ -96,10 +96,10 @@ export default function LaporanStockPerlengkapanPage() {
 
   // Resolve Company Name for Cover Letter Print Heading
   const getCompanyName = (coId: number) => {
-    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
-    if (coId === 3) return 'PT WAJIRA YANOTAMA';
-    if (coId === 4) return 'PT WAJIRA TRANSINDO';
-    return 'PT WAJIRA TRANSINDO';
+    if (coId === 1) return 'PT DERALY  ';
+    if (coId === 3) return 'PT DERALY ';
+    if (coId === 4) return 'PT DERALY ';
+    return 'PT DERALY ';
   };
 
   // Print Header Title based on active tab

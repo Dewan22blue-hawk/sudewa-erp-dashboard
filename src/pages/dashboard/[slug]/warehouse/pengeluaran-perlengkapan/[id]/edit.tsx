@@ -50,7 +50,7 @@ export default function PengeluaranPerlengkapanEditPage() {
   const rawId = typeof router.query.id === 'string' ? Number(router.query.id) : NaN;
   const id = Number.isFinite(rawId) ? rawId : undefined;
 
-  const companyIdValue = 4; // Enforce PT Wajira Transindo
+  const companyIdValue = 4; // Enforce PT Deraly ERP Transindo
 
   const query = useGoodsIssueEquipmentDetail(id);
   const updateHeaderMutation = useUpdateGoodsIssueEquipment();

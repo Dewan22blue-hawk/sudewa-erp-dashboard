@@ -41,7 +41,7 @@ export default function PerlengkapanMasukEditPage() {
   const rawId = typeof router.query.id === 'string' ? Number(router.query.id) : NaN;
   const id = Number.isFinite(rawId) ? rawId : undefined;
 
-  const companyIdValue = 4; // PT Wajira Transindo
+  const companyIdValue = 4; // PT Deraly ERP Transindo
 
   const query = useGoodsReceiptEquipmentDetail(id);
   const updateHeaderMutation = useUpdateGoodsReceiptEquipment();

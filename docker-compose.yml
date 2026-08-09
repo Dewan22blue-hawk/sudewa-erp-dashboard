@@ -1,7 +1,5 @@
-version: "3.8"
-
 services:
-  wajira-finance-frontend:
+  erp-frontend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,11 +7,13 @@ services:
         NODE_ENV: production
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_AUTH_DOMAIN: ${NEXT_PUBLIC_AUTH_DOMAIN}
-    container_name: wajira-finance-dashboard
-    image: wajira-finance-frontend:latest
+    image: erp-frontend:latest
+    container_name: erp-frontend
     restart: unless-stopped
+
     ports:
-      - "3000:3000"
+      - "3031:3000"
+
     volumes:
       - ./src:/app/src
       - ./public:/app/public
@@ -21,24 +21,28 @@ services:
       - ./package-lock.json:/app/package-lock.json
       - /app/node_modules
       - /app/.next
+
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_AUTH_DOMAIN: ${NEXT_PUBLIC_AUTH_DOMAIN}
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-      - NEXT_PUBLIC_AUTH_DOMAIN=${NEXT_PUBLIC_AUTH_DOMAIN}
+
     networks:
-      - wajira-local-net
+      - playground-net
+
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
 
 networks:
-  wajira-local-net:
+  playground-net:
     external: true

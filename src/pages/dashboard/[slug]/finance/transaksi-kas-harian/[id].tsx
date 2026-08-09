@@ -145,7 +145,7 @@ export default function KasHarianDetailPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Detail & Pembayaran Kas Harian - Wajira Dashboard</title>
+        <title>Detail & Pembayaran Kas Harian - Deraly ERP Dashboard</title>
       </Head>
 
 

@@ -22,7 +22,7 @@ export const DOEkspedisiPrintDocument: React.FC<Props> = ({ data }) => {
     <article className="w-full bg-white text-slate-900">
       <header className="mb-4 flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">Wajira - Delivery Order Ekspedisi</h1>
+          <h1 className="text-2xl font-bold">Deraly ERP - Delivery Order Ekspedisi</h1>
           <p className="text-sm text-slate-700">Alamat perusahaan · Telepon · Email</p>
         </div>
         <div className="text-right">

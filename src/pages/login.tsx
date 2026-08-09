@@ -162,7 +162,7 @@ export default function LoginPage() {
 
           {/* Centered Logo */}
           <div className="relative z-10 w-[400px] h-[400px] animate-fade-in">
-            <Image src="/wajira-logo.png" alt="Wajira Logo" fill className="object-contain drop-shadow-lg" priority />
+            <Image src="/assets/login_banner.png" alt="Deraly ERP Logo" fill className="object-contain drop-shadow-lg" priority />
           </div>
         </div>
       </div>

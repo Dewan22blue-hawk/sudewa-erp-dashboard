@@ -53,10 +53,10 @@ export default function LaporanAssetPage() {
   const selectedPrintBackground = getLetterheadByCompanyId(resolvedCompanyId);
 
   const getCompanyName = (coId: number) => {
-    if (coId === 1) return 'PT WAJIRA JAGRATARA MORINDO';
-    if (coId === 3) return 'PT WAJIRA YANOTAMA';
-    if (coId === 4) return 'PT WAJIRA TRANSINDO';
-    return 'PT WAJIRA';
+    if (coId === 1) return 'PT DERALY  ';
+    if (coId === 3) return 'PT DERALY ';
+    if (coId === 4) return 'PT DERALY ';
+    return 'PT DERALY';
   };
 
   // States
@@ -255,7 +255,7 @@ export default function LaporanAssetPage() {
                 className="pl-9 bg-white rounded-md border-slate-200 shadow-sm"
               />
             </div>
-            
+
             <div className="flex flex-col space-y-1 w-full sm:w-auto">
               <div className="w-full sm:w-[260px]">
                 <DatePickerWithRange

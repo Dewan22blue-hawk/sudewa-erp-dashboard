@@ -153,9 +153,9 @@ export default function LPJumlahPenyerahanPage() {
       cell: (item) => <span className="text-slate-600 whitespace-nowrap">{formatDateString(item.process_date || item.stnk_registration_date || item.bpkb_registration_date)}</span>,
     },
     {
-      header: activeTab === 'stnk' ? 'TGL TERIMA STNK' : 
-              activeTab === 'bpkb' ? 'TGL TERIMA BPKB' : 
-              activeTab === 'skpd' ? 'TGL TERIMA SKPD' : 'TGL TERIMA TNKB',
+      header: activeTab === 'stnk' ? 'TGL TERIMA STNK' :
+        activeTab === 'bpkb' ? 'TGL TERIMA BPKB' :
+          activeTab === 'skpd' ? 'TGL TERIMA SKPD' : 'TGL TERIMA TNKB',
       id: 'tgl_terima',
       alignment: 'center',
       cell: (item) => {
@@ -183,7 +183,7 @@ export default function LPJumlahPenyerahanPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Laporan Jumlah Penyerahan - Wajira Dashboard</title>
+        <title>Laporan Jumlah Penyerahan - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">
@@ -264,7 +264,7 @@ export default function LPJumlahPenyerahanPage() {
                     Laporan Jumlah Penyerahan {activeTab.toUpperCase()}
                   </h2>
                   <p className="text-[15px] font-bold text-gray-900 tracking-wide">
-                    PT WAJIRA YANOTAMA
+                    PT DERALY
                   </p>
                   <p className="text-[12px] text-gray-600">
                     Tanggal Cetak: {formatDate(new Date())}

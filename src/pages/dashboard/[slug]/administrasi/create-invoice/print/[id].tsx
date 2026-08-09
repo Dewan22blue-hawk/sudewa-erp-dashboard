@@ -17,7 +17,7 @@ export default function CreateInvoicePrintPage() {
   const id = router.isReady && typeof router.query.id === 'string' ? Number(router.query.id) : 0;
   const expeditionId = router.isReady && typeof router.query.expeditionId === 'string' ? Number(router.query.expeditionId) : 0;
   const slug = typeof router.query.slug === 'string' ? router.query.slug : '';
-  const [companyName, setCompanyName] = React.useState('WAJIRA JAGRATARA TRANSINDO');
+  const [companyName, setCompanyName] = React.useState('DERALY  ');
   const detailQuery = useDoInvoiceDetail(router.isReady && id > 0 ? id : null);
 
   React.useEffect(() => {

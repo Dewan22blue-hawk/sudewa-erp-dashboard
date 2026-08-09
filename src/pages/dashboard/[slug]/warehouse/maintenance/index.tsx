@@ -26,7 +26,7 @@ export default function MaintenanceListPage() {
 
   const { isLoading: isCompanyLoading } = useCompany();
 
-  // PT Wajira Transindo company ID is 4
+  // PT Deraly ERP Transindo company ID is 4
   const activeCompanyId = 4;
 
   const { page, perPage, search, setPage, setPerPage, updateQuery } = useQueryParamsTable({ defaultPerPage: 25 });
@@ -133,7 +133,7 @@ export default function MaintenanceListPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Maintenance - Wajira Dashboard</title>
+        <title>Maintenance - Deraly ERP Dashboard</title>
       </Head>
 
       <div className="space-y-6">

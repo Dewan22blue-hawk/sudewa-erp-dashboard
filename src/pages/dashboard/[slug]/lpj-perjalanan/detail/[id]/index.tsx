@@ -102,7 +102,7 @@ export default function DetailLPJPerjalananPage() {
         </Card>
 
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold text-gray-800 uppercase">Laporan Target Income Ekspedisi PT Wajira Jagatrara Transindo</p>
+          <p className="text-[11px] font-semibold text-gray-800 uppercase">Laporan Target Income Ekspedisi PT Deraly ERP Jagatrara Transindo</p>
           <LPJDetailTable items={detailRows} />
         </div>
 

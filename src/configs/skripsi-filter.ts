@@ -1,4 +1,4 @@
-export const ACTIVE_COMPANY_KEYWORD = 'morindo';
+export const ACTIVE_COMPANY_KEYWORD = 'deraly';
 
 export const HIDDEN_MENU_LABELS = [
   // Master Data

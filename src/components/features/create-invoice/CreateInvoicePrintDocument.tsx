@@ -12,7 +12,7 @@ interface Props {
   hideControls?: boolean;
 }
 
-const COMPANY_BANK_NAME = 'PT. WAJIRA JAGRATARA TRANSINDO';
+const COMPANY_BANK_NAME = 'PT. DERALY  ';
 const COMPANY_BANK_ACCOUNT = '456-631-1313';
 const COMPANY_CONFIRMATION_NUMBER = '0878-8353-1313';
 

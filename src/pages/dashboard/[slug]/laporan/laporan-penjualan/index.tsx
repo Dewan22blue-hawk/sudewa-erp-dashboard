@@ -59,7 +59,7 @@ export default function LaporanPenjualanPage() {
             : 'Tahun 2026';
 
         csvContent += `"${getReportTitle()}"\n`;
-        csvContent += `"PT WAJIRA JAGRATARA MORINDO"\n`;
+        csvContent += `"PT DERALY  "\n`;
         csvContent += `"${periodText}"\n\n`;
 
         if (activeTab === 'per-nota') {
@@ -180,7 +180,7 @@ export default function LaporanPenjualanPage() {
                                         REKAP PENJUALAN {activeTab.replace('-', ' ')}
                                     </h2>
                                     <p className="text-[13px] font-bold text-gray-900 tracking-wide">
-                                        PT WAJIRA JAGRATARA MORINDO
+                                        PT DERALY
                                     </p>
                                     <p className="text-[13px] font-semibold text-gray-800 opacity-90">
                                         {startDate && endDate

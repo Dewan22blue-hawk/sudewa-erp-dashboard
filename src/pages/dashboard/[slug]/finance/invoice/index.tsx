@@ -27,7 +27,7 @@ export default function FinanceInvoicePage() {
   const [perPage, setPerPage] = useState(25);
   const [orderBy, setOrderBy] = useState('created_at');
   const [orderSort, setOrderSort] = useState<'asc' | 'desc'>('desc');
-  
+
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<DoInvoice | null>(null);
 
@@ -75,7 +75,7 @@ export default function FinanceInvoicePage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Invoice Terbuat - PT Wajira Transindo</title>
+        <title>Invoice Terbuat - PT Deraly ERP Transindo</title>
       </Head>
 
       <div className="space-y-6">

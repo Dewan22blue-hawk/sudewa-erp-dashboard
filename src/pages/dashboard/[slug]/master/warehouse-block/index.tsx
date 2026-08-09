@@ -101,7 +101,7 @@ export default function WarehouseBlockPage() {
   return (
     <>
       <Head>
-        <title>Blok Gudang | Wajira</title>
+        <title>Blok Gudang | Deraly ERP</title>
       </Head>
       <DashboardLayout>
         <div className="space-y-6">

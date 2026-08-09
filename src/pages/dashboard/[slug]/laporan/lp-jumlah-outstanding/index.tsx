@@ -246,7 +246,7 @@ export default function LPJumlahOutstandingPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>Laporan Jumlah Outstanding - Wajira Dashboard</title>
+        <title>Laporan Jumlah Outstanding - Deraly ERP Dashboard</title>
       </Head>
       <div className="space-y-6">
         {/* Header Section */}
@@ -326,7 +326,7 @@ export default function LPJumlahOutstandingPage() {
                     {getPrintTitle()}
                   </h2>
                   <p className="text-[15px] font-bold text-gray-900 tracking-wide">
-                    PT WAJIRA YANOTAMA
+                    PT DERALY
                   </p>
                   <p className="text-[12px] text-gray-600">
                     Tanggal Cetak: {formatDate(new Date())}

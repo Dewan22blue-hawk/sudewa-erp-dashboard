@@ -17,8 +17,8 @@ export default function LaporanStockView({ data }: Props) {
             <div className="flex flex-col items-center justify-center mb-10 relative">
                 {/* Logo */}
                 <Image
-                    src="/wajira-logo.png"
-                    alt="Wajira Logo"
+                    src="/assets/login_banner.png"
+                    alt="Deraly ERP Logo"
                     width={80}
                     height={80}
                     className="absolute left-8 top-0 object-contain"
@@ -26,7 +26,7 @@ export default function LaporanStockView({ data }: Props) {
 
                 <div className="text-center space-y-1">
                     <h2 className="font-bold text-lg">LAPORAN STOCK</h2>
-                    <h3 className="font-bold text-sm uppercase">PT WAJIRA JAGATRARA MORINDO</h3>
+                    <h3 className="font-bold text-sm uppercase">PT DERALY  </h3>
                     <p className="text-xs text-gray-500">Periode: Bulan Berjalan</p>
                 </div>
             </div>

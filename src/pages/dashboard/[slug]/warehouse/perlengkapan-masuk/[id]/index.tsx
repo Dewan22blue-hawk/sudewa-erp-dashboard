@@ -62,7 +62,7 @@ export default function PerlengkapanMasukDetailPage() {
   const transactionId = Number.isFinite(rawId) ? rawId : undefined;
 
   const transactionQuery = useGoodsReceiptEquipmentDetail(transactionId);
-  const cashesQuery = useKas(4); // Wajira Transindo company ID
+  const cashesQuery = useKas(4); // Deraly ERP Transindo company ID
 
   const uploadInvoiceMutation = useUploadGoodsReceiptInvoice();
   const createBillingMutation = useCreateGoodsReceiptBilling();
