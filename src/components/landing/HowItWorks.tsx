@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
 import { Network, Zap, ShieldCheck } from "lucide-react";
 
 const steps = [
@@ -34,28 +33,6 @@ const steps = [
 export default function HowItWorks() {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Track whole section scroll
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start center", "end 80%"]
-  });
-
-  // Calculate neon line height
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
-  // Calculate step specific animations
-  const step1Opacity = useTransform(scrollYProgress, [-0.2, 0], [0.3, 1]);
-  const step1Y = useTransform(scrollYProgress, [-0.2, 0], [40, 0]);
-  const step2Opacity = useTransform(scrollYProgress, [0.13, 0.33], [0.3, 1]);
-  const step2Y = useTransform(scrollYProgress, [0.13, 0.33], [40, 0]);
-  const step3Opacity = useTransform(scrollYProgress, [0.46, 0.66], [0.3, 1]);
-  const step3Y = useTransform(scrollYProgress, [0.46, 0.66], [40, 0]);
-
-  const stepAnimations = [
-    { opacity: step1Opacity, y: step1Y },
-    { opacity: step2Opacity, y: step2Y },
-    { opacity: step3Opacity, y: step3Y },
-  ];
 
   return (
     <section 
@@ -69,17 +46,14 @@ export default function HowItWorks() {
       <div className="max-w-4xl mx-auto px-6 lg:px-12 relative z-20">
         
         <div className="text-center mb-24 lg:mb-40">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+          <h2
             className="text-4xl sm:text-6xl font-black text-white tracking-[-0.03em]"
           >
             Visi Masa Depan. <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-fuchsia-500">
               Satu Kesatuan.
             </span>
-          </motion.h2>
+          </h2>
           <p className="mt-8 text-xl text-slate-400 font-bold max-w-2xl mx-auto">
             Garis waktu bagaimana kami mendefinisikan ulang batas kemustahilan produktivitas operasional.
           </p>
@@ -90,25 +64,21 @@ export default function HowItWorks() {
           <div className="absolute left-[39px] sm:left-[47px] top-0 bottom-0 w-1 bg-slate-800 rounded-full" />
           
           {/* Glowing Animated Scroll Line connecting steps vertically */}
-          <motion.div 
-            style={{ height: lineHeight }}
+          <div
             className="absolute left-[39px] sm:left-[47px] top-0 w-1 bg-gradient-to-b from-blue-500 via-pink-500 to-emerald-500 rounded-full origin-top shadow-[0_0_15px_rgba(59,130,246,0.8)]" 
           />
 
           <div className="flex flex-col gap-24 sm:gap-40">
             {steps.map((step, index) => {
               const Icon = step.icon;
-              const stepOpacity = stepAnimations[index].opacity;
-              const stepY = stepAnimations[index].y;
 
               return (
-                <motion.div 
-                  key={step.id} 
-                  style={{ opacity: stepOpacity, y: stepY }}
+                <div 
+                  key={step.id}
                   className="relative pl-24 sm:pl-32"
                 >
                   {/* Glowing Icon Point */}
-                  <motion.div 
+                  <div 
                      className={`absolute left-4 sm:left-6 -translate-x-1/2 top-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0a0a0a] border-4 border-slate-800 flex items-center justify-center z-10 
                                 transition-all duration-700 ease-out`}
                   >
@@ -117,7 +87,7 @@ export default function HowItWorks() {
                       <div className={`absolute inset-0 rounded-full blur-md opacity-0 transition-opacity duration-300`} />
                       <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${step.color} relative z-20`} />
                     </div>
-                  </motion.div>
+                  </div>
 
                   <div className="pt-2 sm:pt-3">
                     <h3 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">{step.title}</h3>
@@ -125,7 +95,7 @@ export default function HowItWorks() {
                       {step.desc}
                     </p>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 
 const placeholderLogos = [
   "Acme Corp", "Lumina SaaS", "Nexus Logistics", "Velocity ERP", "Quantum Finance",
@@ -18,9 +17,7 @@ export default function TrustedByMarquee() {
       </p>
 
       <div className="flex w-fit overflow-hidden">
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
+        <div
           className="flex flex-nowrap items-center gap-10 sm:gap-16 md:gap-32 px-6 sm:px-8 min-w-max"
         >
           {placeholderLogos.map((logo, idx) => (
@@ -31,7 +28,7 @@ export default function TrustedByMarquee() {
               {logo}
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

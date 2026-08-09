@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 
 const testimonials = [
   {
@@ -43,15 +42,12 @@ export default function Testimonials() {
       </div>
 
       <div className="flex w-fit overflow-hidden py-10">
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, ease: "linear", duration: 40 }}
+        <div
           className="flex flex-nowrap items-center gap-6 sm:gap-10 px-8 min-w-max"
         >
           {displayData.map((testi, idx) => (
-            <motion.div 
+            <div 
               key={idx}
-              whileHover={{ scale: 1.05, y: -10 }}
               className={`w-[320px] sm:w-[400px] shrink-0 p-8 sm:p-10 rounded-[3rem] ${testi.color} shadow-clay-sm border-2 flex flex-col justify-between min-h-[300px] cursor-pointer`}
             >
               <p className="text-lg sm:text-xl font-bold leading-relaxed mb-8 opacity-80">&quot;{testi.story}&quot;</p>
@@ -65,9 +61,9 @@ export default function Testimonials() {
                   <p className="text-sm sm:text-base font-bold opacity-60">{testi.role}</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,42 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sparkles, Box, Zap, User } from "lucide-react";
 
 export default function Navbar() {
-  const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious();
-    
-    if (previous !== undefined) {
-      if (latest > previous && latest > 120) {
-        setHidden(true); 
-      } else if (latest < previous) {
-        setHidden(false); 
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 120) {
+        setHidden(true);
+      } else if (currentScrollY < lastScrollY) {
+        setHidden(false);
       }
-    }
-    
-    setScrolled(latest > 30);
-  });
+      setScrolled(currentScrollY > 30);
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
       {/* DESKTOP NAVBAR (Hidden on mobile) */}
-      <motion.nav
-        variants={{
-          visible: { y: 0, opacity: 1 },
-          hidden: { y: "-100%", opacity: 0 }
-        }}
-        animate={hidden ? "hidden" : "visible"}
-        transition={{ type: "spring", stiffness: 120, damping: 20 }}
+      <nav
         className={`hidden md:flex fixed top-0 left-0 right-0 z-[999] justify-center w-full px-4 transition-all duration-300 ${
           scrolled ? "pt-3" : "pt-8"
-        }`}
+        } ${hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}`}
       >
         <div 
           className={`flex items-center justify-between w-full max-w-5xl px-4 py-2 transition-all duration-500 rounded-full ${
@@ -78,10 +72,10 @@ export default function Navbar() {
             </Link>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* MOBILE TOP FLOATING LOGO (Sticky Minimal) */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-[990] flex p-4 sm:p-6 pointer-events-none transition-transform duration-500 ease-out" style={{ transform: scrolled ? 'translateY(-100%)' : 'translateY(0)' }}>
+      <div className="md:hidden fixed top-0 left-0 right-0 z-[990] flex p-4 sm:p-6 pointer-events-none transition-transform duration-500 ease-out">
         <div className="flex items-center gap-2 pointer-events-auto bg-white/80 backdrop-blur-xl px-4 py-3 rounded-full shadow-clay-sm border-2 border-white/50">
           <img src="/assets/login_banner.png" alt="Logo" className="w-8 h-8 rounded-lg object-contain drop-shadow" onError={(e) => e.currentTarget.src = '/wajira-logo.png'} />
           <span className="font-extrabold tracking-tight text-slate-900 text-lg">Deraly.id</span>
@@ -89,14 +83,8 @@ export default function Navbar() {
       </div>
 
       {/* MOBILE BOTTOM DOCK (Floating Tudder Bar) */}
-      <motion.div 
-        variants={{
-          visible: { y: 0, opacity: 1, scale: 1 },
-          hidden: { y: "150%", opacity: 0, scale: 0.85 }
-        }}
-        animate={hidden ? "hidden" : "visible"}
-        transition={{ type: "spring", stiffness: 200, damping: 25 }}
-        className="md:hidden fixed bottom-6 left-4 right-4 z-[999] flex justify-center pb-safe"
+      <div 
+        className={`md:hidden fixed bottom-6 left-4 right-4 z-[999] flex justify-center pb-safe transition-all duration-300 ${hidden ? "translate-y-[150%] opacity-0 scale-75" : "translate-y-0 opacity-100 scale-100"}`}
       >
         <div className="bg-white/80 backdrop-blur-3xl px-8 py-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15),_inset_0_2px_4px_rgba(255,255,255,1)] border-2 border-white/60 flex items-center justify-between w-full max-w-sm">
           
@@ -123,7 +111,7 @@ export default function Navbar() {
           </Link>
           
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }

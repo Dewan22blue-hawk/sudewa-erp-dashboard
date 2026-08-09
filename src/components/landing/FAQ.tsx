@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 const faqs = [
@@ -43,7 +42,7 @@ export default function FAQ() {
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <motion.div 
+              <div 
                 key={index}
                 className={`overflow-hidden rounded-3xl border-2 transition-colors duration-300 ${isOpen ? 'bg-white border-blue-500/20 shadow-clay-sm' : 'bg-transparent border-slate-200 hover:border-slate-300 hover:bg-white/50'}`}
               >
@@ -54,32 +53,23 @@ export default function FAQ() {
                   <span className={`text-lg sm:text-xl font-extrabold tracking-tight transition-colors duration-300 ${isOpen ? 'text-blue-600' : 'text-slate-900'}`}>
                     {faq.question}
                   </span>
-                  <motion.div 
-                    initial={false}
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                  <div
                     className="flex-shrink-0 ml-4 rounded-full bg-slate-100 p-2 text-slate-500"
                   >
                     <ChevronDown size={20} />
-                  </motion.div>
+                  </div>
                 </button>
-                <AnimatePresence initial={false}>
                   {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                    <div
                     >
                       <div className="px-6 sm:px-8 pb-6 sm:pb-8 pt-0">
                         <p className="text-lg text-slate-500 leading-relaxed font-semibold">
                           {faq.answer}
                         </p>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
-              </motion.div>
+              </div>
             );
           })}
         </div>
