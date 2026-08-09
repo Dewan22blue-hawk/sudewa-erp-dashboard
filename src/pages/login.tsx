@@ -146,8 +146,8 @@ export default function LoginPage() {
               </Button>
             </div>
           </form>
-          </div>
         </div>
+      </div>
 
       {/* Right Side - Premium Modern Gradient & Banner */}
       <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center relative overflow-hidden bg-slate-50">
@@ -155,22 +155,23 @@ export default function LoginPage() {
         <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-rose-400/40 blur-[120px] mix-blend-multiply opacity-80" />
         <div className="absolute -bottom-[10%] -right-[10%] w-[70%] h-[70%] rounded-full bg-orange-400/30 blur-[120px] mix-blend-multiply opacity-80" />
         <div className="absolute top-[30%] left-[20%] w-[50%] h-[50%] rounded-full bg-indigo-400/20 blur-[100px] mix-blend-multiply opacity-70" />
-        
+
         {/* Subtle grid pattern overlay for texture */}
         <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         {/* Centered Banner with modern floating effect */}
         <div className="relative z-10 w-[75%] max-w-[550px] aspect-square animate-fade-in transition-all duration-700 ease-in-out hover:scale-[1.02] hover:-translate-y-2">
-          <Image 
-            src="/assets/login_banner.png" 
-            alt="Login Banner" 
-            fill 
-            className="object-contain drop-shadow-[0_20px_50px_rgba(225,29,72,0.15)]" 
-            priority 
-            sizes="(max-width: 1024px) 100vw, 50vw" 
+          <Image
+            width={80}
+            height={80}
+            src="/assets/login_banner.png"
+            alt="Login Banner"
+            className="object-contain drop-shadow-[0_20px_50px_rgba(225,29,72,0.15)]"
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
           />
         </div>
       </div>
-      </div>
+    </div>
   );
 }

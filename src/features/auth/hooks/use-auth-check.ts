@@ -29,7 +29,8 @@
 import { useCallback, useEffect } from 'react';
 import { NextRouter } from 'next/router';
 import { getAccessToken, checkTokenValidity, isTokenCheckThrottled, markTokenCheckAttempt, removeAccessToken } from '@/lib/auth/token';
-import { clearStoredCompanyId, clearStoredPermissions } from '@/lib/session/storage';
+import { clearStoredCompanyId, clearStoredPermissions, getStoredPermissions } from '@/lib/session/storage';
+import { QueryClient } from '@tanstack/react-query';
 
 /**
  * Public/non-authenticated pages that should skip token validation
@@ -70,9 +71,11 @@ const shouldValidateToken = (pathname: string): boolean => {
  * Hook that performs proactive token validation on route changes
  *
  * @param router - Next.js router instance from useRouter()
+ * @param queryClient - TanStack QueryClient instance
  * @returns void
  */
-export const useAuthCheck = (router: NextRouter) => {
+export const useAuthCheck = (router: NextRouter, queryClient: QueryClient) => {
+
   const validateTokenOnRouteChange = useCallback(async () => {
     // Determine if we should validate the token for this route
     if (!shouldValidateToken(router.pathname)) {
@@ -80,7 +83,8 @@ export const useAuthCheck = (router: NextRouter) => {
     }
 
     // Check if we're throttled (skip if less than 2 minutes have passed)
-    if (isTokenCheckThrottled()) {
+    const hasStored = getStoredPermissions().length > 0;
+    if (isTokenCheckThrottled() && hasStored) {
       console.debug('[useAuthCheck] Token check throttled - skipping validation');
       return;
     }
@@ -99,6 +103,7 @@ export const useAuthCheck = (router: NextRouter) => {
         removeAccessToken();
         clearStoredCompanyId();
         clearStoredPermissions();
+        queryClient.removeQueries({ queryKey: ['auth'] });
         if (router.pathname !== '/login') {
           await router.push('/login');
         }
@@ -109,7 +114,7 @@ export const useAuthCheck = (router: NextRouter) => {
       // Log the error but don't interrupt the app flow
       console.warn('[useAuthCheck] Error during token validation:', error?.message || error);
     }
-  }, [router]);
+  }, [router, queryClient]);
 
   useEffect(() => {
     // Run once on app init (except public routes), then continue on route changes.

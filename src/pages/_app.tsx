@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }))
   const router = useRouter()
 
-  useAuthCheck(router)
+  useAuthCheck(router, queryClient)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

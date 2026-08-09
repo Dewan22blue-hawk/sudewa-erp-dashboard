@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Laugh, Gamepad2, Mic } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 // Massive Type inspired by Honk
 const AnimatedHeading = ({ text, delay = 0, colorClass = "text-slate-900" }: { text: string; delay?: number; colorClass?: string }) => (
@@ -15,12 +16,10 @@ const AnimatedHeading = ({ text, delay = 0, colorClass = "text-slate-900" }: { t
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  
 
-  
   return (
-    <section 
-      ref={containerRef} 
+    <section
+      ref={containerRef}
       className="relative min-h-[140vh] bg-[#FAFAFA] flex flex-col items-center justify-start pt-32 sm:pt-40 overflow-hidden"
     >
       {/* Amie Pastel Gradients combined with Honk Electric Blue */}
@@ -79,10 +78,12 @@ export default function HeroSection() {
           </div>
 
           <div className="w-full aspect-[4/3] sm:aspect-[16/9] bg-slate-100 rounded-3xl sm:rounded-[2.5rem] overflow-hidden shadow-inner relative">
-            <img 
-              src="/wajira-footer-design.png" 
-              alt="Dashboard Preview" 
-              className="w-full h-full object-cover relative z-10 transition-transform duration-700 hover:scale-105"
+            <Image
+              width={1600}
+              height={900}
+              src="/wajira-footer-design.png"
+              alt="Wajira Footer Design"
+              className="w-full h-full object-center relative z-10 transition-transform duration-700 hover:scale-105"
             />
           </div>
         </div>

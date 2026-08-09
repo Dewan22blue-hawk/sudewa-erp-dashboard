@@ -68,7 +68,7 @@ export function Sidebar() {
           {isDesktopCollapsed ? (
             <div className="flex items-center justify-center w-full">
               <div className="relative w-8 h-8">
-                <Image src="/assets/login_banner.png" alt="Logo" fill className="object-contain" sizes="32px" />
+                <Image width={80} height={80} src="/assets/login_banner.png" alt="Logo" className="object-contain" sizes="32px" />
               </div>
             </div>
           ) : (

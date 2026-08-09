@@ -4,11 +4,14 @@ import { useState } from 'react';
 import { AuthService } from '../services/auth.service';
 import { LoginRequest, AuthResponse } from '../types/auth.types';
 import { setAccessToken } from '@/lib/auth/token';
+import { setStoredPermissions } from '@/lib/session/storage';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const login = async (credentials: LoginRequest): Promise<AuthResponse | undefined> => {
     setIsLoading(true);
@@ -19,6 +22,13 @@ export const useLogin = () => {
 
       if (response.data && response.data.access_token) {
         setAccessToken(response.data.access_token);
+        try {
+          const permissions = await AuthService.getPermissions();
+          setStoredPermissions(permissions);
+          queryClient.setQueryData(['auth', 'permissions'], permissions);
+        } catch (permErr) {
+          console.error('Failed to load permissions during login:', permErr);
+        }
       }
 
       return response;

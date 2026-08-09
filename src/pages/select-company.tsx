@@ -100,7 +100,7 @@ export default function SelectCompanyPage() {
           {/* LOGO */}
           <div className="flex justify-center mb-8">
             <div className="relative w-[100px] h-[100px]">
-              <Image src="/assets/login_banner.png" alt="Deraly ERP Logo" fill className="object-contain drop-shadow-sm" priority />
+              <Image width={80} height={80} src="/assets/login_banner.png" alt="Deraly ERP Logo" className="object-contain drop-shadow-sm" priority />
             </div>
           </div>
 
