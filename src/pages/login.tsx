@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useLogin } from '@/features/auth/hooks/use-login';
-import { useCompany } from '@/contexts/CompanyContext';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { getAccessToken, checkTokenValidity, removeAccessToken } from '@/lib/auth/token';
 import { clearStoredCompanyId, clearStoredPermissions } from '@/lib/session/storage';
@@ -13,7 +12,6 @@ import { LoadingState } from '@/components/ui/loading-state';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setCompanyId } = useCompany();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -54,8 +52,7 @@ export default function LoginPage() {
       const response = await login({ login: userId, email: userId, password });
       if (response?.status) {
         // Successfully logged in
-        setCompanyId('1');
-        router.push('/dashboard/1');
+        router.push('/select-company');
       }
     } catch (err) {
       // Error is handled by useLogin and accessible via `error` state
